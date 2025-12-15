@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { 
   X, 
   TrendingDown, 
-  TrendingUp, 
   BarChart3, 
   Target, 
   AlertTriangle,
