@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Moon, Sun, AlertCircle, Settings } from 'lucide-react';
 import { ExamSelector } from './components/ExamSelector';
 import { ExamView } from './components/ExamView';
