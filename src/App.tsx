@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Moon, Sun, AlertCircle, Settings } from 'lucide-react';
 import { ExamSelector } from './components/ExamSelector';
 import { ExamView } from './components/ExamView';
 import { ImportExamModal } from './components/ImportExamModal';
 import { VocabVault } from './components/VocabVault';
 import { AdminPage } from './components/AdminPage';
-import { Exam, UserAnswer, VocabWord, Question } from './types';
+import { Exam, UserAnswer, VocabWord } from './types';
 import { getAllExams, getExamById, createExam, parseExamText, deleteExam } from './services/examService';
 import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/vocabService';
 import { getExplanation } from './services/openaiService';
@@ -33,7 +33,7 @@ function App() {
   const [useFirebase] = useState(isFirebaseConfigured());
   const [openAIConfigured] = useState(() => {
     const key = import.meta.env.VITE_OPENAI_API_KEY;
-    return key && key !== 'your-openai-api-key-here' && key.startsWith('sk-');
+    return Boolean(key && key !== 'your-openai-api-key-here' && key.startsWith('sk-'));
   });
 
   // Exam states

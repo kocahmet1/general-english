@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { ChevronUp, BarChart3, RefreshCw } from 'lucide-react';
 import { Exam, UserAnswer } from '../types';
 import { QuestionCard } from './QuestionCard';
@@ -12,14 +12,14 @@ interface ExamViewProps {
   vocabWordsInVault: string[];
 }
 
-export const ExamView: React.FC<ExamViewProps> = ({
+export const ExamView = ({
   exam,
   userAnswers,
   onAnswer,
   onAddToVault,
   onResetExam,
   vocabWordsInVault
-}) => {
+}: ExamViewProps) => {
   const topRef = useRef<HTMLDivElement>(null);
   
   // Calculate stats
@@ -104,7 +104,7 @@ export const ExamView: React.FC<ExamViewProps> = ({
             <div key={difficulty} className="difficulty-section">
               <h2 className="difficulty-header">{difficulty}</h2>
               <div className="questions-grid">
-                {questions.map((question, idx) => (
+                {questions.map((question) => (
                   <QuestionCard
                     key={question.id}
                     question={question}

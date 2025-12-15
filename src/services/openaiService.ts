@@ -87,8 +87,6 @@ Açıklamanı öğretici ve anlaşılır bir şekilde yaz.`;
 
 // Extract vocabulary words from a question (for vocab vault feature)
 export function extractVocabularyWords(question: Question): string[] {
-  const words: string[] = [];
-  
   // Extract words from question text (words in blanks or key vocabulary)
   const questionWords = question.questionText
     .replace(/_+/g, '') // Remove blanks

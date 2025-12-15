@@ -8,7 +8,7 @@ const VOCAB_KEY = 'english_master_vocab';
 // Check if Firebase is configured
 export function isFirebaseConfigured(): boolean {
   const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-  return apiKey && apiKey !== 'your-api-key' && apiKey !== 'your-api-key-here';
+  return Boolean(apiKey && apiKey !== 'your-api-key' && apiKey !== 'your-api-key-here');
 }
 
 // ===== EXAM FUNCTIONS =====
