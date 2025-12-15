@@ -1,11 +1,12 @@
-﻿import { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Moon, Sun, AlertCircle, Settings } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { BookOpen, Moon, Sun, AlertCircle, Settings, BarChart3 } from 'lucide-react';
 import { ExamSelector } from './components/ExamSelector';
 import { ExamView } from './components/ExamView';
 import { ImportExamModal } from './components/ImportExamModal';
 import { VocabVault } from './components/VocabVault';
 import { AdminPage } from './components/AdminPage';
-import { Exam, UserAnswer, VocabWord } from './types';
+import { PerformanceTracker } from './components/PerformanceTracker';
+import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory } from './types';
 import { getAllExams, getExamById, createExam, parseExamText, deleteExam } from './services/examService';
 import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/vocabService';
 import { getExplanation } from './services/openaiService';
@@ -17,7 +18,13 @@ import {
   deleteLocalExam,
   getLocalVocabWords,
   addLocalVocabWord,
-  removeLocalVocabWord
+  removeLocalVocabWord,
+  addMistakeRecord,
+  updateAnswerStats,
+  getPerformanceStats,
+  getRecentMistakes,
+  getMistakesByCategory,
+  clearTrackingData
 } from './services/localStorageService';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from './data/sampleExam';
 import './App.css';
@@ -48,9 +55,21 @@ function App() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showVocabVault, setShowVocabVault] = useState(false);
   const [showAdminPage, setShowAdminPage] = useState(false);
+  const [showPerformanceTracker, setShowPerformanceTracker] = useState(false);
 
   // Vocab vault state
   const [vocabWords, setVocabWords] = useState<VocabWord[]>([]);
+
+  // Performance tracking state
+  const [performanceStats, setPerformanceStats] = useState<PerformanceStats>({
+    totalAnswered: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0,
+    categoryBreakdown: [],
+    weakestAreas: [],
+    strongestAreas: []
+  });
+  const [recentMistakes, setRecentMistakes] = useState<MistakeRecord[]>([]);
 
   // Apply theme
   useEffect(() => {
@@ -62,7 +81,15 @@ function App() {
   useEffect(() => {
     loadExams();
     loadVocabWords();
+    loadPerformanceData();
   }, []);
+
+  const loadPerformanceData = () => {
+    const stats = getPerformanceStats();
+    const recent = getRecentMistakes(7);
+    setPerformanceStats(stats);
+    setRecentMistakes(recent);
+  };
 
   // Load selected exam
   useEffect(() => {
@@ -161,6 +188,9 @@ function App() {
 
     const isCorrect = selectedAnswer === question.correctAnswer;
 
+    // Update answer statistics
+    updateAnswerStats(isCorrect);
+
     // Set initial answer state
     setUserAnswers(prev => {
       const newAnswers = new Map(prev);
@@ -176,10 +206,25 @@ function App() {
       return newAnswers;
     });
 
-    // If incorrect and OpenAI is configured, get explanation
+    // If incorrect and OpenAI is configured, get explanation and track mistake
     if (!isCorrect && openAIConfigured) {
       try {
-        const explanation = await getExplanation(question, selectedAnswer, question.correctAnswer);
+        const response = await getExplanation(question, selectedAnswer, question.correctAnswer);
+        
+        // Track the mistake with the grammar category
+        addMistakeRecord(
+          currentExam.id,
+          questionId,
+          question.questionText,
+          selectedAnswer,
+          question.correctAnswer,
+          response.grammarCategory,
+          question.difficulty
+        );
+        
+        // Reload performance data after tracking mistake
+        loadPerformanceData();
+        
         setUserAnswers(prev => {
           const newAnswers = new Map(prev);
           const currentAnswer = newAnswers.get(questionId);
@@ -187,7 +232,8 @@ function App() {
             newAnswers.set(questionId, {
               ...currentAnswer,
               isLoading: false,
-              explanation
+              explanation: response.explanation,
+              grammarCategory: response.grammarCategory
             });
           }
           return newAnswers;
@@ -207,6 +253,21 @@ function App() {
           return newAnswers;
         });
       }
+    } else if (!isCorrect && !openAIConfigured) {
+      // Track mistake even without OpenAI, using 'other' as category
+      addMistakeRecord(
+        currentExam.id,
+        questionId,
+        question.questionText,
+        selectedAnswer,
+        question.correctAnswer,
+        'other',
+        question.difficulty
+      );
+      loadPerformanceData();
+    } else {
+      // Correct answer - just reload stats
+      loadPerformanceData();
     }
   }, [currentExam, openAIConfigured]);
 
@@ -287,6 +348,17 @@ function App() {
     setUserAnswers(new Map());
   };
 
+  const handleClearTrackingData = () => {
+    if (confirm('Tüm performans verilerini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+      clearTrackingData();
+      loadPerformanceData();
+    }
+  };
+
+  const handleGetMistakesByCategory = (category: GrammarCategory): MistakeRecord[] => {
+    return getMistakesByCategory(category);
+  };
+
   const handleLoadSampleExam = async () => {
     try {
       let examId: string | null;
@@ -350,6 +422,18 @@ function App() {
         </div>
         
         <div className="header-right">
+          <button 
+            className="performance-btn"
+            onClick={() => setShowPerformanceTracker(true)}
+            title="Performans Analizi"
+          >
+            <BarChart3 size={20} />
+            <span>Performans</span>
+            {performanceStats.totalIncorrect > 0 && (
+              <span className="badge warning">{performanceStats.totalIncorrect}</span>
+            )}
+          </button>
+          
           <button 
             className="vocab-vault-btn"
             onClick={() => setShowVocabVault(true)}
@@ -455,7 +539,7 @@ function App() {
               ) : (
                 <div className="empty-state">
                   <BookOpen size={64} />
-                  <h2>Hoş Geldiniz!</h2>
+                  <h2>Hoşgeldin Ali Kaan</h2>
                   <p>İngilizce seviyenizi test etmek için sol taraftan bir sınav seçin.</p>
                   {exams.length > 0 ? (
                     <button onClick={() => setSelectedExamId(exams[0].id)}>
@@ -491,6 +575,16 @@ function App() {
         onClose={() => setShowVocabVault(false)}
         vocabWords={vocabWords}
         onRemoveWord={handleRemoveFromVault}
+      />
+
+      {/* Performance Tracker Panel */}
+      <PerformanceTracker
+        isOpen={showPerformanceTracker}
+        onClose={() => setShowPerformanceTracker(false)}
+        stats={performanceStats}
+        recentMistakes={recentMistakes}
+        onClearData={handleClearTrackingData}
+        getMistakesByCategory={handleGetMistakesByCategory}
       />
     </div>
   );

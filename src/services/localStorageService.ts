@@ -1,9 +1,20 @@
 // Local Storage Service - Fallback when Firebase is not configured
-import { Exam, Question, VocabWord } from '../types';
+import { 
+  Exam, 
+  Question, 
+  VocabWord, 
+  MistakeRecord, 
+  GrammarCategory,
+  CategoryStats,
+  PerformanceStats,
+  GRAMMAR_CATEGORY_LABELS
+} from '../types';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from '../data/sampleExam';
 
 const EXAMS_KEY = 'english_master_exams';
 const VOCAB_KEY = 'english_master_vocab';
+const MISTAKES_KEY = 'english_master_mistakes';
+const ANSWER_STATS_KEY = 'english_master_answer_stats';
 
 // Check if Firebase is configured
 export function isFirebaseConfigured(): boolean {
@@ -172,6 +183,196 @@ export function removeLocalVocabWord(wordId: string): boolean {
     console.error('Error removing local vocab word:', error);
     return false;
   }
+}
+
+// ===== MISTAKE TRACKING FUNCTIONS =====
+
+interface AnswerStats {
+  totalAnswered: number;
+  totalCorrect: number;
+  totalIncorrect: number;
+}
+
+// Get all mistake records
+export function getMistakeRecords(): MistakeRecord[] {
+  try {
+    const stored = localStorage.getItem(MISTAKES_KEY);
+    if (!stored) return [];
+    
+    const mistakes: MistakeRecord[] = JSON.parse(stored);
+    return mistakes.map(m => ({
+      ...m,
+      timestamp: new Date(m.timestamp)
+    }));
+  } catch (error) {
+    console.error('Error reading mistake records:', error);
+    return [];
+  }
+}
+
+// Add a new mistake record
+export function addMistakeRecord(
+  examId: string,
+  questionId: number,
+  questionText: string,
+  selectedAnswer: string,
+  correctAnswer: string,
+  grammarCategory: GrammarCategory,
+  difficulty?: string
+): string | null {
+  try {
+    const stored = localStorage.getItem(MISTAKES_KEY);
+    const mistakes: MistakeRecord[] = stored ? JSON.parse(stored) : [];
+    
+    const newMistake: MistakeRecord = {
+      id: `mistake_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      examId,
+      questionId,
+      questionText,
+      selectedAnswer,
+      correctAnswer,
+      grammarCategory,
+      difficulty,
+      timestamp: new Date()
+    };
+    
+    mistakes.unshift(newMistake);
+    localStorage.setItem(MISTAKES_KEY, JSON.stringify(mistakes));
+    
+    return newMistake.id;
+  } catch (error) {
+    console.error('Error adding mistake record:', error);
+    return null;
+  }
+}
+
+// Get answer statistics
+export function getAnswerStats(): AnswerStats {
+  try {
+    const stored = localStorage.getItem(ANSWER_STATS_KEY);
+    if (!stored) {
+      return { totalAnswered: 0, totalCorrect: 0, totalIncorrect: 0 };
+    }
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Error reading answer stats:', error);
+    return { totalAnswered: 0, totalCorrect: 0, totalIncorrect: 0 };
+  }
+}
+
+// Update answer statistics
+export function updateAnswerStats(isCorrect: boolean): void {
+  try {
+    const stats = getAnswerStats();
+    stats.totalAnswered += 1;
+    if (isCorrect) {
+      stats.totalCorrect += 1;
+    } else {
+      stats.totalIncorrect += 1;
+    }
+    localStorage.setItem(ANSWER_STATS_KEY, JSON.stringify(stats));
+  } catch (error) {
+    console.error('Error updating answer stats:', error);
+  }
+}
+
+// Get comprehensive performance statistics
+export function getPerformanceStats(): PerformanceStats {
+  try {
+    const mistakes = getMistakeRecords();
+    const answerStats = getAnswerStats();
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    // Calculate category breakdown
+    const categoryMap = new Map<GrammarCategory, CategoryStats>();
+    
+    // Initialize all categories
+    const allCategories = Object.keys(GRAMMAR_CATEGORY_LABELS) as GrammarCategory[];
+    allCategories.forEach(cat => {
+      categoryMap.set(cat, {
+        category: cat,
+        totalMistakes: 0,
+        recentMistakes: 0,
+        lastMistake: undefined
+      });
+    });
+    
+    // Count mistakes per category
+    mistakes.forEach(mistake => {
+      const catStats = categoryMap.get(mistake.grammarCategory);
+      if (catStats) {
+        catStats.totalMistakes += 1;
+        
+        const mistakeDate = new Date(mistake.timestamp);
+        if (mistakeDate >= sevenDaysAgo) {
+          catStats.recentMistakes += 1;
+        }
+        
+        if (!catStats.lastMistake || mistakeDate > catStats.lastMistake) {
+          catStats.lastMistake = mistakeDate;
+        }
+      }
+    });
+    
+    const categoryBreakdown = Array.from(categoryMap.values())
+      .filter(c => c.totalMistakes > 0)
+      .sort((a, b) => b.totalMistakes - a.totalMistakes);
+    
+    // Determine weakest areas (most mistakes)
+    const weakestAreas = categoryBreakdown
+      .slice(0, 5)
+      .map(c => c.category);
+    
+    // Determine strongest areas (categories answered but with fewest mistakes)
+    // For simplicity, we'll consider categories with mistakes but lowest count
+    const strongestAreas = categoryBreakdown
+      .slice(-5)
+      .reverse()
+      .map(c => c.category);
+    
+    return {
+      totalAnswered: answerStats.totalAnswered,
+      totalCorrect: answerStats.totalCorrect,
+      totalIncorrect: answerStats.totalIncorrect,
+      categoryBreakdown,
+      weakestAreas,
+      strongestAreas
+    };
+  } catch (error) {
+    console.error('Error calculating performance stats:', error);
+    return {
+      totalAnswered: 0,
+      totalCorrect: 0,
+      totalIncorrect: 0,
+      categoryBreakdown: [],
+      weakestAreas: [],
+      strongestAreas: []
+    };
+  }
+}
+
+// Clear all tracking data
+export function clearTrackingData(): void {
+  try {
+    localStorage.removeItem(MISTAKES_KEY);
+    localStorage.removeItem(ANSWER_STATS_KEY);
+  } catch (error) {
+    console.error('Error clearing tracking data:', error);
+  }
+}
+
+// Get mistakes by category
+export function getMistakesByCategory(category: GrammarCategory): MistakeRecord[] {
+  const mistakes = getMistakeRecords();
+  return mistakes.filter(m => m.grammarCategory === category);
+}
+
+// Get recent mistakes (last N days)
+export function getRecentMistakes(days: number = 7): MistakeRecord[] {
+  const mistakes = getMistakeRecords();
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  return mistakes.filter(m => new Date(m.timestamp) >= cutoff);
 }
 
 
