@@ -887,8 +887,7 @@ function App() {
                   <div className="welcome-hero">
                     <div className="hero-glow"></div>
                     <BookOpen size={56} className="hero-icon" />
-                    <h1>Hoşgeldin Ali Kaan</h1>
-                    <p>IELTS başarına giden yolda seninle birlikteyiz. Hangi becerini geliştirmek istersin?</p>
+                    
                   </div>
 
                   <div className="skill-cards-grid">
