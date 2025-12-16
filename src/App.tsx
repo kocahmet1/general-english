@@ -1,15 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Moon, Sun, AlertCircle, Settings, BarChart3 } from 'lucide-react';
+import { BookOpen, Moon, Sun, AlertCircle, Settings, BarChart3, PenLine, FileText, Mic, Headphones } from 'lucide-react';
 import { ExamSelector } from './components/ExamSelector';
 import { ExamView } from './components/ExamView';
 import { ImportExamModal } from './components/ImportExamModal';
 import { VocabVault } from './components/VocabVault';
 import { AdminPage } from './components/AdminPage';
 import { PerformanceTracker } from './components/PerformanceTracker';
-import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory } from './types';
+import { WritingPractice } from './components/WritingPractice';
+import { ReadingComprehension } from './components/ReadingComprehension';
+import { SpeakingPractice } from './components/SpeakingPractice';
+import { ListeningPractice } from './components/ListeningPractice';
+import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory, WritingSubmission, WritingPrompt, WritingFeedback, ReadingProgress, ReadingStats, ReadingQuestionType, ListeningProgress, ListeningStats, ListeningQuestionType, IELTSListeningSection } from './types';
 import { getAllExams, getExamById, createExam, parseExamText, deleteExam } from './services/examService';
 import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/vocabService';
-import { getExplanation } from './services/openaiService';
+import { getExplanation, getWritingFeedback } from './services/openaiService';
+import { sampleReadingPassages } from './data/readingPassages';
+import { listeningTests } from './data/listeningQuestions';
 import {
   isFirebaseConfigured,
   getLocalExams,
@@ -24,7 +30,24 @@ import {
   getPerformanceStats,
   getRecentMistakes,
   getMistakesByCategory,
-  clearTrackingData
+  clearTrackingData,
+  getWritingSubmissions,
+  saveWritingSubmission,
+  updateWritingSubmission,
+  deleteWritingSubmission,
+  getWritingPrompts,
+  getReadingProgress,
+  saveReadingProgress,
+  deleteReadingProgress,
+  getReadingStats,
+  updateReadingStats,
+  getCompletedPassageIds,
+  getListeningProgress,
+  saveListeningProgress,
+  deleteListeningProgress,
+  getListeningStats,
+  updateListeningStats,
+  getCompletedListeningTestIds
 } from './services/localStorageService';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from './data/sampleExam';
 import './App.css';
@@ -56,9 +79,25 @@ function App() {
   const [showVocabVault, setShowVocabVault] = useState(false);
   const [showAdminPage, setShowAdminPage] = useState(false);
   const [showPerformanceTracker, setShowPerformanceTracker] = useState(false);
+  const [showWritingPractice, setShowWritingPractice] = useState(false);
+  const [showReadingComprehension, setShowReadingComprehension] = useState(false);
+  const [showSpeakingPractice, setShowSpeakingPractice] = useState(false);
+  const [showListeningPractice, setShowListeningPractice] = useState(false);
 
   // Vocab vault state
   const [vocabWords, setVocabWords] = useState<VocabWord[]>([]);
+
+  // Writing practice state
+  const [writingSubmissions, setWritingSubmissions] = useState<WritingSubmission[]>([]);
+  const [writingPrompts] = useState<WritingPrompt[]>(getWritingPrompts());
+
+  // Reading comprehension state
+  const [completedPassageIds, setCompletedPassageIds] = useState<string[]>([]);
+  const [readingStats, setReadingStats] = useState<ReadingStats>(getReadingStats());
+
+  // Listening practice state
+  const [completedListeningTestIds, setCompletedListeningTestIds] = useState<string[]>([]);
+  const [listeningStats, setListeningStats] = useState<ListeningStats>(getListeningStats());
 
   // Performance tracking state
   const [performanceStats, setPerformanceStats] = useState<PerformanceStats>({
@@ -82,6 +121,9 @@ function App() {
     loadExams();
     loadVocabWords();
     loadPerformanceData();
+    loadWritingSubmissions();
+    loadReadingData();
+    loadListeningData();
   }, []);
 
   const loadPerformanceData = () => {
@@ -326,6 +368,25 @@ function App() {
     }
   };
 
+  // Generic handler for adding words to vault from any source (reading, listening, etc.)
+  const handleAddToVaultGeneric = async (word: string, questionContext: string, sourceId: string, questionId: number) => {
+    try {
+      let wordId: string | null;
+      
+      if (useFirebase) {
+        wordId = await addVocabWord(word, questionContext, sourceId, questionId);
+      } else {
+        wordId = addLocalVocabWord(word, questionContext, sourceId, questionId);
+      }
+      
+      if (wordId) {
+        await loadVocabWords();
+      }
+    } catch (error) {
+      console.error('Failed to add word to vault:', error);
+    }
+  };
+
   const handleRemoveFromVault = async (wordId: string) => {
     try {
       let success: boolean;
@@ -357,6 +418,236 @@ function App() {
 
   const handleGetMistakesByCategory = (category: GrammarCategory): MistakeRecord[] => {
     return getMistakesByCategory(category);
+  };
+
+  // Writing Practice Functions
+  const loadWritingSubmissions = () => {
+    const submissions = getWritingSubmissions();
+    setWritingSubmissions(submissions);
+  };
+
+  const handleSubmitWriting = async (
+    text: string,
+    promptId?: string,
+    promptTitle?: string
+  ): Promise<WritingFeedback | null> => {
+    // Calculate word count
+    const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+    // Save submission first (without feedback)
+    const submissionId = saveWritingSubmission({
+      promptId,
+      promptTitle,
+      originalText: text,
+      wordCount
+    });
+
+    if (!submissionId) {
+      return null;
+    }
+
+    // Get AI feedback if OpenAI is configured
+    if (openAIConfigured) {
+      try {
+        const feedback = await getWritingFeedback(text, promptTitle);
+        
+        // Update submission with feedback
+        updateWritingSubmission(submissionId, { feedback });
+        
+        // Reload submissions
+        loadWritingSubmissions();
+        
+        return feedback;
+      } catch (error) {
+        console.error('Failed to get writing feedback:', error);
+        loadWritingSubmissions();
+        return null;
+      }
+    } else {
+      loadWritingSubmissions();
+      return null;
+    }
+  };
+
+  const handleDeleteWritingSubmission = (submissionId: string) => {
+    deleteWritingSubmission(submissionId);
+    loadWritingSubmissions();
+  };
+
+  // Reading Comprehension Functions
+  const loadReadingData = () => {
+    setCompletedPassageIds(getCompletedPassageIds());
+    setReadingStats(getReadingStats());
+  };
+
+  const handleAnswerReadingQuestion = (
+    passageId: string,
+    questionId: number,
+    answer: string,
+    isCorrect: boolean,
+    questionType: string
+  ) => {
+    // Get or create progress for this passage
+    let progress = getReadingProgress(passageId);
+    
+    if (!progress) {
+      progress = {
+        passageId,
+        answers: new Map(),
+        startedAt: new Date()
+      };
+    }
+
+    // Add the answer
+    const answersMap = progress.answers instanceof Map 
+      ? progress.answers 
+      : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
+    
+    answersMap.set(questionId, {
+      questionId,
+      selectedAnswer: answer,
+      isCorrect
+    });
+
+    progress.answers = answersMap;
+    saveReadingProgress(progress);
+  };
+
+  const handleCompleteReadingPassage = (passageId: string, score: number, difficulty: string) => {
+    // Update progress with completion
+    const progress = getReadingProgress(passageId);
+    if (progress) {
+      const answersMap = progress.answers instanceof Map 
+        ? progress.answers 
+        : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
+      
+      // Calculate question type results
+      const passage = sampleReadingPassages.find(p => p.id === passageId);
+      const questionTypeResults: Record<ReadingQuestionType, { correct: number; total: number }> = {} as Record<ReadingQuestionType, { correct: number; total: number }>;
+      
+      if (passage) {
+        passage.questions.forEach(q => {
+          const answer = answersMap.get(q.id);
+          if (!questionTypeResults[q.questionType]) {
+            questionTypeResults[q.questionType] = { correct: 0, total: 0 };
+          }
+          questionTypeResults[q.questionType].total += 1;
+          if (answer?.isCorrect) {
+            questionTypeResults[q.questionType].correct += 1;
+          }
+        });
+      }
+
+      saveReadingProgress({
+        ...progress,
+        answers: answersMap,
+        completedAt: new Date(),
+        score
+      });
+
+      // Update stats
+      updateReadingStats(
+        true,
+        difficulty,
+        answersMap.size,
+        Array.from(answersMap.values()).filter(a => a.isCorrect).length,
+        questionTypeResults
+      );
+
+      loadReadingData();
+    }
+  };
+
+  const handleGetReadingProgress = (passageId: string): ReadingProgress | null => {
+    return getReadingProgress(passageId);
+  };
+
+  const handleResetReadingProgress = (passageId: string) => {
+    deleteReadingProgress(passageId);
+    loadReadingData();
+  };
+
+  // Listening Practice Functions
+  const loadListeningData = () => {
+    setCompletedListeningTestIds(getCompletedListeningTestIds());
+    setListeningStats(getListeningStats());
+  };
+
+  const handleAnswerListeningQuestion = (
+    testId: string,
+    questionId: number,
+    answer: string,
+    isCorrect: boolean,
+    questionType: string
+  ) => {
+    // Get or create progress for this test
+    let progress = getListeningProgress(testId);
+    
+    if (!progress) {
+      progress = {
+        testId,
+        answers: new Map(),
+        startedAt: new Date(),
+        audioPlayCount: 0
+      };
+    }
+
+    // Add the answer
+    const answersMap = progress.answers instanceof Map 
+      ? progress.answers 
+      : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
+    
+    answersMap.set(questionId, {
+      questionId,
+      selectedAnswer: answer,
+      isCorrect
+    });
+
+    progress.answers = answersMap;
+    saveListeningProgress(progress);
+  };
+
+  const handleCompleteListeningTest = (
+    testId: string, 
+    score: number, 
+    section: IELTSListeningSection, 
+    difficulty: string,
+    questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>
+  ) => {
+    // Update progress with completion
+    const progress = getListeningProgress(testId);
+    if (progress) {
+      const answersMap = progress.answers instanceof Map 
+        ? progress.answers 
+        : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
+
+      saveListeningProgress({
+        ...progress,
+        answers: answersMap,
+        completedAt: new Date(),
+        score
+      });
+
+      // Update stats
+      updateListeningStats(
+        section,
+        difficulty,
+        answersMap.size,
+        Array.from(answersMap.values()).filter(a => a.isCorrect).length,
+        questionTypeResults
+      );
+
+      loadListeningData();
+    }
+  };
+
+  const handleGetListeningProgress = (testId: string): ListeningProgress | null => {
+    return getListeningProgress(testId);
+  };
+
+  const handleResetListeningProgress = (testId: string) => {
+    deleteListeningProgress(testId);
+    loadListeningData();
   };
 
   const handleLoadSampleExam = async () => {
@@ -420,6 +711,61 @@ function App() {
             </div>
           )}
         </div>
+        
+        {/* Navigation Menu */}
+        <nav className="nav-menu">
+          <button 
+            className="nav-item nav-exam"
+            onClick={() => {
+              if (exams.length > 0) {
+                setSelectedExamId(exams[0].id);
+              } else {
+                handleLoadSampleExam();
+              }
+              setShowAdminPage(false);
+            }}
+            title="Sınav Modu"
+          >
+            <BookOpen size={18} />
+            <span>Sınav</span>
+          </button>
+          
+          <button 
+            className="nav-item nav-reading"
+            onClick={() => setShowReadingComprehension(true)}
+            title="Okuma Anlama"
+          >
+            <FileText size={18} />
+            <span>Okuma</span>
+          </button>
+          
+          <button 
+            className="nav-item nav-speaking"
+            onClick={() => setShowSpeakingPractice(true)}
+            title="IELTS Konuşma Pratiği"
+          >
+            <Mic size={18} />
+            <span>Konuşma</span>
+          </button>
+          
+          <button 
+            className="nav-item nav-listening"
+            onClick={() => setShowListeningPractice(true)}
+            title="IELTS Dinleme Pratiği"
+          >
+            <Headphones size={18} />
+            <span>Dinleme</span>
+          </button>
+          
+          <button 
+            className="nav-item nav-writing"
+            onClick={() => setShowWritingPractice(true)}
+            title="Yazma Pratiği"
+          >
+            <PenLine size={18} />
+            <span>Yazma</span>
+          </button>
+        </nav>
         
         <div className="header-right">
           <button 
@@ -537,24 +883,120 @@ function App() {
                   vocabWordsInVault={vocabWordsInVault}
                 />
               ) : (
-                <div className="empty-state">
-                  <BookOpen size={64} />
-                  <h2>Hoşgeldin Ali Kaan</h2>
-                  <p>İngilizce seviyenizi test etmek için sol taraftan bir sınav seçin.</p>
-                  {exams.length > 0 ? (
-                    <button onClick={() => setSelectedExamId(exams[0].id)}>
-                      İlk Sınavı Başlat
+                <div className="welcome-dashboard">
+                  <div className="welcome-hero">
+                    <div className="hero-glow"></div>
+                    <BookOpen size={56} className="hero-icon" />
+                    <h1>Hoşgeldin Ali Kaan</h1>
+                    <p>IELTS başarına giden yolda seninle birlikteyiz. Hangi becerini geliştirmek istersin?</p>
+                  </div>
+
+                  <div className="skill-cards-grid">
+                    {/* Sınav Card */}
+                    <button 
+                      className="skill-card skill-card-exam"
+                      onClick={() => {
+                        if (exams.length > 0) {
+                          setSelectedExamId(exams[0].id);
+                        } else {
+                          handleLoadSampleExam();
+                        }
+                      }}
+                    >
+                      <div className="skill-card-icon">
+                        <BookOpen size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Sınav</h3>
+                        <p>Gramer ve kelime bilgini test et</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
                     </button>
-                  ) : (
-                    <div className="empty-state-buttons">
-                      <button onClick={handleLoadSampleExam} className="primary-btn">
+
+                    {/* Okuma Card */}
+                    <button 
+                      className="skill-card skill-card-reading"
+                      onClick={() => setShowReadingComprehension(true)}
+                    >
+                      <div className="skill-card-icon">
+                        <FileText size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Okuma</h3>
+                        <p>Akademik metinleri anlama pratiği yap</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
+                    </button>
+
+                    {/* Konuşma Card */}
+                    <button 
+                      className="skill-card skill-card-speaking"
+                      onClick={() => setShowSpeakingPractice(true)}
+                    >
+                      <div className="skill-card-icon">
+                        <Mic size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Konuşma</h3>
+                        <p>Speaking sınavına hazırlan</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
+                    </button>
+
+                    {/* Dinleme Card */}
+                    <button 
+                      className="skill-card skill-card-listening"
+                      onClick={() => setShowListeningPractice(true)}
+                    >
+                      <div className="skill-card-icon">
+                        <Headphones size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Dinleme</h3>
+                        <p>Listening bölümüne hazırlan</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
+                    </button>
+
+                    {/* Yazma Card */}
+                    <button 
+                      className="skill-card skill-card-writing"
+                      onClick={() => setShowWritingPractice(true)}
+                    >
+                      <div className="skill-card-icon">
+                        <PenLine size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Yazma</h3>
+                        <p>Essay ve task yazımını geliştir</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
+                    </button>
+                  </div>
+
+                  {/* Quick Start CTA */}
+                  <div className="quick-start-section">
+                    {exams.length > 0 ? (
+                      <button 
+                        className="quick-start-btn"
+                        onClick={() => setSelectedExamId(exams[0].id)}
+                      >
+                        <span className="btn-pulse"></span>
+                        İlk Sınavı Başlat
+                      </button>
+                    ) : (
+                      <button 
+                        className="quick-start-btn"
+                        onClick={handleLoadSampleExam}
+                      >
+                        <span className="btn-pulse"></span>
                         120 Soruluk Örnek Sınavı Yükle
                       </button>
-                      <p className="admin-hint">
-                        Kendi sınavınızı eklemek için üst menüdeki <strong>Yönetim</strong> butonunu kullanın.
-                      </p>
-                    </div>
-                  )}
+                    )}
+                    <p className="quick-start-hint">
+                      veya üst menüden bir beceri seçin
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -585,6 +1027,54 @@ function App() {
         recentMistakes={recentMistakes}
         onClearData={handleClearTrackingData}
         getMistakesByCategory={handleGetMistakesByCategory}
+      />
+
+      {/* Writing Practice Panel */}
+      <WritingPractice
+        isOpen={showWritingPractice}
+        onClose={() => setShowWritingPractice(false)}
+        submissions={writingSubmissions}
+        prompts={writingPrompts}
+        onSubmitWriting={handleSubmitWriting}
+        onDeleteSubmission={handleDeleteWritingSubmission}
+        isOpenAIConfigured={openAIConfigured}
+      />
+
+      {/* Reading Comprehension Panel */}
+      <ReadingComprehension
+        isOpen={showReadingComprehension}
+        onClose={() => setShowReadingComprehension(false)}
+        passages={sampleReadingPassages}
+        completedPassageIds={completedPassageIds}
+        stats={readingStats}
+        onAnswerQuestion={handleAnswerReadingQuestion}
+        onCompletePassage={handleCompleteReadingPassage}
+        getProgress={handleGetReadingProgress}
+        onResetProgress={handleResetReadingProgress}
+        onAddToVault={handleAddToVaultGeneric}
+        vocabWordsInVault={vocabWordsInVault}
+      />
+
+      {/* Speaking Practice Panel */}
+      <SpeakingPractice
+        isOpen={showSpeakingPractice}
+        onClose={() => setShowSpeakingPractice(false)}
+        isOpenAIConfigured={openAIConfigured}
+      />
+
+      {/* Listening Practice Panel */}
+      <ListeningPractice
+        isOpen={showListeningPractice}
+        onClose={() => setShowListeningPractice(false)}
+        tests={listeningTests}
+        completedTestIds={completedListeningTestIds}
+        stats={listeningStats}
+        onAnswerQuestion={handleAnswerListeningQuestion}
+        onCompleteTest={handleCompleteListeningTest}
+        getProgress={handleGetListeningProgress}
+        onResetProgress={handleResetListeningProgress}
+        onAddToVault={handleAddToVaultGeneric}
+        vocabWordsInVault={vocabWordsInVault}
       />
     </div>
   );

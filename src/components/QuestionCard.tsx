@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Check, X, Loader2, ChevronDown, ChevronUp, BookPlus } from 'lucide-react';
+import { Check, X, Loader2, ChevronDown, ChevronUp, BookPlus, Headphones } from 'lucide-react';
 import { Question, UserAnswer } from '../types';
 import { extractVocabularyWords } from '../services/openaiService';
+import { VoiceTutor } from './VoiceTutor';
 
 interface QuestionCardProps {
   question: Question;
@@ -22,6 +23,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 }) => {
   const [showExplanation, setShowExplanation] = useState(true);
   const [showVocabOptions, setShowVocabOptions] = useState(false);
+  const [showVoiceTutor, setShowVoiceTutor] = useState(false);
   
   const hasAnswered = userAnswer !== undefined;
   const isCorrect = userAnswer?.isCorrect;
@@ -102,13 +104,27 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       {/* Explanation Section */}
       {hasAnswered && !isCorrect && (
         <div className="explanation-section">
-          <button 
-            className="explanation-toggle"
-            onClick={() => setShowExplanation(!showExplanation)}
-          >
-            <span>Açıklama</span>
-            {showExplanation ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
+          <div className="explanation-header">
+            <button 
+              className="explanation-toggle"
+              onClick={() => setShowExplanation(!showExplanation)}
+            >
+              <span>Açıklama</span>
+              {showExplanation ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+            
+            {/* Voice Tutor Button */}
+            {!isLoading && userAnswer?.explanation && (
+              <button 
+                className="voice-tutor-btn"
+                onClick={() => setShowVoiceTutor(true)}
+                title="Sesli açıklama al ve soru sor"
+              >
+                <Headphones size={18} />
+                <span>Sesli Öğretmen</span>
+              </button>
+            )}
+          </div>
           
           {showExplanation && (
             <div className="explanation-content">
@@ -169,8 +185,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           )}
         </div>
       )}
+
+      {/* Voice Tutor Modal */}
+      {showVoiceTutor && userAnswer?.explanation && (
+        <VoiceTutor
+          isOpen={showVoiceTutor}
+          onClose={() => setShowVoiceTutor(false)}
+          questionText={question.questionText}
+          explanation={userAnswer.explanation}
+          studentAnswer={userAnswer.selectedAnswer}
+          correctAnswer={question.correctAnswer}
+        />
+      )}
     </div>
   );
 };
-
-
