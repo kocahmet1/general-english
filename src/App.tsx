@@ -485,7 +485,7 @@ function App() {
     questionId: number,
     answer: string,
     isCorrect: boolean,
-    questionType: string
+    _questionType: string
   ) => {
     // Get or create progress for this passage
     let progress = getReadingProgress(passageId);
@@ -578,7 +578,7 @@ function App() {
     questionId: number,
     answer: string,
     isCorrect: boolean,
-    questionType: string
+    _questionType: string
   ) => {
     // Get or create progress for this test
     let progress = getListeningProgress(testId);

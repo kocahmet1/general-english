@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   X,
   Mic,
-  MicOff,
   Play,
   Pause,
   Square,
@@ -33,12 +32,11 @@ import {
   IELTS_SECTION_LABELS,
   IELTS_SECTION_DESCRIPTIONS
 } from '../types';
-import { ieltsQuestions, getQuestionsBySection, getRandomQuestion } from '../data/speakingQuestions';
+import { getQuestionsBySection } from '../data/speakingQuestions';
 import { transcribeAudio, analyzeSpeaking, generateSpeech, generateVoiceFeedbackText } from '../services/openaiService';
 import {
   getSpeakingSessions,
   saveSpeakingSession,
-  updateSpeakingSession,
   deleteSpeakingSession,
   getSpeakingStats,
   updateSpeakingStats,
@@ -78,7 +76,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
   const [voiceFeedbackEnabled, setVoiceFeedbackEnabled] = useState(true);
   
   // Session state
-  const [currentSession, setCurrentSession] = useState<SpeakingSession | null>(null);
+  const [_currentSession, setCurrentSession] = useState<SpeakingSession | null>(null);
   const [sessions, setSessions] = useState<SpeakingSession[]>([]);
   const [stats, setStats] = useState<SpeakingStats>(getSpeakingStats());
   

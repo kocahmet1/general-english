@@ -16,10 +16,8 @@ import {
   RefreshCw,
   List,
   Volume2,
-  VolumeX,
   CheckCircle,
   FileText,
-  Loader2,
   History,
   BookPlus
 } from 'lucide-react';
@@ -30,7 +28,6 @@ import {
   ListeningStats,
   IELTSListeningSection,
   IELTS_LISTENING_SECTION_LABELS,
-  IELTS_LISTENING_SECTION_DESCRIPTIONS,
   LISTENING_QUESTION_TYPE_LABELS,
   ListeningQuestionType
 } from '../types';
@@ -254,7 +251,7 @@ export const ListeningPractice = ({
   };
 
   // Check if answer is correct (handles completion type questions)
-  const checkAnswer = (question: typeof selectedTest.questions[0], answer: string): boolean => {
+  const checkAnswer = (question: ListeningTest['questions'][0], answer: string): boolean => {
     if (question.questionType === 'completion' || question.questionType === 'short_answer') {
       const normalizedAnswer = answer.trim().toLowerCase();
       const normalizedCorrect = question.correctAnswer.toLowerCase();
@@ -411,7 +408,7 @@ export const ListeningPractice = ({
   };
 
   // Extract vocabulary words from question text and options
-  const extractVocabWords = (question: typeof selectedTest.questions[0]): string[] => {
+  const extractVocabWords = (question: ListeningTest['questions'][0]): string[] => {
     const words: string[] = [];
     
     // Extract from question text

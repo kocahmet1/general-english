@@ -836,9 +836,12 @@ export function updateSpeakingSession(sessionId: string, updates: Partial<Speaki
     
     if (index === -1) return false;
     
+    // Extract and convert Date fields, keep other fields
+    const { startedAt, completedAt, ...restUpdates } = updates;
     const updateData: Partial<StoredSpeakingSession> = {
-      ...updates,
-      completedAt: updates.completedAt?.toISOString()
+      ...restUpdates,
+      ...(startedAt && { startedAt: startedAt.toISOString() }),
+      ...(completedAt && { completedAt: completedAt.toISOString() })
     };
     
     sessions[index] = { ...sessions[index], ...updateData };
@@ -918,7 +921,7 @@ export function getSpeakingStats(): SpeakingStats {
 }
 
 // Update speaking statistics
-export function updateSpeakingStats(session: SpeakingSession): void {
+export function updateSpeakingStats(_session: SpeakingSession): void {
   try {
     const stats = getSpeakingStats();
     const sessions = getSpeakingSessions();

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X,
   PenLine,
@@ -170,7 +170,7 @@ export const WritingPractice = ({
     // Sort errors by start index
     const sortedErrors = [...errors].sort((a, b) => a.startIndex - b.startIndex);
     
-    const elements: JSX.Element[] = [];
+    const elements: React.JSX.Element[] = [];
     let lastIndex = 0;
 
     sortedErrors.forEach((error, idx) => {
