@@ -67,11 +67,17 @@ export async function getExamById(examId: string): Promise<Exam | null> {
 // Create a new exam
 export async function createExam(name: string, description: string, questions: Question[]): Promise<string | null> {
   try {
+    // Ensure all questions have unique IDs by using array index as base
+    const questionsWithUniqueIds = questions.map((q, index) => ({
+      ...q,
+      id: index + 1 // Use 1-based index to ensure unique IDs
+    }));
+    
     const examsRef = collection(db, EXAMS_COLLECTION);
     const docRef = await addDoc(examsRef, {
       name,
       description,
-      questions,
+      questions: questionsWithUniqueIds,
       createdAt: Timestamp.now()
     });
     return docRef.id;

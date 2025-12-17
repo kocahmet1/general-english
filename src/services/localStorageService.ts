@@ -75,8 +75,34 @@ export function getLocalExamById(examId: string): Exam | null {
     const exam = exams.find(e => e.id === examId);
     
     if (exam) {
+      // Check for duplicate IDs and fix them if found
+      const seenIds = new Set<number>();
+      let hasDuplicates = false;
+      
+      for (const q of exam.questions) {
+        if (seenIds.has(q.id)) {
+          hasDuplicates = true;
+          break;
+        }
+        seenIds.add(q.id);
+      }
+      
+      // If duplicates found, reassign unique IDs
+      const questions = hasDuplicates 
+        ? exam.questions.map((q, index) => ({ ...q, id: index + 1 }))
+        : exam.questions;
+      
+      // If we fixed duplicates, save the corrected exam back to storage
+      if (hasDuplicates) {
+        const updatedExams = exams.map(e => 
+          e.id === examId ? { ...e, questions } : e
+        );
+        localStorage.setItem(EXAMS_KEY, JSON.stringify(updatedExams));
+      }
+      
       return {
         ...exam,
+        questions,
         createdAt: new Date(exam.createdAt)
       };
     }
@@ -92,11 +118,17 @@ export function createLocalExam(name: string, description: string, questions: Qu
     const stored = localStorage.getItem(EXAMS_KEY);
     const exams: Exam[] = stored ? JSON.parse(stored) : [];
     
+    // Ensure all questions have unique IDs by using array index as base
+    const questionsWithUniqueIds = questions.map((q, index) => ({
+      ...q,
+      id: index + 1 // Use 1-based index to ensure unique IDs
+    }));
+    
     const newExam: Exam = {
       id: `exam_${Date.now()}`,
       name,
       description,
-      questions,
+      questions: questionsWithUniqueIds,
       createdAt: new Date()
     };
     
