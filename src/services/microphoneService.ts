@@ -103,3 +103,4 @@ export function isMicrophonePermissionGranted(): boolean {
   return microphonePermissionState === 'granted';
 }
 
+

@@ -546,9 +546,7 @@ body {
 
 /* Stats Bar */
 .stats-bar {
-  position: sticky;
-  top: 73px;
-  z-index: 50;
+  position: static;
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
@@ -1475,9 +1473,6 @@ body {
     width: 100%;
   }
   
-  .stats-bar {
-    top: 65px;
-  }
 }
 
 @media (max-width: 768px) {
