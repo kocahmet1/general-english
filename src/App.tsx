@@ -10,6 +10,7 @@ import { WritingPractice } from './components/WritingPractice';
 import { ReadingComprehension } from './components/ReadingComprehension';
 import { SpeakingPractice } from './components/SpeakingPractice';
 import { ListeningPractice } from './components/ListeningPractice';
+import { GrammarLessons } from './components/GrammarLessons';
 import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory, WritingSubmission, WritingPrompt, WritingFeedback, ReadingProgress, ReadingStats, ReadingQuestionType, ListeningProgress, ListeningStats, ListeningQuestionType, IELTSListeningSection } from './types';
 import { getAllExams, getExamById, createExam, parseExamText, deleteExam } from './services/examService';
 import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/vocabService';
@@ -83,6 +84,7 @@ function App() {
   const [showReadingComprehension, setShowReadingComprehension] = useState(false);
   const [showSpeakingPractice, setShowSpeakingPractice] = useState(false);
   const [showListeningPractice, setShowListeningPractice] = useState(false);
+  const [showGrammarLessons, setShowGrammarLessons] = useState(false);
 
   // Vocab vault state
   const [vocabWords, setVocabWords] = useState<VocabWord[]>([]);
@@ -145,10 +147,10 @@ function App() {
     try {
       if (useFirebase) {
         // Add timeout for Firebase - fallback to local if it takes too long
-        const timeoutPromise = new Promise<never>((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Firebase timeout')), 5000)
         );
-        
+
         try {
           const examList = await Promise.race([getAllExams(), timeoutPromise]);
           setExams(examList);
@@ -177,7 +179,7 @@ function App() {
     try {
       let exam: Exam | null = null;
       if (useFirebase) {
-        const timeoutPromise = new Promise<never>((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Firebase timeout')), 5000)
         );
         try {
@@ -201,7 +203,7 @@ function App() {
   const loadVocabWords = async () => {
     try {
       if (useFirebase) {
-        const timeoutPromise = new Promise<never>((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Firebase timeout')), 5000)
         );
         try {
@@ -241,8 +243,8 @@ function App() {
         selectedAnswer,
         isCorrect,
         isLoading: !isCorrect && openAIConfigured,
-        explanation: !isCorrect && !openAIConfigured ? 
-          'OpenAI API yapılandırılmamış. Açıklama almak için .env dosyasında VITE_OPENAI_API_KEY değerini ayarlayın.' : 
+        explanation: !isCorrect && !openAIConfigured ?
+          'OpenAI API yapılandırılmamış. Açıklama almak için .env dosyasında VITE_OPENAI_API_KEY değerini ayarlayın.' :
           undefined
       });
       return newAnswers;
@@ -252,7 +254,7 @@ function App() {
     if (!isCorrect && openAIConfigured) {
       try {
         const response = await getExplanation(question, selectedAnswer, question.correctAnswer);
-        
+
         // Track the mistake with the grammar category
         addMistakeRecord(
           currentExam.id,
@@ -263,10 +265,10 @@ function App() {
           response.grammarCategory,
           question.difficulty
         );
-        
+
         // Reload performance data after tracking mistake
         loadPerformanceData();
-        
+
         setUserAnswers(prev => {
           const newAnswers = new Map(prev);
           const currentAnswer = newAnswers.get(questionId);
@@ -321,26 +323,26 @@ function App() {
   ): Promise<boolean> => {
     try {
       const questions = parseExamText(examText, answerKey);
-      
+
       if (questions.length === 0) {
         console.error('No questions parsed');
         return false;
       }
 
       let examId: string | null;
-      
+
       if (useFirebase) {
         examId = await createExam(name, description, questions);
       } else {
         examId = createLocalExam(name, description, questions);
       }
-      
+
       if (examId) {
         await loadExams();
         setSelectedExamId(examId);
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Failed to import exam:', error);
@@ -353,13 +355,13 @@ function App() {
 
     try {
       let wordId: string | null;
-      
+
       if (useFirebase) {
         wordId = await addVocabWord(word, questionContext, selectedExamId, questionId);
       } else {
         wordId = addLocalVocabWord(word, questionContext, selectedExamId, questionId);
       }
-      
+
       if (wordId) {
         await loadVocabWords();
       }
@@ -372,13 +374,13 @@ function App() {
   const handleAddToVaultGeneric = async (word: string, questionContext: string, sourceId: string, questionId: number) => {
     try {
       let wordId: string | null;
-      
+
       if (useFirebase) {
         wordId = await addVocabWord(word, questionContext, sourceId, questionId);
       } else {
         wordId = addLocalVocabWord(word, questionContext, sourceId, questionId);
       }
-      
+
       if (wordId) {
         await loadVocabWords();
       }
@@ -390,13 +392,13 @@ function App() {
   const handleRemoveFromVault = async (wordId: string) => {
     try {
       let success: boolean;
-      
+
       if (useFirebase) {
         success = await removeVocabWord(wordId);
       } else {
         success = removeLocalVocabWord(wordId);
       }
-      
+
       if (success) {
         setVocabWords(prev => prev.filter(w => w.id !== wordId));
       }
@@ -450,13 +452,13 @@ function App() {
     if (openAIConfigured) {
       try {
         const feedback = await getWritingFeedback(text, promptTitle);
-        
+
         // Update submission with feedback
         updateWritingSubmission(submissionId, { feedback });
-        
+
         // Reload submissions
         loadWritingSubmissions();
-        
+
         return feedback;
       } catch (error) {
         console.error('Failed to get writing feedback:', error);
@@ -489,7 +491,7 @@ function App() {
   ) => {
     // Get or create progress for this passage
     let progress = getReadingProgress(passageId);
-    
+
     if (!progress) {
       progress = {
         passageId,
@@ -499,10 +501,10 @@ function App() {
     }
 
     // Add the answer
-    const answersMap = progress.answers instanceof Map 
-      ? progress.answers 
+    const answersMap = progress.answers instanceof Map
+      ? progress.answers
       : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
-    
+
     answersMap.set(questionId, {
       questionId,
       selectedAnswer: answer,
@@ -517,14 +519,14 @@ function App() {
     // Update progress with completion
     const progress = getReadingProgress(passageId);
     if (progress) {
-      const answersMap = progress.answers instanceof Map 
-        ? progress.answers 
+      const answersMap = progress.answers instanceof Map
+        ? progress.answers
         : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
-      
+
       // Calculate question type results
       const passage = sampleReadingPassages.find(p => p.id === passageId);
       const questionTypeResults: Record<ReadingQuestionType, { correct: number; total: number }> = {} as Record<ReadingQuestionType, { correct: number; total: number }>;
-      
+
       if (passage) {
         passage.questions.forEach(q => {
           const answer = answersMap.get(q.id);
@@ -582,7 +584,7 @@ function App() {
   ) => {
     // Get or create progress for this test
     let progress = getListeningProgress(testId);
-    
+
     if (!progress) {
       progress = {
         testId,
@@ -593,10 +595,10 @@ function App() {
     }
 
     // Add the answer
-    const answersMap = progress.answers instanceof Map 
-      ? progress.answers 
+    const answersMap = progress.answers instanceof Map
+      ? progress.answers
       : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
-    
+
     answersMap.set(questionId, {
       questionId,
       selectedAnswer: answer,
@@ -608,17 +610,17 @@ function App() {
   };
 
   const handleCompleteListeningTest = (
-    testId: string, 
-    score: number, 
-    section: IELTSListeningSection, 
+    testId: string,
+    score: number,
+    section: IELTSListeningSection,
     difficulty: string,
     questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>
   ) => {
     // Update progress with completion
     const progress = getListeningProgress(testId);
     if (progress) {
-      const answersMap = progress.answers instanceof Map 
-        ? progress.answers 
+      const answersMap = progress.answers instanceof Map
+        ? progress.answers
         : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
 
       saveListeningProgress({
@@ -653,13 +655,13 @@ function App() {
   const handleLoadSampleExam = async () => {
     try {
       let examId: string | null;
-      
+
       if (useFirebase) {
         examId = await createExam(sampleExamName, sampleExamDescription, sampleExamQuestions);
       } else {
         examId = createLocalExam(sampleExamName, sampleExamDescription, sampleExamQuestions);
       }
-      
+
       if (examId) {
         await loadExams();
         setSelectedExamId(examId);
@@ -672,13 +674,13 @@ function App() {
   const handleDeleteExam = async (examId: string) => {
     try {
       let success: boolean;
-      
+
       if (useFirebase) {
         success = await deleteExam(examId);
       } else {
         success = deleteLocalExam(examId);
       }
-      
+
       if (success) {
         // If deleted exam was selected, clear selection
         if (selectedExamId === examId) {
@@ -711,10 +713,10 @@ function App() {
             </div>
           )}
         </div>
-        
+
         {/* Navigation Menu */}
         <nav className="nav-menu">
-          <button 
+          <button
             className="nav-item nav-exam"
             onClick={() => {
               if (exams.length > 0) {
@@ -729,8 +731,17 @@ function App() {
             <BookOpen size={18} />
             <span>Sınav</span>
           </button>
-          
-          <button 
+
+          <button
+            className="nav-item nav-grammar"
+            onClick={() => setShowGrammarLessons(true)}
+            title="Gramer Dersleri"
+          >
+            <BookOpen size={18} />
+            <span>Gramer</span>
+          </button>
+
+          <button
             className="nav-item nav-reading"
             onClick={() => setShowReadingComprehension(true)}
             title="Okuma Anlama"
@@ -738,8 +749,8 @@ function App() {
             <FileText size={18} />
             <span>Okuma</span>
           </button>
-          
-          <button 
+
+          <button
             className="nav-item nav-speaking"
             onClick={() => setShowSpeakingPractice(true)}
             title="IELTS Konuşma Pratiği"
@@ -747,8 +758,8 @@ function App() {
             <Mic size={18} />
             <span>Konuşma</span>
           </button>
-          
-          <button 
+
+          <button
             className="nav-item nav-listening"
             onClick={() => setShowListeningPractice(true)}
             title="IELTS Dinleme Pratiği"
@@ -756,8 +767,8 @@ function App() {
             <Headphones size={18} />
             <span>Dinleme</span>
           </button>
-          
-          <button 
+
+          <button
             className="nav-item nav-writing"
             onClick={() => setShowWritingPractice(true)}
             title="Yazma Pratiği"
@@ -766,9 +777,9 @@ function App() {
             <span>Yazma</span>
           </button>
         </nav>
-        
+
         <div className="header-right">
-          <button 
+          <button
             className="performance-btn"
             onClick={() => setShowPerformanceTracker(true)}
             title="Performans Analizi"
@@ -779,8 +790,8 @@ function App() {
               <span className="badge warning">{performanceStats.totalIncorrect}</span>
             )}
           </button>
-          
-          <button 
+
+          <button
             className="vocab-vault-btn"
             onClick={() => setShowVocabVault(true)}
           >
@@ -790,8 +801,8 @@ function App() {
               <span className="badge">{vocabWords.length}</span>
             )}
           </button>
-          
-          <button 
+
+          <button
             className="admin-btn"
             onClick={() => setShowAdminPage(true)}
             title="Yönetim Paneli"
@@ -799,8 +810,8 @@ function App() {
             <Settings size={20} />
             <span>Yönetim</span>
           </button>
-          
-          <button 
+
+          <button
             className="theme-toggle"
             onClick={() => setIsDarkMode(!isDarkMode)}
             title={isDarkMode ? 'Açık tema' : 'Koyu tema'}
@@ -832,7 +843,7 @@ function App() {
                 onDeleteExam={handleDeleteExam}
                 isLoading={isLoadingExams}
               />
-              
+
               {/* Configuration Status */}
               <div className="config-status">
                 <h3>Yapılandırma Durumu</h3>
@@ -845,7 +856,7 @@ function App() {
                   <span>OpenAI: {openAIConfigured ? 'Aktif' : 'Yapılandırılmamış'}</span>
                 </div>
               </div>
-              
+
               {/* Quick Stats */}
               {currentExam && userAnswers.size > 0 && (
                 <div className="quick-stats">
@@ -887,12 +898,11 @@ function App() {
                   <div className="welcome-hero">
                     <div className="hero-glow"></div>
                     <BookOpen size={56} className="hero-icon" />
-                    
                   </div>
 
                   <div className="skill-cards-grid">
                     {/* Sınav Card */}
-                    <button 
+                    <button
                       className="skill-card skill-card-exam"
                       onClick={() => {
                         if (exams.length > 0) {
@@ -913,7 +923,7 @@ function App() {
                     </button>
 
                     {/* Okuma Card */}
-                    <button 
+                    <button
                       className="skill-card skill-card-reading"
                       onClick={() => setShowReadingComprehension(true)}
                     >
@@ -928,7 +938,7 @@ function App() {
                     </button>
 
                     {/* Konuşma Card */}
-                    <button 
+                    <button
                       className="skill-card skill-card-speaking"
                       onClick={() => setShowSpeakingPractice(true)}
                     >
@@ -943,7 +953,7 @@ function App() {
                     </button>
 
                     {/* Dinleme Card */}
-                    <button 
+                    <button
                       className="skill-card skill-card-listening"
                       onClick={() => setShowListeningPractice(true)}
                     >
@@ -958,7 +968,7 @@ function App() {
                     </button>
 
                     {/* Yazma Card */}
-                    <button 
+                    <button
                       className="skill-card skill-card-writing"
                       onClick={() => setShowWritingPractice(true)}
                     >
@@ -976,7 +986,7 @@ function App() {
                   {/* Quick Start CTA */}
                   <div className="quick-start-section">
                     {exams.length > 0 ? (
-                      <button 
+                      <button
                         className="quick-start-btn"
                         onClick={() => setSelectedExamId(exams[0].id)}
                       >
@@ -984,7 +994,7 @@ function App() {
                         İlk Sınavı Başlat
                       </button>
                     ) : (
-                      <button 
+                      <button
                         className="quick-start-btn"
                         onClick={handleLoadSampleExam}
                       >
@@ -1075,6 +1085,11 @@ function App() {
         onAddToVault={handleAddToVaultGeneric}
         vocabWordsInVault={vocabWordsInVault}
       />
+
+      {/* Grammar Lessons Modal */}
+      {showGrammarLessons && (
+        <GrammarLessons onClose={() => setShowGrammarLessons(false)} />
+      )}
     </div>
   );
 }
