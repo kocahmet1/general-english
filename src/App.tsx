@@ -922,6 +922,22 @@ function App() {
                       <div className="skill-card-arrow">→</div>
                     </button>
 
+                    {/* Gramer Card */}
+                    <button
+                      className="skill-card skill-card-grammar highlight-card"
+                      onClick={() => setShowGrammarLessons(true)}
+                    >
+                      <div className="new-badge">NEW</div>
+                      <div className="skill-card-icon">
+                        <BookOpen size={32} />
+                      </div>
+                      <div className="skill-card-content">
+                        <h3>Gramer</h3>
+                        <p>Dilbilgisi kurallarını öğren ve pratik yap</p>
+                      </div>
+                      <div className="skill-card-arrow">→</div>
+                    </button>
+
                     {/* Okuma Card */}
                     <button
                       className="skill-card skill-card-reading"

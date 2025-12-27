@@ -8115,17 +8115,85 @@ body {
   background: rgba(240, 136, 62, 0.12);
 }
 
-.skill-card-writing::before {
-  background: var(--accent-yellow);
-}
-
-.skill-card-writing:hover {
-  border-color: var(--accent-yellow);
-}
-
 .skill-card-writing .skill-card-icon {
   color: var(--accent-yellow);
   background: rgba(210, 153, 34, 0.12);
+}
+
+.skill-card-grammar::before {
+  background: var(--accent-primary);
+}
+
+.skill-card-grammar:hover {
+  border-color: var(--accent-primary);
+}
+
+.skill-card-grammar .skill-card-icon {
+  color: var(--accent-primary);
+  background: rgba(88, 166, 255, 0.12);
+}
+
+/* Allow overflow specifically for grammar card to show the badge */
+.skill-card-grammar {
+  overflow: visible !important;
+}
+
+.highlight-card {
+  box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+  animation: card-pulse 3s infinite ease-in-out;
+}
+
+@keyframes card-pulse {
+  0% {
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+    border-color: var(--border-primary);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(88, 166, 255, 0.4);
+    border-color: var(--accent-primary);
+  }
+
+  100% {
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+    border-color: var(--border-primary);
+  }
+}
+
+.new-badge {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  background: linear-gradient(180deg, #58a6ff 0%, #005cc5 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  /* 3D Depth Shadows */
+  box-shadow:
+    0 2px 0 #004494,
+    0 4px 10px rgba(88, 166, 255, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: badge-float-3d 3s infinite ease-in-out;
+  z-index: 20;
+  border: 2px solid white;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+@keyframes badge-float-3d {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(8deg) scale(1);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(-4deg) scale(1.1);
+  }
 }
 
 .skill-card-icon {
@@ -8304,6 +8372,7 @@ body {
   max-width: 1400px;
   max-height: 90vh;
   overflow-y: auto;
+  padding: var(--spacing-xl);
 }
 
 /* Stats Dashboard */
@@ -8440,12 +8509,16 @@ body {
 .grammar-lesson-card {
   position: relative;
   background: var(--bg-card);
-  border: 2px solid var(--border-primary);
+  border: 1px solid var(--border-primary);
+  border-bottom: 5px solid var(--border-primary);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   cursor: pointer;
   transition: all var(--transition-normal);
   overflow: hidden;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .grammar-lesson-card::before {
@@ -8460,9 +8533,11 @@ body {
 }
 
 .grammar-lesson-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--lesson-color, var(--accent-primary));
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-bottom-color: var(--lesson-color, var(--accent-primary));
 }
 
 .grammar-lesson-card.completed {
