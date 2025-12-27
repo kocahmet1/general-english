@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, AlertCircle, Lightbulb, Award, RotateCcw } from 'lucide-react';
-import { GrammarTopic, GrammarExercise } from '../types/grammarLesson';
+import { GrammarTopic } from '../types/grammarLesson';
 import { grammarLessons } from '../data/grammarLessons';
-import { updateLessonProgress, getLessonProgress } from '../services/grammarLessonService';
+import { updateLessonProgress } from '../services/grammarLessonService';
 
 interface GrammarLessonViewProps {
     topic: GrammarTopic;
@@ -177,8 +177,8 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
                                         {(() => {
                                             const content = lesson.sections[activeSection].content || '';
                                             const lines = content.split('\n');
-                                            const elements: JSX.Element[] = [];
-                                            let currentList: JSX.Element[] = [];
+                                            const elements: React.ReactNode[] = [];
+                                            let currentList: React.ReactNode[] = [];
 
                                             for (let i = 0; i < lines.length; i++) {
                                                 const line = lines[i].trim();

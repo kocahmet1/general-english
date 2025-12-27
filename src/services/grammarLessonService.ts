@@ -1,4 +1,4 @@
-import { GrammarTopic, LessonProgress, GrammarLessonStats, ExerciseAnswer } from '../types/grammarLesson';
+import { GrammarTopic, LessonProgress, GrammarLessonStats } from '../types/grammarLesson';
 import { grammarLessons } from '../data/grammarLessons';
 
 // Local Storage Keys
