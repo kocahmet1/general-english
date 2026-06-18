@@ -782,7 +782,7 @@ function App() {
         <div className="header-left">
           <div className="logo" onClick={() => { setSelectedExamId(null); setCurrentExam(null); }} style={{ cursor: 'pointer' }}>
             <BookOpen size={32} />
-            <span>Veritas Ielts Prep App</span>
+            <span>Veritas English Prep App</span>
           </div>
           {!useFirebase && (
             <div className="local-mode-badge" title="Firebase yapılandırılmamış - Yerel depolama kullanılıyor">

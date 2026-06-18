@@ -7,7 +7,7 @@ const STATS_KEY = 'grammar_lesson_stats';
 const LAST_ACCESSED_KEY = 'grammar_lesson_last_accessed';
 
 // Get lesson progress from localStorage
-export const getLessonProgress = (topic: GrammarTopic): LessonProgress | null => {
+const getLessonProgress = (topic: GrammarTopic): LessonProgress | null => {
     const key = `${PROGRESS_KEY_PREFIX}${topic}`;
     const stored = localStorage.getItem(key);
 
@@ -23,7 +23,7 @@ export const getLessonProgress = (topic: GrammarTopic): LessonProgress | null =>
 };
 
 // Save lesson progress
-export const saveLessonProgress = (progress: LessonProgress): void => {
+const saveLessonProgress = (progress: LessonProgress): void => {
     const key = `${PROGRESS_KEY_PREFIX}${progress.topic}`;
     // Convert Map to object for storage
     const dataToStore = {
@@ -137,7 +137,7 @@ export const updateLessonProgress = (
 };
 
 // Reset lesson progress
-export const resetLessonProgress = (topic: GrammarTopic): void => {
+const resetLessonProgress = (topic: GrammarTopic): void => {
     const key = `${PROGRESS_KEY_PREFIX}${topic}`;
     localStorage.removeItem(key);
 };

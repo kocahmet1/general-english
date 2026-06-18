@@ -37,5 +37,6 @@ dist-ssr
 # Android APK and toolchain
 android-offline-app/
 .android-toolchain/
+.tools/
 *.apk
 *.aab

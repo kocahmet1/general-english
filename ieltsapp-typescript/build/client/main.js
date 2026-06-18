@@ -546,9 +546,22 @@ function createFitbQuestionElement(question, totalQuestions) {
         updateScoreSummary('fitb', totalQuestions);
     });
     actions.appendChild(checkButton);
+    const showAnswerBtn = document.createElement('button');
+    showAnswerBtn.type = 'button';
+    showAnswerBtn.className = 'btn show-answer-btn';
+    showAnswerBtn.textContent = 'Cevabı Ver';
+    const answerRevealBox = document.createElement('div');
+    answerRevealBox.className = 'answer-reveal-box hidden';
+    showAnswerBtn.addEventListener('click', () => {
+        answerRevealBox.innerHTML = `<span class="answer-reveal-label">Cevap:</span> <span class="answer-reveal-value">${escapeHtml(question.answer)}</span>`;
+        answerRevealBox.classList.remove('hidden');
+        showAnswerBtn.disabled = true;
+        showAnswerBtn.textContent = 'Cevap Gösterildi';
+    });
+    actions.appendChild(showAnswerBtn);
     const result = document.createElement('div');
     result.className = 'answer-result hidden';
-    container.append(questionText, answerInput, actions, result);
+    container.append(questionText, answerInput, actions, result, answerRevealBox);
     return container;
 }
 function createTfngQuestionElement(question, totalQuestions) {
@@ -600,7 +613,20 @@ function createTfngQuestionElement(question, totalQuestions) {
         });
         actions.appendChild(highlightButton);
     }
-    container.append(statement, options, actions, result);
+    const showAnswerBtn = document.createElement('button');
+    showAnswerBtn.type = 'button';
+    showAnswerBtn.className = 'btn show-answer-btn';
+    showAnswerBtn.textContent = 'Cevabı Ver';
+    const answerRevealBox = document.createElement('div');
+    answerRevealBox.className = 'answer-reveal-box hidden';
+    showAnswerBtn.addEventListener('click', () => {
+        answerRevealBox.innerHTML = `<span class="answer-reveal-label">Cevap:</span> <span class="answer-reveal-value">${escapeHtml(question.answer)}</span>`;
+        answerRevealBox.classList.remove('hidden');
+        showAnswerBtn.disabled = true;
+        showAnswerBtn.textContent = 'Cevap Gösterildi';
+    });
+    actions.appendChild(showAnswerBtn);
+    container.append(statement, options, actions, result, answerRevealBox);
     return container;
 }
 function updateScoreSummary(kind, totalQuestions) {

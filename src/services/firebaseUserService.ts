@@ -178,30 +178,6 @@ export async function getRecentMistakes(limitCount: number = 20): Promise<Mistak
     });
 }
 
-export async function getMistakesByCategory(category: GrammarCategory): Promise<MistakeRecord[]> {
-    const userId = auth?.currentUser?.uid;
-    if (!userId) return [];
-
-    const mistakesRef = collection(db, 'users', userId, 'mistakes');
-    const q = query(
-        mistakesRef,
-        orderBy('timestamp', 'desc')
-    );
-    const snap = await getDocs(q);
-
-    // We filter client-side because Firestore requires a composite index for where() + orderBy()
-    return snap.docs
-        .map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                timestamp: data.timestamp?.toDate() || new Date()
-            } as MistakeRecord;
-        })
-        .filter(m => m.grammarCategory === category);
-}
-
 export async function clearTrackingData(): Promise<void> {
     const userId = auth?.currentUser?.uid;
     if (!userId) return;

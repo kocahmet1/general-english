@@ -1,4 +1,4 @@
-﻿import { Question, GrammarCategory, WritingFeedback, GrammarError, SpeakingFeedback, SpeakingQuestion } from '../types';
+import { Question, GrammarCategory, WritingFeedback, SpeakingFeedback, SpeakingQuestion } from '../types';
 
 const VALID_CATEGORIES: GrammarCategory[] = [
   'past_perfect', 'present_perfect', 'past_simple', 'present_simple',
@@ -7,12 +7,12 @@ const VALID_CATEGORIES: GrammarCategory[] = [
   'gerunds_infinitives', 'passive_voice', 'relative_clauses',
   'reported_speech', 'conjunctions', 'idioms_expressions', 'collocations',
   'comparatives_superlatives', 'subject_verb_agreement', 'pronouns',
-  'word_order', 'quantifiers', 'other'
+  'word_order', 'quantifiers', 'other',
 ];
 
 const API_BASE = '/api/openai';
 
-export interface ExplanationResponse {
+interface ExplanationResponse {
   explanation: string;
   grammarCategory: GrammarCategory;
 }
@@ -46,20 +46,20 @@ function normalizeCategory(category: GrammarCategory): GrammarCategory {
 export async function getExplanation(
   question: Question,
   selectedAnswer: string,
-  correctAnswer: string
+  correctAnswer: string,
 ): Promise<ExplanationResponse> {
   try {
     const response = await apiJson<ExplanationResponse>('/explanation', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ question, selectedAnswer, correctAnswer })
+      body: JSON.stringify({ question, selectedAnswer, correctAnswer }),
     });
 
     return {
       explanation: response.explanation || 'Açıklama oluşturulamadı.',
-      grammarCategory: normalizeCategory(response.grammarCategory)
+      grammarCategory: normalizeCategory(response.grammarCategory),
     };
   } catch (error) {
     console.error('Error getting explanation:', error);
@@ -67,7 +67,7 @@ export async function getExplanation(
     if (isMissingServerKey(error)) {
       return {
         explanation: 'OpenAI sunucuda yapılandırılmamış. Render ortam değişkenlerine OPENAI_API_KEY ekleyin.',
-        grammarCategory: 'other'
+        grammarCategory: 'other',
       };
     }
 
@@ -75,7 +75,7 @@ export async function getExplanation(
       explanation: error instanceof Error
         ? `Açıklama alınırken hata oluştu: ${error.message}`
         : 'Açıklama alınırken bir hata oluştu. Lütfen tekrar deneyin.',
-      grammarCategory: 'other'
+      grammarCategory: 'other',
     };
   }
 }
@@ -87,7 +87,7 @@ export function extractVocabularyWords(question: Question): string[] {
     .filter(word => word.length > 3 && /^[a-zA-Z]+$/.test(word));
 
   const optionWords = question.options
-    .map(opt => opt.text)
+    .map(option => option.text)
     .filter(text => text.length > 2 && /^[a-zA-Z\s]+$/.test(text));
 
   const allWords = [...questionWords, ...optionWords];
@@ -99,33 +99,6 @@ export function extractVocabularyWords(question: Question): string[] {
   });
 }
 
-export async function getWritingFeedback(
-  text: string,
-  promptTitle?: string
-): Promise<WritingFeedback> {
-  try {
-    return await apiJson<WritingFeedback>('/writing-feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text, promptTitle })
-    });
-  } catch (error) {
-    console.error('Error getting writing feedback:', error);
-
-    if (isMissingServerKey(error)) {
-      return getDefaultFeedback('OpenAI sunucuda yapılandırılmamış. Render ortam değişkenlerine OPENAI_API_KEY ekleyin.');
-    }
-
-    return getDefaultFeedback(
-      error instanceof Error
-        ? `Geri bildirim alınırken hata oluştu: ${error.message}`
-        : 'Geri bildirim alınırken bir hata oluştu. Lütfen tekrar deneyin.'
-    );
-  }
-}
-
 function getDefaultFeedback(message: string): WritingFeedback {
   return {
     overallScore: 0,
@@ -135,36 +108,21 @@ function getDefaultFeedback(message: string): WritingFeedback {
     errors: [],
     suggestions: [message],
     correctedText: '',
-    summary: message
+    summary: message,
   };
-}
-
-export async function getMetaWritingFeedback(text: string): Promise<GrammarError[]> {
-  try {
-    return await apiJson<GrammarError[]>('/meta-writing-feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text })
-    });
-  } catch (error) {
-    console.error('Error getting meta writing feedback:', error);
-    return [];
-  }
 }
 
 export async function getFullWritingFeedback(
   text: string,
-  promptTitle?: string
+  promptTitle?: string,
 ): Promise<WritingFeedback> {
   try {
     return await apiJson<WritingFeedback>('/full-writing-feedback', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text, promptTitle })
+      body: JSON.stringify({ text, promptTitle }),
     });
   } catch (error) {
     console.error('Error getting full writing feedback:', error);
@@ -176,7 +134,7 @@ export async function getFullWritingFeedback(
     return getDefaultFeedback(
       error instanceof Error
         ? `Geri bildirim alınırken hata oluştu: ${error.message}`
-        : 'Geri bildirim alınırken bir hata oluştu. Lütfen tekrar deneyin.'
+        : 'Geri bildirim alınırken bir hata oluştu. Lütfen tekrar deneyin.',
     );
   }
 }
@@ -188,7 +146,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     const response = await fetch(`${API_BASE}/transcribe`, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
@@ -204,15 +162,15 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
 export async function generateSpeech(
   text: string,
-  voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' = 'nova'
+  voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' = 'nova',
 ): Promise<ArrayBuffer> {
   try {
     const response = await fetch(`${API_BASE}/speech`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text, voice })
+      body: JSON.stringify({ text, voice }),
     });
 
     if (!response.ok) {
@@ -228,15 +186,15 @@ export async function generateSpeech(
 
 export async function analyzeSpeaking(
   transcript: string,
-  question: SpeakingQuestion
+  question: SpeakingQuestion,
 ): Promise<SpeakingFeedback> {
   try {
     return await apiJson<SpeakingFeedback>('/speaking-analysis', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ transcript, question })
+      body: JSON.stringify({ transcript, question }),
     });
   } catch (error) {
     console.error('Error analyzing speaking:', error);
@@ -247,7 +205,7 @@ export async function analyzeSpeaking(
 
     return getDefaultSpeakingFeedback(
       error instanceof Error ? `Değerlendirme hatası: ${error.message}` : 'Değerlendirme alınırken hata oluştu.',
-      transcript
+      transcript,
     );
   }
 }
@@ -262,15 +220,15 @@ function getDefaultSpeakingFeedback(message: string, transcript: string): Speaki
     transcript,
     corrections: [],
     suggestions: [message],
-    summary: message
+    summary: message,
   };
 }
 
 export function generateVoiceFeedbackText(feedback: SpeakingFeedback): string {
-  const bandText = feedback.overallBandScore >= 7 ? 'Excellent performance!' :
-    feedback.overallBandScore >= 6 ? 'Good job!' :
-      feedback.overallBandScore >= 5 ? 'Nice effort, keep practicing!' :
-        'Keep practicing, you can improve!';
+  const bandText = feedback.overallBandScore >= 7 ? 'Excellent performance!'
+    : feedback.overallBandScore >= 6 ? 'Good job!'
+      : feedback.overallBandScore >= 5 ? 'Nice effort, keep practicing!'
+        : 'Keep practicing, you can improve!';
 
   let text = `${bandText} Your overall band score is ${feedback.overallBandScore}. `;
   text += `Fluency: ${feedback.fluencyScore}, Vocabulary: ${feedback.vocabularyScore}, `;

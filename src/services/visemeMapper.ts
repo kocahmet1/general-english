@@ -17,7 +17,7 @@
  *   9: OO      — rounded lips (O, U, W, OO)
  */
 
-export type VisemeId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+type VisemeId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export interface VisemeShape {
     mouthOpen: number;   // 0-1
@@ -28,7 +28,7 @@ export interface VisemeShape {
 /**
  * Mouth shape parameters for each viseme ID
  */
-export const VISEME_SHAPES: Record<VisemeId, VisemeShape> = {
+const VISEME_SHAPES: Record<VisemeId, VisemeShape> = {
     0: { mouthOpen: 0.0, mouthWidth: 0.8, lipRound: 0.3 }, // REST
     1: { mouthOpen: 0.0, mouthWidth: 0.7, lipRound: 0.5 }, // PP (lips pressed)
     2: { mouthOpen: 0.15, mouthWidth: 0.8, lipRound: 0.2 }, // FF (lip-teeth)
@@ -73,7 +73,7 @@ const CHAR_MAP: Record<string, VisemeId> = {
     'ç': 6, 'ş': 6, 'ğ': 5, 'ı': 7, 'ö': 9, 'ü': 9,
 };
 
-export interface VisemeFrame {
+interface VisemeFrame {
     visemeId: VisemeId;
     shape: VisemeShape;
     duration: number;  // estimated ms
@@ -90,7 +90,7 @@ const SPACE_DURATION_MS = 40;   // short pause between words
 /**
  * Convert a text string to a sequence of viseme frames.
  */
-export function textToVisemes(text: string): VisemeFrame[] {
+function textToVisemes(text: string): VisemeFrame[] {
     const frames: VisemeFrame[] = [];
     const lower = text.toLowerCase();
     let i = 0;

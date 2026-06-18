@@ -1,4 +1,4 @@
-import { ListeningTest, IELTSListeningSection } from '../types';
+import { ListeningTest } from '../types';
 
 export const listeningTests: ListeningTest[] = [
   // ===================================
@@ -949,26 +949,6 @@ Sleep also plays a vital role in memory consolidation. Research indicates that g
   }
 ];
 
-// Get tests by section
-export const getListeningTestsBySection = (section: IELTSListeningSection): ListeningTest[] => {
-  return listeningTests.filter(t => t.section === section);
-};
-
-// Get a random test from a specific section
-export const getRandomListeningTest = (section?: IELTSListeningSection): ListeningTest => {
-  const tests = section ? getListeningTestsBySection(section) : listeningTests;
-  return tests[Math.floor(Math.random() * tests.length)];
-};
-
-// Get tests by difficulty
-export const getListeningTestsByDifficulty = (difficulty: string): ListeningTest[] => {
-  return listeningTests.filter(t => t.difficulty === difficulty);
-};
-
-// Get test by ID
-export const getListeningTestById = (testId: string): ListeningTest | undefined => {
-  return listeningTests.find(t => t.id === testId);
-};
 
 
 

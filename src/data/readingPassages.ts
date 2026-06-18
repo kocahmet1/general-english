@@ -444,25 +444,3 @@ Another question is whether artificial general intelligence, or AGI, will ever e
     createdAt: new Date('2024-02-15')
   }
 ];
-
-export const getReadingPassageById = (id: string): ReadingPassage | undefined => {
-  return sampleReadingPassages.find(p => p.id === id);
-};
-
-export const getReadingPassagesByDifficulty = (difficulty: string): ReadingPassage[] => {
-  return sampleReadingPassages.filter(p => p.difficulty === difficulty);
-};
-
-export const getReadingPassagesByTopic = (topic: string): ReadingPassage[] => {
-  return sampleReadingPassages.filter(p => p.topic === topic);
-};
-
-
-
-
-
-
-
-
-
-

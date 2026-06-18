@@ -128,26 +128,6 @@ export interface VocabWord {
   questionId: number;
 }
 
-export interface ExamResult {
-  examId: string;
-  answers: UserAnswer[];
-  score: number;
-  totalQuestions: number;
-  completedAt: Date;
-}
-
-// For parsing imported exams
-export interface ParsedQuestion {
-  number: number;
-  text: string;
-  options: { letter: string; text: string }[];
-}
-
-export interface ParsedExam {
-  questions: ParsedQuestion[];
-  answers: Record<number, string>;
-}
-
 // ===================================
 // Writing Practice Module Types
 // ===================================
@@ -353,13 +333,6 @@ export const IELTS_LISTENING_SECTION_LABELS: Record<IELTSListeningSection, strin
   section4: 'Section 4 - Academic Lecture'
 };
 
-export const IELTS_LISTENING_SECTION_DESCRIPTIONS: Record<IELTSListeningSection, string> = {
-  section1: 'A conversation between two people in an everyday social context (e.g., booking a hotel, making arrangements).',
-  section2: 'A monologue set in an everyday social context (e.g., a speech about local facilities, a tour guide).',
-  section3: 'A conversation between up to four people in an educational or training context (e.g., university students discussing an assignment).',
-  section4: 'A monologue on an academic subject (e.g., a university lecture).'
-};
-
 export type ListeningQuestionType =
   | 'multiple_choice'      // Choose from A, B, C, D
   | 'matching'             // Match items from two lists
@@ -425,16 +398,3 @@ export interface ListeningStats {
   testsByDifficulty: Record<string, number>;
   questionTypePerformance: Record<ListeningQuestionType, { correct: number; total: number }>;
 }
-
-export interface ListeningSession {
-  id: string;
-  testId: string;
-  test: ListeningTest;
-  answers: Map<number, ListeningAnswer>;
-  score: number;
-  duration: number;                 // Time taken in seconds
-  audioPlayCount: number;
-  startedAt: Date;
-  completedAt?: Date;
-}
-

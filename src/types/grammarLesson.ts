@@ -82,9 +82,3 @@ export interface GrammarLessonStats {
   lastPracticeDate: Date | null;
 }
 
-export interface ExerciseAnswer {
-  exerciseId: number;
-  userAnswer: string | string[];
-  isCorrect: boolean;
-  timestamp: Date;
-}

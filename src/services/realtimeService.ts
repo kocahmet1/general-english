@@ -9,7 +9,7 @@
 
 import { getExistingMicrophoneStream, isMicrophonePermissionGranted } from './microphoneService';
 
-export interface RealtimeSessionConfig {
+interface RealtimeSessionConfig {
   instructions: string;
   voice: 'alloy' | 'echo' | 'shimmer' | 'ash' | 'ballad' | 'coral' | 'sage' | 'verse';
   inputAudioTranscription?: boolean;

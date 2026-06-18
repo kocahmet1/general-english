@@ -181,7 +181,7 @@ SADECE JSON formatında yanıt ver.`;
   }
 }
 
-export async function getWritingFeedback(text, promptTitle) {
+async function getWritingFeedback(text, promptTitle) {
   try {
     const openai = getOpenAIClient();
 
@@ -293,7 +293,7 @@ Respond ONLY with valid JSON.`;
   }
 }
 
-export async function getMetaWritingFeedback(text) {
+async function getMetaWritingFeedback(text) {
   try {
     const openai = getOpenAIClient();
 

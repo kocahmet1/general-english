@@ -1,6 +1,6 @@
 import { SpeakingQuestion } from '../types';
 
-export const ieltsQuestions: SpeakingQuestion[] = [
+const ieltsQuestions: SpeakingQuestion[] = [
   // ===================================
   // Section 1 - Introduction & Interview
   // ===================================
@@ -507,16 +507,6 @@ export const getQuestionsBySection = (section: string): SpeakingQuestion[] => {
   return ieltsQuestions.filter(q => q.section === section);
 };
 
-// Get a random question from a specific section
-export const getRandomQuestion = (section?: string): SpeakingQuestion => {
-  const questions = section ? getQuestionsBySection(section) : ieltsQuestions;
-  return questions[Math.floor(Math.random() * questions.length)];
-};
-
-// Get questions by topic
-export const getQuestionsByTopic = (topic: string): SpeakingQuestion[] => {
-  return ieltsQuestions.filter(q => q.topic.toLowerCase().includes(topic.toLowerCase()));
-};
 
 
 

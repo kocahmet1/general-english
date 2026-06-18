@@ -1,7 +1,7 @@
 ﻿import express from 'express';
 import multer from 'multer';
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   analyzeSpeaking,
@@ -9,18 +9,19 @@ import {
   generateSpeech,
   getExplanation,
   getFullWritingFeedback,
-  getMetaWritingFeedback,
-  getWritingFeedback,
   transcribeAudio
 } from './openaiApi.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const envFile = path.resolve(__dirname, '../.env');
 const distDir = path.resolve(__dirname, '../dist');
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 }
 });
+
+loadEnvFile(envFile);
 
 const app = express();
 app.disable('x-powered-by');
@@ -51,6 +52,31 @@ function asyncRoute(handler) {
   };
 }
 
+function loadEnvFile(filePath) {
+  if (!existsSync(filePath)) {
+    return;
+  }
+
+  const content = readFileSync(filePath, 'utf8');
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+
+    const separator = trimmed.indexOf('=');
+    if (separator === -1) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, separator).trim();
+    const value = trimmed.slice(separator + 1).trim();
+    if (key && !(key in process.env)) {
+      process.env[key] = value;
+    }
+  }
+}
+
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
@@ -69,24 +95,6 @@ app.post('/api/openai/explanation', asyncRoute(async (req, res) => {
   }
 
   res.json(await getExplanation(question, selectedAnswer, correctAnswer));
-}));
-
-app.post('/api/openai/writing-feedback', asyncRoute(async (req, res) => {
-  const { text, promptTitle } = req.body || {};
-  if (!text) {
-    throw createHttpError(400, 'text is required.');
-  }
-
-  res.json(await getWritingFeedback(text, promptTitle));
-}));
-
-app.post('/api/openai/meta-writing-feedback', asyncRoute(async (req, res) => {
-  const { text } = req.body || {};
-  if (!text) {
-    throw createHttpError(400, 'text is required.');
-  }
-
-  res.json(await getMetaWritingFeedback(text));
 }));
 
 app.post('/api/openai/full-writing-feedback', asyncRoute(async (req, res) => {

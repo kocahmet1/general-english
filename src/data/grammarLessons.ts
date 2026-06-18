@@ -3786,17 +3786,4 @@ Bu sıfatlar kurala uymaz, ezberlenmesi gerekir:
     ...additionalGrammarLessons
 ];
 
-// Helper function to get a lesson by topic
-export const getLessonByTopic = (topic: GrammarTopic): GrammarLesson | undefined => {
-    return grammarLessons.find(lesson => lesson.topic === topic);
-};
-
-// Helper function to get all topics
-export const getAllTopics = (): GrammarTopic[] => {
-    return grammarLessons.map(lesson => lesson.topic);
-};
-
-// Export count for validation
-export const totalLessons = grammarLessons.length; // Should be 12
-export const totalExercises = grammarLessons.reduce((sum, lesson) => sum + lesson.exercises.length, 0); // Should be 480
 

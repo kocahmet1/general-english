@@ -97,24 +97,5 @@ export async function removeVocabWord(wordId: string): Promise<boolean> {
   }
 }
 
-// Check if a word is in the vault
-export async function isWordInVault(word: string): Promise<boolean> {
-  try {
-    const userId = auth?.currentUser?.uid;
-    if (!userId) return false;
-
-    const vocabRef = collection(db, VOCAB_COLLECTION);
-    const q = query(
-      vocabRef,
-      where('userId', '==', userId),
-      where('word', '==', word.toLowerCase())
-    );
-    const snapshot = await getDocs(q);
-    return !snapshot.empty;
-  } catch (error) {
-    console.error('Error checking vocab word:', error);
-    return false;
-  }
-}
 
 
