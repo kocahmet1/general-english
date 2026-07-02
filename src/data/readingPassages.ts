@@ -442,5 +442,430 @@ Another question is whether artificial general intelligence, or AGI, will ever e
       }
     ],
     createdAt: new Date('2024-02-15')
+  },
+  {
+    id: 'passage_6',
+    title: 'Urban Gardens and Community Life',
+    topic: 'Society & Environment',
+    difficulty: 'Upper Intermediate',
+    wordCount: 236,
+    estimatedTime: 10,
+    passage: `In many cities, small areas of unused land are being turned into community gardens. These gardens are usually managed by local residents, schools, or neighborhood groups. At first, they may look like simple places to grow vegetables, but their value often goes far beyond food.
+
+One benefit is that community gardens make fresh produce more accessible. In some neighborhoods, supermarkets are far away or too expensive for many families. A shared garden can provide tomatoes, herbs, lettuce, and other basic foods during the growing season. Even when the harvest is small, it can help people feel more connected to what they eat.
+
+Community gardens can also improve social life. People who might not normally speak to one another meet while watering plants, sharing tools, or planning weekend work. Older residents may teach younger people how to plant seeds or protect plants from insects. In this way, the garden becomes a place for informal learning.
+
+There are environmental benefits as well. Plants can cool small areas of a city, attract bees and butterflies, and absorb rainwater that might otherwise run into streets. Some gardens also use compost, which turns food waste into useful soil.
+
+However, community gardens need careful organization. Someone must decide who can use each plot, how water will be paid for, and what rules everyone should follow. If these questions are handled fairly, a small garden can become an important part of city life.`,
+    questions: [
+      {
+        id: 1,
+        questionText: 'What is the main idea of this passage?',
+        questionType: 'main_idea',
+        options: [
+          { letter: 'A', text: 'Community gardens only help people grow food' },
+          { letter: 'B', text: 'Community gardens can support food, social life, and the environment' },
+          { letter: 'C', text: 'City land should never be used for housing' },
+          { letter: 'D', text: 'Gardening is too difficult for most city residents' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage explains several benefits of community gardens, including food, social connection, learning, and environmental value.'
+      },
+      {
+        id: 2,
+        questionText: 'According to the passage, why can community gardens help some neighborhoods?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'They replace all supermarkets' },
+          { letter: 'B', text: 'They provide some fresh produce where shops may be far away or expensive' },
+          { letter: 'C', text: 'They make all food free for the city' },
+          { letter: 'D', text: 'They stop people from buying vegetables' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage says gardens can help when supermarkets are far away or too expensive by providing some fresh produce.'
+      },
+      {
+        id: 3,
+        questionText: 'The word "accessible" in paragraph 2 is closest in meaning to:',
+        questionType: 'vocabulary',
+        options: [
+          { letter: 'A', text: 'easy to reach or use' },
+          { letter: 'B', text: 'impossible to grow' },
+          { letter: 'C', text: 'expensive to repair' },
+          { letter: 'D', text: 'hidden from public view' }
+        ],
+        correctAnswer: 'A',
+        explanation: '"Accessible" means easy to reach or use. In the passage, it refers to fresh produce being easier for people to get.'
+      },
+      {
+        id: 4,
+        questionText: 'What can be inferred about older residents in community gardens?',
+        questionType: 'inference',
+        options: [
+          { letter: 'A', text: 'They may share useful gardening knowledge' },
+          { letter: 'B', text: 'They are not allowed to use garden plots' },
+          { letter: 'C', text: 'They usually avoid speaking to younger people' },
+          { letter: 'D', text: 'They only visit gardens in winter' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage says older residents may teach younger people how to plant seeds or protect plants.'
+      },
+      {
+        id: 5,
+        questionText: 'Why does the final paragraph mention rules and water costs?',
+        questionType: 'structure',
+        options: [
+          { letter: 'A', text: 'To show that gardens need organization to work well' },
+          { letter: 'B', text: 'To prove that gardens are always unsuccessful' },
+          { letter: 'C', text: 'To explain why plants need sunlight' },
+          { letter: 'D', text: 'To compare gardens with supermarkets' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The final paragraph explains that community gardens need fair rules and organization.'
+      }
+    ],
+    createdAt: new Date('2024-03-01')
+  },
+  {
+    id: 'passage_7',
+    title: 'The Science of Sleep',
+    topic: 'Health & Science',
+    difficulty: 'Upper Intermediate',
+    wordCount: 221,
+    estimatedTime: 10,
+    passage: `Sleep is often treated as a break from daily life, but scientists describe it as an active process. While we sleep, the brain sorts information, strengthens memories, and helps the body repair itself. For students and workers, sleep is not a luxury; it is part of learning and health.
+
+One important function of sleep is memory. After people learn new information, sleep helps the brain organize it. This does not mean that sleeping once before a test is enough. Regular sleep over many nights is more useful than one long night of rest after several late nights.
+
+Sleep also affects emotions. People who sleep poorly often find it harder to stay calm, solve problems, or respond patiently to others. This is one reason why tired people may overreact to small problems. Good sleep can make daily stress easier to manage.
+
+Modern life creates several obstacles to healthy sleep. Bright screens, late messages, caffeine, and irregular schedules can all delay the body clock. Many people also use their phones in bed, which makes the brain connect the bedroom with activity instead of rest.
+
+Experts usually recommend a simple routine: keep similar sleep and wake times, reduce screen use before bed, and make the room dark and quiet. These habits may sound ordinary, but they can have a strong effect when practiced consistently.`,
+    questions: [
+      {
+        id: 1,
+        questionText: 'What is the main purpose of this passage?',
+        questionType: 'purpose',
+        options: [
+          { letter: 'A', text: 'To explain why sleep is important for the brain, body, and emotions' },
+          { letter: 'B', text: 'To argue that people should study only at night' },
+          { letter: 'C', text: 'To describe the history of sleeping habits' },
+          { letter: 'D', text: 'To compare different types of beds' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage explains several roles of sleep, including memory, emotional control, and physical repair.'
+      },
+      {
+        id: 2,
+        questionText: 'According to the passage, how does sleep help with learning?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'It removes the need to study' },
+          { letter: 'B', text: 'It helps the brain organize new information' },
+          { letter: 'C', text: 'It makes every subject easy' },
+          { letter: 'D', text: 'It works only on the night before a test' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage states that sleep helps the brain organize information after people learn it.'
+      },
+      {
+        id: 3,
+        questionText: 'The word "obstacles" in paragraph 4 is closest in meaning to:',
+        questionType: 'vocabulary',
+        options: [
+          { letter: 'A', text: 'things that make something difficult' },
+          { letter: 'B', text: 'habits that always help' },
+          { letter: 'C', text: 'places for sleeping' },
+          { letter: 'D', text: 'types of memory' }
+        ],
+        correctAnswer: 'A',
+        explanation: '"Obstacles" are things that make something difficult. The passage lists problems that can delay healthy sleep.'
+      },
+      {
+        id: 4,
+        questionText: 'What can be inferred about using a phone in bed?',
+        questionType: 'inference',
+        options: [
+          { letter: 'A', text: 'It may make it harder for the brain to relax in bed' },
+          { letter: 'B', text: 'It always improves sleep quality' },
+          { letter: 'C', text: 'It is the only cause of poor sleep' },
+          { letter: 'D', text: 'It helps people wake up earlier' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage says phone use in bed can make the brain connect the bedroom with activity instead of rest.'
+      },
+      {
+        id: 5,
+        questionText: 'Which habit is recommended in the final paragraph?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'Drinking caffeine before bed' },
+          { letter: 'B', text: 'Changing sleep times every night' },
+          { letter: 'C', text: 'Reducing screen use before bed' },
+          { letter: 'D', text: 'Keeping the room bright' }
+        ],
+        correctAnswer: 'C',
+        explanation: 'The final paragraph recommends reducing screen use before bed.'
+      }
+    ],
+    createdAt: new Date('2024-03-05')
+  },
+  {
+    id: 'passage_8',
+    title: 'Public Transport and City Life',
+    topic: 'Urban Planning',
+    difficulty: 'Upper Intermediate',
+    wordCount: 236,
+    estimatedTime: 10,
+    passage: `Public transport shapes how people experience a city. Buses, trams, metros, and trains do more than move passengers from one place to another. They influence where people can work, how much money they spend on travel, and how much pollution a city produces.
+
+A strong transport system gives people more choices. Someone who does not own a car can still reach schools, hospitals, shops, and offices. This is especially important for young people, older adults, and families with lower incomes. When transport is reliable, people can plan their day with less stress.
+
+Public transport can also reduce traffic. A full bus may carry the same number of people as many private cars. This means fewer vehicles on the road, less noise, and lower emissions. However, people are more likely to use public transport when it is clean, safe, frequent, and connected to the places they need to go.
+
+Design matters as much as vehicles. Clear signs, simple ticket systems, and comfortable waiting areas can make a journey easier. If a passenger must use three confusing apps or wait at a dark stop, the system feels less useful, even if the bus itself is modern.
+
+Cities that invest in public transport often need patience. New routes and stations can be expensive, and construction may disturb daily life for a while. Over time, though, better transport can make a city more equal, cleaner, and easier to move through.`,
+    questions: [
+      {
+        id: 1,
+        questionText: 'What is the main idea of this passage?',
+        questionType: 'main_idea',
+        options: [
+          { letter: 'A', text: 'Public transport affects many parts of city life' },
+          { letter: 'B', text: 'Private cars are always cheaper than buses' },
+          { letter: 'C', text: 'Cities should stop building train stations' },
+          { letter: 'D', text: 'Modern buses do not need drivers' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage explains how public transport affects access, traffic, pollution, design, and equality in cities.'
+      },
+      {
+        id: 2,
+        questionText: 'According to the passage, who especially benefits from reliable public transport?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'Only people who own cars' },
+          { letter: 'B', text: 'Young people, older adults, and lower-income families' },
+          { letter: 'C', text: 'Only tourists visiting museums' },
+          { letter: 'D', text: 'People who never travel' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage directly names young people, older adults, and families with lower incomes.'
+      },
+      {
+        id: 3,
+        questionText: 'The word "reliable" in paragraph 2 is closest in meaning to:',
+        questionType: 'vocabulary',
+        options: [
+          { letter: 'A', text: 'expensive and rare' },
+          { letter: 'B', text: 'able to be trusted' },
+          { letter: 'C', text: 'difficult to understand' },
+          { letter: 'D', text: 'far from the city' }
+        ],
+        correctAnswer: 'B',
+        explanation: '"Reliable" means able to be trusted. A reliable system helps people plan their day.'
+      },
+      {
+        id: 4,
+        questionText: 'Why does the passage mention clear signs and simple ticket systems?',
+        questionType: 'structure',
+        options: [
+          { letter: 'A', text: 'To show that design can affect how useful transport feels' },
+          { letter: 'B', text: 'To explain how buses are built' },
+          { letter: 'C', text: 'To argue that signs are more important than routes' },
+          { letter: 'D', text: 'To describe traffic laws' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage uses these examples to show that passenger experience depends on design, not only vehicles.'
+      },
+      {
+        id: 5,
+        questionText: 'What is the author\'s attitude toward investing in public transport?',
+        questionType: 'tone',
+        options: [
+          { letter: 'A', text: 'Generally supportive, while recognizing costs and disruption' },
+          { letter: 'B', text: 'Completely negative' },
+          { letter: 'C', text: 'Uninterested and neutral' },
+          { letter: 'D', text: 'Only concerned with ticket prices' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The author says investment can be expensive and disruptive, but also explains long-term benefits.'
+      }
+    ],
+    createdAt: new Date('2024-03-10')
+  },
+  {
+    id: 'passage_9',
+    title: 'Digital Payments and Everyday Life',
+    topic: 'Technology & Society',
+    difficulty: 'Upper Intermediate',
+    wordCount: 226,
+    estimatedTime: 9,
+    passage: `Digital payments have changed the way many people buy and sell things. Instead of using cash, customers can pay with cards, mobile phones, watches, or online banking apps. For many businesses, this makes payments faster and reduces the need to keep large amounts of cash in a shop.
+
+Convenience is the main reason digital payments have grown. A person can order food, pay bills, or send money to a friend without visiting a bank. Small businesses can also sell to customers online and receive payment immediately. This can help them reach people outside their local area.
+
+However, digital payments can create new problems. Not everyone has a bank account, a smartphone, or a stable internet connection. Older adults and people in rural areas may find digital systems difficult to use. If shops stop accepting cash completely, these customers may be excluded.
+
+Security is another concern. Digital systems can record where and when people spend money. This information can help banks notice fraud, but it also raises questions about privacy. Customers need to understand passwords, suspicious links, and the risks of sharing personal information.
+
+For these reasons, many experts support a balanced approach. Digital payments are useful and will probably continue to grow, but cash still has a role. A payment system works best when it is fast, safe, and open to as many people as possible.`,
+    questions: [
+      {
+        id: 1,
+        questionText: 'What is the passage mainly about?',
+        questionType: 'main_idea',
+        options: [
+          { letter: 'A', text: 'The benefits and challenges of digital payments' },
+          { letter: 'B', text: 'Why cash has disappeared everywhere' },
+          { letter: 'C', text: 'How to open a bank account' },
+          { letter: 'D', text: 'The history of shopping malls' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage discusses both advantages of digital payments and concerns such as access, security, and privacy.'
+      },
+      {
+        id: 2,
+        questionText: 'According to the passage, why are digital payments convenient?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'They require people to visit a bank every day' },
+          { letter: 'B', text: 'They let people pay bills or send money without visiting a bank' },
+          { letter: 'C', text: 'They can only be used in large stores' },
+          { letter: 'D', text: 'They remove the need for passwords' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage says people can pay bills or send money to a friend without visiting a bank.'
+      },
+      {
+        id: 3,
+        questionText: 'The word "excluded" in paragraph 3 is closest in meaning to:',
+        questionType: 'vocabulary',
+        options: [
+          { letter: 'A', text: 'left out' },
+          { letter: 'B', text: 'invited in' },
+          { letter: 'C', text: 'paid more quickly' },
+          { letter: 'D', text: 'protected from fraud' }
+        ],
+        correctAnswer: 'A',
+        explanation: '"Excluded" means left out. The passage says some customers may be left out if shops stop accepting cash.'
+      },
+      {
+        id: 4,
+        questionText: 'What concern does the passage raise about privacy?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'Digital systems can record spending information' },
+          { letter: 'B', text: 'Cash always records personal details' },
+          { letter: 'C', text: 'Passwords are never needed online' },
+          { letter: 'D', text: 'Banks cannot notice fraud' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage says digital systems can record where and when people spend money.'
+      },
+      {
+        id: 5,
+        questionText: 'What does the author suggest in the final paragraph?',
+        questionType: 'inference',
+        options: [
+          { letter: 'A', text: 'Digital payments are useful, but cash should still be available' },
+          { letter: 'B', text: 'All shops should refuse cash immediately' },
+          { letter: 'C', text: 'Online payments should be slower' },
+          { letter: 'D', text: 'Only banks should sell products online' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The author supports a balanced approach and says cash still has a role.'
+      }
+    ],
+    createdAt: new Date('2024-03-15')
+  },
+  {
+    id: 'passage_10',
+    title: 'Learning a Second Language as an Adult',
+    topic: 'Education',
+    difficulty: 'Upper Intermediate',
+    wordCount: 224,
+    estimatedTime: 10,
+    passage: `Many adults believe that children learn languages easily while adults learn slowly. There is some truth in this idea, especially with pronunciation. Young children often copy new sounds without fear. Adults may notice mistakes more and feel embarrassed when they speak. However, adults also have strengths that can help them learn effectively.
+
+Adult learners usually understand why they are studying. They may need English for work, travel, university, or communication with friends. This clear purpose can create strong motivation. Adults can also use learning strategies, such as taking notes, comparing grammar with their first language, and setting weekly goals.
+
+Another advantage is life experience. Adults know more about the world, so they can connect new words to real situations. For example, a business owner learning words about negotiation may understand the topic quickly because it connects to daily work.
+
+The main challenge is often time. Adults may have jobs, families, and other responsibilities. Because of this, short regular practice can be more realistic than long study sessions. Reading for ten minutes, reviewing vocabulary on a bus, or speaking with a teacher once a week can still lead to progress.
+
+Successful adult learners usually accept that mistakes are part of the process. They do not wait until their English is perfect before speaking. Instead, they use the language, notice problems, and improve step by step.`,
+    questions: [
+      {
+        id: 1,
+        questionText: 'What is the main idea of this passage?',
+        questionType: 'main_idea',
+        options: [
+          { letter: 'A', text: 'Adults cannot learn new languages' },
+          { letter: 'B', text: 'Adults face challenges but also have useful strengths when learning languages' },
+          { letter: 'C', text: 'Children should not study pronunciation' },
+          { letter: 'D', text: 'Language learning is only useful for travel' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The passage explains both challenges and strengths of adult language learners.'
+      },
+      {
+        id: 2,
+        questionText: 'According to the passage, why can adults have strong motivation?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'They usually know why they are studying' },
+          { letter: 'B', text: 'They never feel embarrassed' },
+          { letter: 'C', text: 'They always have more free time than children' },
+          { letter: 'D', text: 'They do not need weekly goals' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The passage says adult learners often have a clear purpose, which can create strong motivation.'
+      },
+      {
+        id: 3,
+        questionText: 'The word "strategies" in paragraph 2 is closest in meaning to:',
+        questionType: 'vocabulary',
+        options: [
+          { letter: 'A', text: 'planned methods' },
+          { letter: 'B', text: 'random mistakes' },
+          { letter: 'C', text: 'native sounds' },
+          { letter: 'D', text: 'school buildings' }
+        ],
+        correctAnswer: 'A',
+        explanation: '"Strategies" means planned methods. The passage gives examples such as taking notes and setting goals.'
+      },
+      {
+        id: 4,
+        questionText: 'Why does the passage mention a business owner?',
+        questionType: 'structure',
+        options: [
+          { letter: 'A', text: 'To show how life experience can connect to new vocabulary' },
+          { letter: 'B', text: 'To explain how to start a company' },
+          { letter: 'C', text: 'To prove that only business owners learn English' },
+          { letter: 'D', text: 'To compare travel and university study' }
+        ],
+        correctAnswer: 'A',
+        explanation: 'The business owner is an example of how adults can connect new words to real situations.'
+      },
+      {
+        id: 5,
+        questionText: 'What attitude toward mistakes does the passage recommend?',
+        questionType: 'detail',
+        options: [
+          { letter: 'A', text: 'Avoid speaking until English is perfect' },
+          { letter: 'B', text: 'Accept mistakes as part of learning' },
+          { letter: 'C', text: 'Ignore all grammar problems forever' },
+          { letter: 'D', text: 'Stop studying after the first mistake' }
+        ],
+        correctAnswer: 'B',
+        explanation: 'The final paragraph says successful adult learners accept that mistakes are part of the process.'
+      }
+    ],
+    createdAt: new Date('2024-03-20')
   }
 ];
