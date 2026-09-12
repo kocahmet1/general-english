@@ -1,3 +1,4 @@
+import { PageBack } from './LearningLayout';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { SpellingForge } from './SpellingForge';
 import { ParagraphSpellingFix } from './ParagraphSpellingFix';
@@ -371,8 +372,8 @@ export const WritingPractice = ({
   if (!isOpen) return null;
 
   return (
-    <div className="writing-practice-overlay" onClick={onClose}>
-      <div className="writing-practice-split" onClick={e => e.stopPropagation()}>
+    <div className="activity-page">
+      <div className="writing-practice-split activity-panel" onClick={e => e.stopPropagation()}>
 
         {/* ===== LEFT PANEL — Voice Tutor ===== */}
         <div className={`writing-left-panel ${isVoiceTutorOpen ? 'voice-active' : ''} ${mobileShowVoice ? 'mobile-show' : 'mobile-hide'}`}>
@@ -535,9 +536,7 @@ export const WritingPractice = ({
                 <span>Yazım</span>
               </button>
             </div>
-            <button className="close-btn" onClick={onClose}>
-              <X size={24} />
-            </button>
+            <PageBack onClick={onClose} />
           </div>
 
           {/* Scrollable Content */}

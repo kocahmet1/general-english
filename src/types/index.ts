@@ -324,50 +324,62 @@ export interface SpeakingStats {
 // Listening Practice Module Types
 // ===================================
 
-export type IELTSListeningSection = 'section1' | 'section2' | 'section3' | 'section4';
+export type ListeningPassageType = 'conversation' | 'lecture';
 
-export const IELTS_LISTENING_SECTION_LABELS: Record<IELTSListeningSection, string> = {
-  section1: 'Section 1 - Everyday Conversation',
-  section2: 'Section 2 - Monologue (Social)',
-  section3: 'Section 3 - Academic Discussion',
-  section4: 'Section 4 - Academic Lecture'
+export const LISTENING_PASSAGE_LABELS: Record<ListeningPassageType, string> = {
+  conversation: 'Conversation',
+  lecture: 'Lecture'
 };
 
 export type ListeningQuestionType =
-  | 'multiple_choice'      // Choose from A, B, C, D
-  | 'matching'             // Match items from two lists
-  | 'completion'           // Fill in the blanks (sentence/note/form completion)
-  | 'map_labeling'         // Label parts of a map/diagram
-  | 'short_answer';        // Write a short answer
+  | 'main_idea'
+  | 'detail'
+  | 'function'
+  | 'attitude'
+  | 'organization'
+  | 'connecting_content'
+  | 'inference';
 
 export const LISTENING_QUESTION_TYPE_LABELS: Record<ListeningQuestionType, string> = {
-  multiple_choice: 'Çoktan Seçmeli',
-  matching: 'Eşleştirme',
-  completion: 'Boşluk Doldurma',
-  map_labeling: 'Harita/Diyagram',
-  short_answer: 'Kısa Cevap'
+  main_idea: 'Ana Fikir / Amaç',
+  detail: 'Ayrıntı',
+  function: 'Konuşmacının Amacı',
+  attitude: 'Tutum',
+  organization: 'Organizasyon',
+  connecting_content: 'Bilgileri İlişkilendirme',
+  inference: 'Çıkarım'
 };
 
 export interface ListeningQuestion {
   id: number;
   questionText: string;
   questionType: ListeningQuestionType;
-  options?: Option[];               // For multiple choice/matching
-  correctAnswer: string;            // The correct answer
-  acceptableAnswers?: string[];     // Alternative correct answers for completion/short answer
-  audioTimestamp?: number;          // When in the audio this question is relevant (seconds)
-  explanation?: string;             // Explanation for the answer
+  options: Option[];
+  correctAnswer: string;            // Sorted, comma-separated letters for multiple answers
+  answerCount?: number;             // Defaults to one
+  replayTurnIndex?: number;         // Optional excerpt from the recording
+  explanation: string;
+}
+
+export interface ListeningTurn {
+  speaker: string;
+  voice: 'nova' | 'onyx';
+  text: string;
+  startTime?: number;
+  endTime?: number;
 }
 
 export interface ListeningTest {
   id: string;
   title: string;
-  section: IELTSListeningSection;
+  section: ListeningPassageType;
   topic: string;
+  context: string;
   difficulty: 'easy' | 'medium' | 'hard';
   transcript: string;               // Full transcript of the audio
   audioText: string;                // Text to be converted to speech (TTS)
   audioUrl?: string;                // Optional external audio URL
+  turns: ListeningTurn[];
   duration: number;                 // Duration in seconds
   questions: ListeningQuestion[];
   createdAt: Date;
@@ -394,7 +406,7 @@ export interface ListeningStats {
   totalQuestionsAnswered: number;
   totalCorrect: number;
   averageScore: number;
-  testsBySection: Record<IELTSListeningSection, number>;
+  testsBySection: Record<ListeningPassageType, number>;
   testsByDifficulty: Record<string, number>;
   questionTypePerformance: Record<ListeningQuestionType, { correct: number; total: number }>;
 }

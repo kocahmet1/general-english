@@ -1,3 +1,5 @@
+import { PageBack } from './LearningLayout';
+import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import {
   X,
@@ -55,13 +57,21 @@ export const ReadingComprehension = ({
   onAddToVault,
   vocabWordsInVault = []
 }: ReadingComprehensionProps) => {
+  const [params, setParams] = useSearchParams();
+  const selectedPassage = passages.find(passage => passage.id === params.get('passage')) || null;
+  const setSelectedPassage = (passage: ReadingPassage | null) => setParams(passage ? { passage: passage.id } : {});
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [selectedPassage, setSelectedPassage] = useState<ReadingPassage | null>(null);
   const [currentAnswers, setCurrentAnswers] = useState<Map<number, ReadingAnswer>>(new Map());
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showPassageInQuestions, setShowPassageInQuestions] = useState(true);
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
   const [showVocabOptions, setShowVocabOptions] = useState<number | null>(null);
+
+  useEffect(() => {
+    setViewMode(selectedPassage ? 'reading' : 'list');
+    setCurrentQuestionIndex(0);
+    setCurrentAnswers(new Map());
+  }, [selectedPassage?.id]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -253,8 +263,8 @@ export const ReadingComprehension = ({
   const currentQuestion = selectedPassage?.questions[currentQuestionIndex];
 
   return (
-    <div className="reading-overlay" onClick={onClose}>
-      <div className="reading-panel" onClick={e => e.stopPropagation()}>
+    <div className="activity-page">
+      <div className="reading-panel activity-panel" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="reading-header">
           <div className="reading-title">
@@ -277,9 +287,7 @@ export const ReadingComprehension = ({
               <span>İstatistikler</span>
             </button>
           </div>
-          <button className="close-btn" onClick={onClose}>
-            <X size={24} />
-          </button>
+          <PageBack onClick={onClose} />
         </div>
 
         {/* Content */}
@@ -767,4 +775,3 @@ export const ReadingComprehension = ({
     </div>
   );
 };
-

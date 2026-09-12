@@ -1,4 +1,7 @@
+import { PageBack } from './LearningLayout';
+import { SentenceWordBoard } from './SentenceWordBoard';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowRight,
@@ -11,8 +14,7 @@ import {
   Lightbulb,
   PenLine,
   RotateCcw,
-  Target,
-  X
+  Target
 } from 'lucide-react';
 import '../sentence-lab.css';
 import { sentenceLabExercises } from '../data/sentenceLabExercises';
@@ -41,6 +43,14 @@ interface SentenceLabProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const moveWord = <T,>(words: T[], from: number, to: number): T[] => {
+  if (from < 0 || from >= words.length || to < 0 || to >= words.length || from === to) return words;
+  const next = [...words];
+  const [word] = next.splice(from, 1);
+  next.splice(to, 0, word);
+  return next;
+};
 
 type SentenceLabViewMode = 'overview' | 'practice' | 'stats' | 'history';
 
@@ -105,8 +115,10 @@ const scrambleArray = <T,>(items: T[]) => {
 };
 
 export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
+  const [params, setParams] = useSearchParams();
+  const activeType = SENTENCE_LAB_TYPE_ORDER.find(type => type === params.get('type')) || null;
+  const setActiveType = (type: SentenceLabExerciseType | null) => setParams(type ? { type } : {});
   const [viewMode, setViewMode] = useState<SentenceLabViewMode>('overview');
-  const [activeType, setActiveType] = useState<SentenceLabExerciseType | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [textAnswer, setTextAnswer] = useState('');
   const [blankAnswers, setBlankAnswers] = useState<string[]>([]);
@@ -178,12 +190,11 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
     }
 
     loadStoredData();
-    setViewMode('overview');
-    setActiveType(null);
+    setViewMode(activeType ? 'practice' : 'overview');
     setCurrentIndex(0);
     setSessionResults([]);
-    resetInputs(null);
-  }, [isOpen]);
+    resetInputs(activeType ? EXERCISES_BY_TYPE[activeType][0] || null : null);
+  }, [isOpen, activeType]);
 
   const handleStartType = (type: SentenceLabExerciseType) => {
     const exercises = EXERCISES_BY_TYPE[type];
@@ -235,7 +246,7 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
     setViewMode('practice');
   };
 
-  const handleSelectChunk = (chunkIndex: number) => {
+  const handleSelectChunk = (chunkIndex: number, position = selectedChunkIndexes.length) => {
     if (!currentExercise || currentExercise.type !== 'sentence_builder' || evaluation) {
       return;
     }
@@ -244,7 +255,12 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
       return;
     }
 
-    setSelectedChunkIndexes((prev) => [...prev, chunkIndex]);
+    setSelectedChunkIndexes((prev) => {
+      if (prev.includes(chunkIndex)) return prev;
+      const next = [...prev];
+      next.splice(position, 0, chunkIndex);
+      return next;
+    });
   };
 
   const handleRemoveChunk = (selectedPosition: number) => {
@@ -253,17 +269,6 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
     }
 
     setSelectedChunkIndexes((prev) => prev.filter((_, index) => index !== selectedPosition));
-  };
-
-  const handleTextWordInsert = (word: string) => {
-    if (evaluation) {
-      return;
-    }
-
-    setTextAnswer((prev) => {
-      const trimmed = prev.trim();
-      return trimmed ? `${trimmed} ${word}` : word;
-    });
   };
 
   const handleBlankChange = (index: number, value: string) => {
@@ -379,63 +384,48 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
     }
 
     switch (currentExercise.type) {
-      case 'sentence_builder': {
-        const selectedChunks = selectedChunkIndexes.map((index) => currentExercise.chunks[index]);
+      case 'sentence_builder':
+        return <SentenceWordBoard
+          key={currentExercise.id + '-' + shuffleVersion}
+          words={shuffledBuilderChunks.map(({ chunk, originalIndex }) => ({ id: originalIndex, text: chunk }))}
+          answer={selectedChunkIndexes.map(index => currentExercise.chunks[index])}
+          usedWordIds={selectedChunkIndexes}
+          disabled={Boolean(evaluation)}
+          placeholder="Build the sentence here."
+          onInsert={handleSelectChunk}
+          onRemove={handleRemoveChunk}
+          onMove={(from, to) => { if (!evaluation) setSelectedChunkIndexes(prev => moveWord(prev, from, to)); }}
+        />;
 
-        return (
-          <div className="sentence-lab-builder">
-            <div className="sentence-lab-selected-line">
-              {selectedChunks.length > 0 ? (
-                selectedChunks.map((chunk, index) => (
-                  <button
-                    key={`${chunk}-${index}`}
-                    type="button"
-                    className="sentence-lab-selected-chunk"
-                    onClick={() => handleRemoveChunk(index)}
-                    disabled={Boolean(evaluation)}
-                  >
-                    {chunk}
-                  </button>
-                ))
-              ) : (
-                <p className="sentence-lab-placeholder">Build the sentence here.</p>
-              )}
-            </div>
-
-            <div className="sentence-lab-bank-grid">
-              {shuffledBuilderChunks.map(({ chunk, originalIndex }) => {
-                const isUsed = selectedChunkIndexes.includes(originalIndex);
-
-                return (
-                  <button
-                    key={`${chunk}-${originalIndex}`}
-                    type="button"
-                    className={`sentence-lab-bank-chunk ${isUsed ? 'is-used' : ''}`}
-                    onClick={() => handleSelectChunk(originalIndex)}
-                    disabled={isUsed || Boolean(evaluation)}
-                  >
-                    {chunk}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        );
+      case 'guided_translation': {
+        const tokens = textAnswer.match(/\S+/g) || [];
+        const normalize = (word: string) => word.toLocaleLowerCase('en').replace(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, '');
+        const remaining = tokens.map(normalize);
+        const usedWordIds = currentExercise.wordBank.flatMap((word, id) => {
+          const index = remaining.indexOf(normalize(word));
+          if (index < 0) return [];
+          remaining.splice(index, 1);
+          return [id];
+        });
+        return <SentenceWordBoard
+          key={currentExercise.id + '-' + shuffleVersion}
+          words={shuffledWordBank.map(({ word, originalIndex }) => ({ id: originalIndex, text: word }))}
+          answer={tokens}
+          usedWordIds={usedWordIds}
+          disabled={Boolean(evaluation)}
+          placeholder="Write the English sentence here."
+          textValue={textAnswer}
+          onTextChange={setTextAnswer}
+          onInsert={(id, position) => {
+            if (evaluation || usedWordIds.includes(id)) return;
+            const next = [...tokens];
+            next.splice(position, 0, currentExercise.wordBank[id]);
+            setTextAnswer(next.join(' '));
+          }}
+          onRemove={position => { if (!evaluation) setTextAnswer(tokens.filter((_, index) => index !== position).join(' ')); }}
+          onMove={(from, to) => { if (!evaluation) setTextAnswer(moveWord(tokens, from, to).join(' ')); }}
+        />;
       }
-
-      case 'guided_translation':
-        return (
-          <div className="sentence-lab-answer-block">
-            <textarea
-              className="sentence-lab-textarea"
-              value={textAnswer}
-              onChange={(event) => setTextAnswer(event.target.value)}
-              placeholder="Write the English sentence here."
-              disabled={Boolean(evaluation)}
-            />
-            {renderWordBank(shuffledWordBank.map((item) => item.word), handleTextWordInsert)}
-          </div>
-        );
 
       case 'partial_translation': {
         const templateParts = currentExercise.template.split('___');
@@ -653,8 +643,8 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
   }
 
   return (
-    <div className="sentence-lab-overlay" onClick={onClose}>
-      <div className="sentence-lab-panel" onClick={(event) => event.stopPropagation()}>
+    <div className="activity-page" lang="en">
+      <div className="sentence-lab-panel activity-panel" onClick={(event) => event.stopPropagation()}>
         <div className="sentence-lab-header">
           <div className="sentence-lab-title">
             <Languages size={24} />
@@ -703,9 +693,7 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
               <span>History</span>
             </button>
 
-            <button type="button" className="sentence-lab-close-btn" onClick={onClose}>
-              <X size={22} />
-            </button>
+            <PageBack onClick={onClose} />
           </div>
         </div>
 

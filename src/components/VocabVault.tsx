@@ -37,9 +37,9 @@ export const VocabVault: React.FC<VocabVaultProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="vocab-vault-panel">
+    <div className="vocab-vault-panel activity-panel">
       <div className="vault-header">
-        <button className="back-btn" onClick={onClose}>
+        <button className="back-btn" aria-label="Ana Sayfa" onClick={onClose}>
           <ChevronLeft size={20} />
         </button>
         <h2>

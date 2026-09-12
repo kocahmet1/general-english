@@ -14,6 +14,7 @@ interface ExamSelectorProps {
   onSelectExam: (examId: string) => void;
   onDeleteExam: (examId: string) => void;
   isLoading: boolean;
+  expanded?: boolean;
 }
 
 export const ExamSelector: React.FC<ExamSelectorProps> = ({
@@ -21,7 +22,8 @@ export const ExamSelector: React.FC<ExamSelectorProps> = ({
   selectedExamId,
   onSelectExam,
   onDeleteExam,
-  isLoading
+  isLoading,
+  expanded = false
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const selectedExam = exams.find(e => e.id === selectedExamId);
@@ -45,10 +47,11 @@ export const ExamSelector: React.FC<ExamSelectorProps> = ({
       </div>
       
       <div className="dropdown-container">
-        <button 
+        {!expanded && <button
           className={`dropdown-trigger ${isOpen ? 'open' : ''}`}
           onClick={() => setIsOpen(!isOpen)}
           disabled={isLoading}
+          aria-expanded={isOpen}
         >
           {isLoading ? (
             <span className="loading-text">Yükleniyor...</span>
@@ -61,10 +64,11 @@ export const ExamSelector: React.FC<ExamSelectorProps> = ({
             <span className="placeholder">Bir sınav seçin...</span>
           )}
           <ChevronDown size={20} className={`chevron ${isOpen ? 'rotated' : ''}`} />
-        </button>
+        </button>}
+        {expanded && isLoading && <p role="status" className="loading-text">Yükleniyor...</p>}
         
-        {isOpen && (
-          <div className="dropdown-menu">
+        {!isLoading && (isOpen || expanded) && (
+          <div className={expanded ? 'exam-catalog' : 'dropdown-menu'}>
             {exams.length === 0 ? (
               <div className="no-exams">
                 <p>Henüz sınav eklenmemiş.</p>
@@ -104,4 +108,3 @@ export const ExamSelector: React.FC<ExamSelectorProps> = ({
     </div>
   );
 };
-

@@ -1,6 +1,6 @@
+import { PageBack } from './LearningLayout';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  X,
   Mic,
   Play,
   Pause,
@@ -102,6 +102,30 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
   const feedbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const prepTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const mountedRef = useRef(true);
+
+  // A page change must release the microphone and stop pending preparation.
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (prepTimerRef.current) clearInterval(prepTimerRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder) {
+        recorder.onstop = null;
+        recorder.ondataavailable = null;
+        if (recorder.state !== 'inactive') recorder.stop();
+        recorder.stream.getTracks().forEach(track => track.stop());
+      }
+      audioRef.current?.pause();
+      feedbackAudioRef.current?.pause();
+    };
+  }, []);
+
+  useEffect(() => () => {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+  }, [audioUrl]);
 
   // Load sessions on mount or when user changes
   useEffect(() => {
@@ -207,6 +231,10 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!mountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -315,7 +343,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
       }
 
       // Generate voice feedback if enabled
-      if (voiceFeedbackEnabled && speakingFeedback.overallBandScore > 0) {
+      if (mountedRef.current && voiceFeedbackEnabled && speakingFeedback.overallBandScore > 0) {
         playVoiceFeedback(speakingFeedback);
       }
 
@@ -345,6 +373,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
       setIsSpeakingFeedback(true);
       const feedbackText = generateVoiceFeedbackText(feedback);
       const audioBuffer = await generateSpeech(feedbackText, 'nova');
+      if (!mountedRef.current) return;
 
       const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
       const url = URL.createObjectURL(blob);
@@ -418,8 +447,8 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
   if (!isOpen) return null;
 
   return (
-    <div className="speaking-overlay">
-      <div className="speaking-panel">
+    <div className="activity-page">
+      <div className="speaking-panel activity-panel">
         {/* Header */}
         <div className="speaking-header">
           <div className="speaking-title">
@@ -452,9 +481,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
             </button>
           </div>
 
-          <button className="close-btn" onClick={onClose}>
-            <X size={24} />
-          </button>
+          <PageBack onClick={onClose} />
         </div>
 
         {/* Content */}
@@ -1066,4 +1093,3 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
     </div>
   );
 }
-

@@ -8,7 +8,8 @@ import {
     orderBy,
     deleteDoc,
     Timestamp,
-    updateDoc
+    updateDoc,
+    runTransaction
 } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import {
@@ -24,7 +25,7 @@ import {
     SpeakingStats,
     ReadingQuestionType,
     IELTSSpeakingSection,
-    IELTSListeningSection,
+    ListeningPassageType,
     ListeningQuestionType
 } from '../types';
 
@@ -552,55 +553,65 @@ export async function getListeningStats(): Promise<ListeningStats> {
     };
     if (!userId) return defaultStats;
 
-    const docSnap = await getDoc(doc(db, 'users', userId, 'stats', 'listening'));
+    const docSnap = await getDoc(doc(db, 'users', userId, 'stats', 'toefl-listening'));
     if (!docSnap.exists()) return defaultStats;
     return docSnap.data() as ListeningStats;
 }
 
 export async function updateListeningStats(
-    section: IELTSListeningSection,
+    testId: string,
+    section: ListeningPassageType,
     difficulty: string,
     totalQuestions: number,
     correctAnswers: number,
-    questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>
+    questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>,
+    audioPlayCount: number
 ): Promise<void> {
     const userId = getUserId();
-    const ref = doc(db, 'users', userId, 'stats', 'listening');
+    const ref = doc(db, 'users', userId, 'stats', 'toefl-listening');
 
-    const docSnap = await getDoc(ref);
-    const current = docSnap.exists() ? docSnap.data() as ListeningStats : {
-        totalTestsCompleted: 0,
-        totalQuestionsAnswered: 0,
-        totalCorrect: 0,
-        averageScore: 0,
-        testsBySection: {} as any,
-        testsByDifficulty: {},
-        questionTypePerformance: {} as any
-    };
+    const progressRef = doc(db, 'users', userId, 'listeningProgress', testId);
+    // Completion and its aggregate are one idempotent write, including retries.
+    await runTransaction(db, async transaction => {
+        const progressSnap = await transaction.get(progressRef);
+        const docSnap = await transaction.get(ref);
+        if (!progressSnap.exists()) throw new Error('Listening progress not found.');
+        if (progressSnap.data().completedAt) return;
+        const current = docSnap.exists() ? docSnap.data() as ListeningStats : {
+            totalTestsCompleted: 0,
+            totalQuestionsAnswered: 0,
+            totalCorrect: 0,
+            averageScore: 0,
+            testsBySection: {} as any,
+            testsByDifficulty: {},
+            questionTypePerformance: {} as any
+        };
 
-    current.totalTestsCompleted++;
-    current.testsBySection[section] = (current.testsBySection[section] || 0) + 1;
-    const testsByDifficulty = current.testsByDifficulty as Record<string, number>;
-    testsByDifficulty[difficulty] = (testsByDifficulty[difficulty] || 0) + 1;
+        current.totalTestsCompleted++;
+        current.testsBySection[section] = (current.testsBySection[section] || 0) + 1;
+        const testsByDifficulty = current.testsByDifficulty as Record<string, number>;
+        testsByDifficulty[difficulty] = (testsByDifficulty[difficulty] || 0) + 1;
 
-    // Update totals
-    current.totalQuestionsAnswered += totalQuestions;
-    current.totalCorrect += correctAnswers;
+        // Update totals
+        current.totalQuestionsAnswered += totalQuestions;
+        current.totalCorrect += correctAnswers;
 
-    const currentTotalScore = current.averageScore * Math.max(0, current.totalTestsCompleted - 1);
-    const newTestScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-    current.averageScore = Math.round((currentTotalScore + newTestScore) / current.totalTestsCompleted);
+        const currentTotalScore = current.averageScore * Math.max(0, current.totalTestsCompleted - 1);
+        const newTestScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+        current.averageScore = Math.round((currentTotalScore + newTestScore) / current.totalTestsCompleted);
 
-    // Question Types
-    Object.keys(questionTypeResults).forEach(key => {
-        const qType = key as ListeningQuestionType;
-        if (!current.questionTypePerformance[qType]) {
-            current.questionTypePerformance[qType] = { correct: 0, total: 0 };
-        }
-        current.questionTypePerformance[qType].correct += questionTypeResults[qType].correct;
-        current.questionTypePerformance[qType].total += questionTypeResults[qType].total;
+        // Question Types
+        Object.keys(questionTypeResults).forEach(key => {
+            const qType = key as ListeningQuestionType;
+            if (!current.questionTypePerformance[qType]) {
+                current.questionTypePerformance[qType] = { correct: 0, total: 0 };
+            }
+            current.questionTypePerformance[qType].correct += questionTypeResults[qType].correct;
+            current.questionTypePerformance[qType].total += questionTypeResults[qType].total;
+        });
+
+        transaction.update(progressRef, { completedAt: Timestamp.now(), score: newTestScore, audioPlayCount });
+        transaction.set(ref, current);
     });
-
-    await setDoc(ref, current);
 }
 

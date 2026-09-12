@@ -1,0 +1,37 @@
+.grammar-topic-art {
+  display: inline-flex;
+  width: 80px;
+  height: 80px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.grammar-topic-art > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform 180ms ease;
+}
+.grammar-topic-art.is-compact { width: 64px; height: 64px; }
+.lesson-card-art-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.activity-panel .lesson-card-art-row .recommended-badge {
+  align-self: center;
+  margin-bottom: 0;
+}
+.grammar-lesson-card:is(:hover, :focus-visible) .grammar-topic-art > svg {
+  transform: translateY(-2px) rotate(-4deg);
+}
+@media (max-width: 600px) {
+  .grammar-topic-art { width: 72px; height: 72px; }
+  .grammar-topic-art.is-compact { width: 52px; height: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grammar-topic-art > svg { transition: none; }
+  .grammar-lesson-card:is(:hover, :focus-visible) .grammar-topic-art > svg { transform: none; }
+}

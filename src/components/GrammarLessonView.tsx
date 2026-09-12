@@ -1,9 +1,11 @@
+import { PageBack } from './LearningLayout';
 import { useState } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, AlertCircle, Lightbulb, Award, RotateCcw, Headphones } from 'lucide-react';
 import { GrammarTopic } from '../types/grammarLesson';
 import { grammarLessons } from '../data/grammarLessons';
 import { updateLessonProgress } from '../services/grammarLessonService';
 import { VoiceTutor } from './VoiceTutor';
+import { GrammarTopicIcon } from './GrammarTopicIcon';
 
 interface GrammarLessonViewProps {
     topic: GrammarTopic;
@@ -15,7 +17,7 @@ interface GrammarLessonViewProps {
 type ViewMode = 'learn' | 'quiz-selection' | 'practice' | 'results';
 
 const parseBold = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    const parts = text.split(/(\*\*.*?\*\*|\*[^*]+\*)/g);
     return parts.map((part, idx) => {
         if (part.startsWith('**') && part.endsWith('**')) {
             const boldText = part.replace(/\*\*/g, '');
@@ -29,6 +31,9 @@ const parseBold = (text: string) => {
                     {boldText}
                 </strong>
             );
+        }
+        if (part.startsWith('*') && part.endsWith('*')) {
+            return <em key={idx}>{part.slice(1, -1)}</em>;
         }
         return <span key={idx}>{part}</span>;
     });
@@ -135,19 +140,17 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
     // LEARN MODE
     if (viewMode === 'learn') {
         return (
-            <div className="modal-overlay">
-                <div className="modal-content grammar-lesson-view-modal">
+            <div className="activity-page">
+                <div className="modal-content grammar-lesson-view-modal activity-panel">
                     <div className="modal-header">
                         <div className="modal-title">
-                            <span className="lesson-icon-large">{lesson.icon}</span>
+                            <GrammarTopicIcon topic={lesson.topic} compact />
                             <div>
                                 <h2>{lesson.title}</h2>
                                 <p className="subtitle">{lesson.description}</p>
                             </div>
                         </div>
-                        <button className="close-btn" onClick={onClose}>
-                            <X size={24} />
-                        </button>
+                        <PageBack onClick={onClose} label="Gramer" />
                     </div>
 
                     <div className="lesson-content-wrapper">
@@ -237,6 +240,10 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
                                                 }
 
                                                 // Handle Headings
+                                                if (/^#{1,6}\s/.test(line)) {
+                                                    elements.push(<h4 key={`heading-${i}`} className="theory-section-heading">{parseBold(line.replace(/^#{1,6}\s+/, ''))}</h4>);
+                                                    continue;
+                                                }
                                                 if (line.startsWith('**') && line.includes('**:')) {
                                                     elements.push(<h4 key={`h4-${i}`} className="theory-subheading">{line.replace(/\*\*/g, '')}</h4>);
                                                     continue;
@@ -314,19 +321,17 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
     // QUIZ SELECTION MODE
     if (viewMode === 'quiz-selection') {
         return (
-            <div className="modal-overlay">
-                <div className="modal-content grammar-lesson-view-modal">
+            <div className="activity-page">
+                <div className="modal-content grammar-lesson-view-modal activity-panel">
                     <div className="modal-header">
                         <div className="modal-title">
-                            <span className="lesson-icon-large">{lesson.icon}</span>
+                            <GrammarTopicIcon topic={lesson.topic} compact />
                             <div>
                                 <h2>{lesson.title} - Select Quiz</h2>
                                 <p className="subtitle">Choose a quiz to test your knowledge</p>
                             </div>
                         </div>
-                        <button className="close-btn" onClick={onClose}>
-                            <X size={24} />
-                        </button>
+                        <PageBack onClick={onClose} label="Gramer" />
                     </div>
 
                     <div className="quiz-selection-container">
@@ -367,8 +372,8 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
     // PRACTICE MODE
     if (viewMode === 'practice') {
         return (
-            <div className="modal-overlay">
-                <div className={`modal-content grammar-lesson-view-modal ${showVoiceTutor ? 'grammar-split-active' : ''}`}>
+            <div className="activity-page">
+                <div className={`modal-content grammar-lesson-view-modal activity-panel ${showVoiceTutor ? 'grammar-split-active' : ''}`}>
                     {/* ===== LEFT PANEL — Voice Tutor ===== */}
                     {showVoiceTutor && (
                         <div className="grammar-voice-panel">
@@ -392,15 +397,13 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
                     <div className="grammar-quiz-panel">
                         <div className="modal-header">
                             <div className="modal-title">
-                                <span className="lesson-icon-large">{lesson.icon}</span>
+                                <GrammarTopicIcon topic={lesson.topic} compact />
                                 <div>
                                     <h2>{lesson.title} - Quiz {selectedQuizId}</h2>
                                     <p className="subtitle">Exercise {currentExerciseIndex + 1} of {filteredExercises.length}</p>
                                 </div>
                             </div>
-                            <button className="close-btn" onClick={onClose}>
-                                <X size={24} />
-                            </button>
+                            <PageBack onClick={onClose} label="Gramer" />
                         </div>
 
                         <div className="practice-progress-bar">
@@ -576,8 +579,8 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
     const passed = score.percentage >= passThreshold;
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content grammar-lesson-view-modal">
+        <div className="activity-page">
+            <div className="modal-content grammar-lesson-view-modal activity-panel">
                 <div className="modal-header">
                     <div className="modal-title">
                         <Award size={28} className={passed ? 'text-success' : 'text-warning'} />
@@ -586,9 +589,7 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
                             <p className="subtitle">{lesson.title}</p>
                         </div>
                     </div>
-                    <button className="close-btn" onClick={() => { onComplete(); onClose(); }}>
-                        <X size={24} />
-                    </button>
+                    <PageBack onClick={() => { onComplete(); onClose(); }} label="Gramer" />
                 </div>
 
                 <div className="results-wrapper">

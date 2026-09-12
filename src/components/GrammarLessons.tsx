@@ -1,8 +1,11 @@
+import { PageBack } from './LearningLayout';
 import { useState, useEffect } from 'react';
-import { X, BookOpen, TrendingUp, Award, Target, BarChart3, RefreshCw } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { BookOpen, TrendingUp, Award, Target, BarChart3, RefreshCw } from 'lucide-react';
 import { grammarLessons } from '../data/grammarLessons';
 import { GrammarTopic } from '../types/grammarLesson';
 import { GrammarLessonView } from './GrammarLessonView';
+import { GrammarTopicIcon } from './GrammarTopicIcon';
 import {
     getGrammarLessonStats,
     getAllLessonProgress,
@@ -15,7 +18,9 @@ interface GrammarLessonsProps {
 }
 
 export function GrammarLessons({ onClose }: GrammarLessonsProps) {
-    const [selectedTopic, setSelectedTopic] = useState<GrammarTopic | null>(null);
+    const [params, setParams] = useSearchParams();
+    const selectedTopic = grammarLessons.find(lesson => lesson.topic === params.get('topic'))?.topic || null;
+    const setSelectedTopic = (topic: GrammarTopic | null) => setParams(topic ? { topic } : {});
     const [stats, setStats] = useState(getGrammarLessonStats());
     const [progressData, setProgressData] = useState(getAllLessonProgress());
 
@@ -54,6 +59,7 @@ export function GrammarLessons({ onClose }: GrammarLessonsProps) {
     if (selectedTopic) {
         return (
             <GrammarLessonView
+                key={selectedTopic}
                 topic={selectedTopic}
                 onClose={handleLessonClose}
                 onComplete={handleLessonComplete}
@@ -66,8 +72,8 @@ export function GrammarLessons({ onClose }: GrammarLessonsProps) {
         : 0;
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content grammar-lessons-modal">
+        <div className="activity-page">
+            <div className="modal-content grammar-lessons-modal activity-panel">
                 {/* Header */}
                 <div className="modal-header">
                     <div className="modal-title">
@@ -77,9 +83,7 @@ export function GrammarLessons({ onClose }: GrammarLessonsProps) {
                             <p className="subtitle">Master IELTS Grammar Step by Step</p>
                         </div>
                     </div>
-                    <button className="close-btn" onClick={onClose} title="Close">
-                        <X size={24} />
-                    </button>
+                    <PageBack onClick={onClose} />
                 </div>
 
                 {/* Stats Dashboard */}
@@ -163,20 +167,21 @@ export function GrammarLessons({ onClose }: GrammarLessonsProps) {
                         const accuracy = progress ? Math.round(progress.score) : null;
 
                         return (
-                            <div
+                            <Link
                                 key={lesson.topic}
                                 className={`grammar-lesson-card ${isCompleted ? 'completed' : ''} ${isRecommended ? 'recommended' : ''}`}
-                                onClick={() => setSelectedTopic(lesson.topic)}
+                                to={"/grammar?topic=" + encodeURIComponent(lesson.topic)}
                                 style={{ '--lesson-color': lesson.color } as React.CSSProperties}
                             >
-                                {isRecommended && (
-                                    <div className="recommended-badge">
-                                        <Target size={14} />
-                                        <span>Recommended</span>
-                                    </div>
-                                )}
-
-                                <div className="lesson-icon">{lesson.icon}</div>
+                                <div className="lesson-card-art-row">
+                                    <GrammarTopicIcon topic={lesson.topic} />
+                                    {isRecommended && (
+                                        <div className="recommended-badge">
+                                            <Target size={14} />
+                                            <span>Recommended</span>
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div className="lesson-content">
                                     <h3 className="lesson-title">{lesson.title}</h3>
@@ -212,7 +217,7 @@ export function GrammarLessons({ onClose }: GrammarLessonsProps) {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

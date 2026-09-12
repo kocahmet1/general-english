@@ -152,7 +152,7 @@ export async function getAdminSpeakingStats(users: AdminUserData[]): Promise<{ e
 
 export async function getAdminListeningStats(users: AdminUserData[]): Promise<{ email: string; stat: ListeningStats }[]> {
   const stats = await fetchFromAllUsers(users, 'stats', (data, id, email) => {
-    if (id === 'listening') {
+    if (id === 'toefl-listening') {
       return { email, stat: data as ListeningStats };
     }
     return null;

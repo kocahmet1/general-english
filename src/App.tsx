@@ -1,5 +1,6 @@
-﻿import { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Moon, Sun, AlertCircle, BarChart3, PenLine, FileText, Mic, Headphones, Languages } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { LearningHome, LearningLayout } from './components/LearningLayout';
 import { ExamSelector } from './components/ExamSelector';
 import { ExamView } from './components/ExamView';
 import { ImportExamModal } from './components/ImportExamModal';
@@ -14,7 +15,7 @@ import { SpeakingPractice } from './components/SpeakingPractice';
 import { ListeningPractice } from './components/ListeningPractice';
 import { GrammarLessons } from './components/GrammarLessons';
 import { SentenceLab } from './components/SentenceLab';
-import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory, WritingSubmission, WritingPrompt, WritingFeedback, ReadingProgress, ReadingStats, ReadingQuestionType, ListeningProgress, ListeningStats, ListeningQuestionType, IELTSListeningSection } from './types';
+import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory, WritingSubmission, WritingPrompt, WritingFeedback, ReadingProgress, ReadingStats, ReadingQuestionType, ListeningProgress, ListeningStats, ListeningQuestionType, ListeningPassageType } from './types';
 import { getAllExams, getExamById, createExam, parseExamText, deleteExam } from './services/examService';
 import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/vocabService';
 import { getExplanation, getFullWritingFeedback } from './services/openaiService';
@@ -56,12 +57,20 @@ import {
 } from './services/firebaseUserService';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from './data/sampleExam';
 import './App.css';
+import './learning.css';
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const page = location.pathname.replace(/\/$/, '') || '/';
+  const selectedExamId = page === '/exams' ? searchParams.get('exam') : null;
+  const setSelectedExamId = (id: string | null) => navigate(id ? '/exams?exam=' + encodeURIComponent(id) : '/exams');
+  const goHome = () => navigate('/');
   // Theme state
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : true;
+    return saved === 'true';
   });
 
   // Firebase check
@@ -70,25 +79,16 @@ function App() {
 
   // Exam states
   const [exams, setExams] = useState<{ id: string; name: string; description?: string; questionCount: number }[]>([]);
-  const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [currentExam, setCurrentExam] = useState<Exam | null>(null);
   const [userAnswers, setUserAnswers] = useState<Map<number, UserAnswer>>(new Map());
   const [isLoadingExams, setIsLoadingExams] = useState(true);
   const [isLoadingCurrentExam, setIsLoadingCurrentExam] = useState(false);
+  const examRequestRef = useRef(0);
 
   // Modal states
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [showVocabVault, setShowVocabVault] = useState(false);
-  const [showAdminPage, setShowAdminPage] = useState(false);
-  const [showPerformanceTracker, setShowPerformanceTracker] = useState(false);
-  const [showWritingPractice, setShowWritingPractice] = useState(false);
-  const [showReadingComprehension, setShowReadingComprehension] = useState(false);
-  const [showSpeakingPractice, setShowSpeakingPractice] = useState(false);
-  const [showListeningPractice, setShowListeningPractice] = useState(false);
-  const [showGrammarLessons, setShowGrammarLessons] = useState(false);
-  const [showSentenceLab, setShowSentenceLab] = useState(false);
 
   // Vocab vault state
   const [vocabWords, setVocabWords] = useState<VocabWord[]>([]);
@@ -195,11 +195,16 @@ function App() {
     }
   };
 
-  // Load selected exam
+  // Ignore any stale response after switching exams or leaving the page.
   useEffect(() => {
+    const request = ++examRequestRef.current;
     if (selectedExamId) {
-      loadExam(selectedExamId);
+      loadExam(selectedExamId, request);
+    } else {
+      setCurrentExam(null);
+      setIsLoadingCurrentExam(false);
     }
+    return () => { examRequestRef.current += 1; };
   }, [selectedExamId]);
 
   const loadExams = async () => {
@@ -233,7 +238,7 @@ function App() {
     }
   };
 
-  const loadExam = async (examId: string) => {
+  const loadExam = async (examId: string, request: number) => {
     setIsLoadingCurrentExam(true);
     setUserAnswers(new Map());
     try {
@@ -250,13 +255,13 @@ function App() {
       } else {
         exam = getLocalExamById(examId);
       }
-      setCurrentExam(exam);
+      if (request === examRequestRef.current) setCurrentExam(exam);
     } catch (error) {
       console.error('Failed to load exam:', error);
       const exam = getLocalExamById(examId);
-      setCurrentExam(exam);
+      if (request === examRequestRef.current) setCurrentExam(exam);
     } finally {
-      setIsLoadingCurrentExam(false);
+      if (request === examRequestRef.current) setIsLoadingCurrentExam(false);
     }
   };
 
@@ -633,9 +638,9 @@ function App() {
     }
   };
 
-  const handleGetReadingProgress = async (passageId: string): Promise<ReadingProgress | null> => {
+  const handleGetReadingProgress = useCallback(async (passageId: string): Promise<ReadingProgress | null> => {
     return await getReadingProgress(passageId);
-  };
+  }, []);
 
   const handleResetReadingProgress = async (passageId: string) => {
     await deleteReadingProgress(passageId);
@@ -689,41 +694,22 @@ function App() {
 
   const handleCompleteListeningTest = async (
     testId: string,
-    score: number,
-    section: IELTSListeningSection,
+    _score: number,
+    section: ListeningPassageType,
     difficulty: string,
-    questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>
+    questionTypeResults: Record<ListeningQuestionType, { correct: number; total: number }>,
+    audioPlayCount: number
   ) => {
-    // Update progress with completion
     const progress = await getListeningProgress(testId);
-    if (progress) {
-      const answersMap = progress.answers instanceof Map
-        ? progress.answers
-        : new Map(Object.entries(progress.answers).map(([k, v]) => [parseInt(k), v]));
-
-      await saveListeningProgress({
-        ...progress,
-        answers: answersMap,
-        completedAt: new Date(),
-        score
-      });
-
-      // Update stats
-      await updateListeningStats(
-        section,
-        difficulty,
-        answersMap.size,
-        Array.from(answersMap.values()).filter(a => a.isCorrect).length,
-        questionTypeResults
-      );
-
-      await loadListeningData();
-    }
+    if (!progress) throw new Error('Listening progress not found.');
+    const answers = progress.answers instanceof Map ? Array.from(progress.answers.values()) : Object.values(progress.answers);
+    await updateListeningStats(testId, section, difficulty, answers.length, answers.filter(a => a.isCorrect).length, questionTypeResults, audioPlayCount);
+    await loadListeningData();
   };
 
-  const handleGetListeningProgress = async (testId: string): Promise<ListeningProgress | null> => {
+  const handleGetListeningProgress = useCallback(async (testId: string): Promise<ListeningProgress | null> => {
     return await getListeningProgress(testId);
-  };
+  }, []);
 
   const handleResetListeningProgress = async (testId: string) => {
     await deleteListeningProgress(testId);
@@ -775,452 +761,60 @@ function App() {
 
   const vocabWordsInVault = vocabWords.map(w => w.word.toLowerCase());
 
+  const validPages = ['/', '/exams', '/exams/manage', '/grammar', '/reading', '/speaking', '/listening', '/writing', '/sentence-lab', '/performance', '/vocabulary'];
+
   return (
-    <div className="app">
-      {/* Header */}
-      <header className="app-header">
-        <div className="header-left">
-          <div className="logo" onClick={() => { setSelectedExamId(null); setCurrentExam(null); }} style={{ cursor: 'pointer' }}>
-            <BookOpen size={32} />
-            <span>Veritas English Prep App</span>
+    <LearningLayout
+      isDarkMode={isDarkMode}
+      onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+      email={user?.email}
+      onLogout={logout}
+      onLogin={() => { setAuthMode('login'); setShowAuthModal(true); }}
+      onRegister={() => { setAuthMode('register'); setShowAuthModal(true); }}
+      vocabCount={vocabWords.length}
+    >
+      {page === '/' && <LearningHome />}
+      {page === '/exams/manage' && <AdminPage
+        exams={exams}
+        onBack={() => navigate('/exams')}
+        onImportExam={() => setShowImportModal(true)}
+        onDeleteExam={handleDeleteExam}
+        onLoadSampleExam={handleLoadSampleExam}
+        useFirebase={useFirebase}
+      />}
+      {page === '/exams' && <section className="exam-page">
+        <div className="exam-page-heading"><h1>Sınav</h1><Link to="/exams/manage">Sınav Yönetimi</Link></div>
+        <div className={currentExam ? 'exam-page-layout' : 'exam-selection'}>
+          <aside className="exam-selection-sidebar">
+            <ExamSelector exams={exams} selectedExamId={selectedExamId} onSelectExam={setSelectedExamId} onDeleteExam={handleDeleteExam} isLoading={isLoadingExams} expanded={!selectedExamId} />
+            {!isLoadingExams && exams.length === 0 && <button className="btn-primary" onClick={handleLoadSampleExam}>Örnek Sınav Yükle</button>}
+            {currentExam && userAnswers.size > 0 && <div className="quick-stats">
+              <h3>Hızlı statistik</h3>
+              <div className="stat-row"><span>Cevaplanan:</span><span>{userAnswers.size} / {currentExam.questions.length}</span></div>
+              <div className="stat-row correct"><span>Doğru:</span><span>{Array.from(userAnswers.values()).filter(a => a.isCorrect).length}</span></div>
+              <div className="stat-row incorrect"><span>Yanlış:</span><span>{Array.from(userAnswers.values()).filter(a => !a.isCorrect).length}</span></div>
+            </div>}
+          </aside>
+          <div className="exam-page-content">
+            {isLoadingCurrentExam ? <div className="loading-state" role="status"><div className="spinner-large" /><p>Sınav yükleniyor...</p></div> : currentExam ? <ExamView
+              exam={currentExam} userAnswers={userAnswers} onAnswer={handleAnswer} onAddToVault={handleAddToVault} onResetExam={handleResetExam} vocabWordsInVault={vocabWordsInVault}
+            /> : null}
           </div>
-          {!useFirebase && (
-            <div className="local-mode-badge" title="Firebase yapılandırılmamış - Yerel depolama kullanılıyor">
-              <AlertCircle size={16} />
-              <span>Yerel Mod</span>
-            </div>
-          )}
         </div>
-
-        {/* Navigation Menu */}
-        <nav className="nav-menu">
-          <button
-            className="nav-item nav-exam"
-            onClick={() => {
-              setSelectedExamId(null);
-              setCurrentExam(null);
-              setShowAdminPage(false);
-            }}
-            title="Ana Sayfa"
-          >
-            <BookOpen size={18} />
-            <span>Ana Sayfa</span>
-          </button>
-
-          <button
-            className="nav-item nav-grammar"
-            onClick={() => setShowGrammarLessons(true)}
-            title="Gramer Dersleri"
-          >
-            <BookOpen size={18} />
-            <span>Gramer</span>
-          </button>
-
-          <button
-            className="nav-item nav-reading"
-            onClick={() => setShowReadingComprehension(true)}
-            title="Okuma Anlama"
-          >
-            <FileText size={18} />
-            <span>Okuma</span>
-          </button>
-
-          <button
-            className="nav-item nav-speaking"
-            onClick={() => setShowSpeakingPractice(true)}
-            title="IELTS Konuşma Pratiği"
-          >
-            <Mic size={18} />
-            <span>Konuşma</span>
-          </button>
-
-          <button
-            className="nav-item nav-listening"
-            onClick={() => setShowListeningPractice(true)}
-            title="IELTS Dinleme Pratiği"
-          >
-            <Headphones size={18} />
-            <span>Dinleme</span>
-          </button>
-
-          <button
-            className="nav-item nav-writing"
-            onClick={() => setShowWritingPractice(true)}
-            title="Yazma Pratiği"
-          >
-            <PenLine size={18} />
-            <span>Yazma</span>
-          </button>
-
-          <button
-            className="nav-item nav-sentence-lab"
-            onClick={() => setShowSentenceLab(true)}
-            title="Sentence Lab"
-          >
-            <Languages size={18} />
-            <span>Sentence Lab</span>
-          </button>
-        </nav>
-
-        <div className="header-right">
-          {user ? (
-            <button
-              className="nav-item nav-logout"
-              onClick={logout}
-              title="Çıkış Yap"
-              style={{ color: '#f87171' }}
-            >
-              <span>Çıkış Yap ({user.email?.split('@')[0]})</span>
-            </button>
-          ) : (
-            <>
-              <button
-                className="nav-item nav-login"
-                onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
-              >
-                <span>Giriş Yap</span>
-              </button>
-              <button
-                className="nav-item nav-signup"
-                onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}
-                style={{ background: 'rgba(167, 139, 250, 0.15)', color: '#c4b5fd', borderRadius: '8px' }}
-              >
-                <span>Kayıt Ol</span>
-              </button>
-            </>
-          )}
-
-          <button
-            className="performance-btn"
-            onClick={() => setShowPerformanceTracker(true)}
-            title="Performans Analizi"
-          >
-            <BarChart3 size={20} />
-            <span>Performans</span>
-            {performanceStats.totalIncorrect > 0 && (
-              <span className="badge warning">{performanceStats.totalIncorrect}</span>
-            )}
-          </button>
-
-          <button
-            className="vocab-vault-btn"
-            onClick={() => setShowVocabVault(true)}
-          >
-            <BookOpen size={20} />
-            <span>Kelime Kasası</span>
-            {vocabWords.length > 0 && (
-              <span className="badge">{vocabWords.length}</span>
-            )}
-          </button>
-
-          <button
-            className="theme-toggle"
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            title={isDarkMode ? 'Açık tema' : 'Koyu tema'}
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="app-main">
-        {showAdminPage ? (
-          <AdminPage
-            exams={exams}
-            onBack={() => setShowAdminPage(false)}
-            onImportExam={() => setShowImportModal(true)}
-            onDeleteExam={handleDeleteExam}
-            onLoadSampleExam={handleLoadSampleExam}
-            useFirebase={useFirebase}
-          />
-        ) : (
-          <>
-            {/* Sidebar with Exam Selector (Only shown during an exam) */}
-            {currentExam && (
-              <aside className="sidebar">
-                <ExamSelector
-                  exams={exams}
-                  selectedExamId={selectedExamId}
-                  onSelectExam={setSelectedExamId}
-                  onDeleteExam={handleDeleteExam}
-                  isLoading={isLoadingExams}
-                />
-
-                {/* Configuration Status */}
-                <div className="config-status">
-                  <h3>Yapılandırma Durumu</h3>
-                  <div className={`status - item ${useFirebase ? 'configured' : 'not-configured'} `}>
-                    <span className="status-dot"></span>
-                    <span>Firebase: {useFirebase ? 'Aktif' : 'Yerel Depolama'}</span>
-                  </div>
-                  <div className={`status - item ${openAIConfigured ? 'configured' : 'not-configured'} `}>
-                    <span className="status-dot"></span>
-                    <span>OpenAI: {openAIConfigured ? 'Aktif' : 'Yapılandırılmamış'}</span>
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                {userAnswers.size > 0 && (
-                  <div className="quick-stats">
-                    <h3>Hızlı statistik</h3>
-                    <div className="stat-row">
-                      <span>Cevaplanan:</span>
-                      <span>{userAnswers.size} / {currentExam.questions.length}</span>
-                    </div>
-                    <div className="stat-row correct">
-                      <span>Doğru:</span>
-                      <span>{Array.from(userAnswers.values()).filter(a => a.isCorrect).length}</span>
-                    </div>
-                    <div className="stat-row incorrect">
-                      <span>Yanlış:</span>
-                      <span>{Array.from(userAnswers.values()).filter(a => !a.isCorrect).length}</span>
-                    </div>
-                  </div>
-                )}
-              </aside>
-            )}
-
-            {/* Exam Content */}
-            <div className={`content ${!currentExam ? 'full-width' : ''} `}>
-              {isLoadingCurrentExam ? (
-                <div className="loading-state">
-                  <div className="spinner-large"></div>
-                  <p>Sınav yükleniyor...</p>
-                </div>
-              ) : currentExam ? (
-                <ExamView
-                  exam={currentExam}
-                  userAnswers={userAnswers}
-                  onAnswer={handleAnswer}
-                  onAddToVault={handleAddToVault}
-                  onResetExam={handleResetExam}
-                  vocabWordsInVault={vocabWordsInVault}
-                />
-              ) : (
-                <div className="welcome-dashboard">
-                  <div className="skill-cards-grid">
-                    <button
-                      className="skill-card skill-card-sentence-lab highlight-card"
-                      onClick={() => setShowSentenceLab(true)}
-                    >
-                      <div className="new-badge">NEW</div>
-                      <div className="skill-card-icon">
-                        <Languages size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Sentence Lab</h3>
-                        <p>Kucuk cumlelerle yapi, grammar ve punctuation calis</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Sınav Card */}
-                    <button
-                      className="skill-card skill-card-exam"
-                      onClick={() => {
-                        if (exams.length > 0) {
-                          setSelectedExamId(exams[0].id);
-                        } else {
-                          handleLoadSampleExam();
-                        }
-                      }}
-                    >
-                      <div className="skill-card-icon">
-                        <BookOpen size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Sınav</h3>
-                        <p>Gramer ve kelime bilgini test et</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Gramer Card */}
-                    <button
-                      className="skill-card skill-card-grammar"
-                      onClick={() => setShowGrammarLessons(true)}
-                    >
-                      <div className="skill-card-icon">
-                        <BookOpen size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Gramer</h3>
-                        <p>Dilbilgisi kurallarını öğren ve pratik yap</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Okuma Card */}
-                    <button
-                      className="skill-card skill-card-reading"
-                      onClick={() => setShowReadingComprehension(true)}
-                    >
-                      <div className="skill-card-icon">
-                        <FileText size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Okuma</h3>
-                        <p>Akademik metinleri anlama pratiği yap</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Konuşma Card */}
-                    <button
-                      className="skill-card skill-card-speaking"
-                      onClick={() => setShowSpeakingPractice(true)}
-                    >
-                      <div className="skill-card-icon">
-                        <Mic size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Konuşma</h3>
-                        <p>Speaking sınavına hazırlan</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Dinleme Card */}
-                    <button
-                      className="skill-card skill-card-listening"
-                      onClick={() => setShowListeningPractice(true)}
-                    >
-                      <div className="skill-card-icon">
-                        <Headphones size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Dinleme</h3>
-                        <p>Listening bölümüne hazırlan</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-
-                    {/* Yazma Card */}
-                    <button
-                      className="skill-card skill-card-writing"
-                      onClick={() => setShowWritingPractice(true)}
-                    >
-                      <div className="skill-card-icon">
-                        <PenLine size={32} />
-                      </div>
-                      <div className="skill-card-content">
-                        <h3>Yazma</h3>
-                        <p>Essay ve task yazımını geliştir</p>
-                      </div>
-                      <div className="skill-card-arrow">â†’</div>
-                    </button>
-                  </div>
-
-                  {/* Floating Config Status */}
-                  <div className="floating-config-status">
-                    <div className={`status - dot ${useFirebase ? 'configured' : 'not-configured'} `} title={`Firebase: ${useFirebase ? 'Aktif' : 'Yerel'} `}></div>
-                    <div className={`status - dot ${openAIConfigured ? 'configured' : 'not-configured'} `} title={`OpenAI: ${openAIConfigured ? 'Aktif' : 'Pasif'} `}></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </main>
-
-      {/* Import Modal */}
-      <ImportExamModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImport={handleImportExam}
-      />
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode={authMode}
-      />
-
-      {/* Vocab Vault Panel */}
-      <VocabVault
-        isOpen={showVocabVault}
-        onClose={() => setShowVocabVault(false)}
-        vocabWords={vocabWords}
-        onRemoveWord={handleRemoveFromVault}
-      />
-
-      {/* Performance Tracker Panel */}
-      <PerformanceTracker
-        isOpen={showPerformanceTracker}
-        onClose={() => setShowPerformanceTracker(false)}
-        stats={performanceStats}
-        recentMistakes={recentMistakes}
-        onClearData={handleClearTrackingData}
-        getMistakesByCategory={handleGetMistakesByCategory}
-      />
-
-      {/* Writing Practice Panel */}
-      <WritingPractice
-        isOpen={showWritingPractice}
-        onClose={() => setShowWritingPractice(false)}
-        submissions={writingSubmissions}
-        prompts={writingPrompts}
-        onSubmitWriting={handleSubmitWriting}
-        onDeleteSubmission={handleDeleteWritingSubmission}
-        isOpenAIConfigured={openAIConfigured}
-      />
-
-      {/* Reading Comprehension Panel */}
-      <ReadingComprehension
-        isOpen={showReadingComprehension}
-        onClose={() => setShowReadingComprehension(false)}
-        passages={sampleReadingPassages}
-        completedPassageIds={completedPassageIds}
-        stats={readingStats}
-        onAnswerQuestion={handleAnswerReadingQuestion}
-        onCompletePassage={handleCompleteReadingPassage}
-        getProgress={handleGetReadingProgress}
-        onResetProgress={handleResetReadingProgress}
-        onAddToVault={handleAddToVaultGeneric}
-        vocabWordsInVault={vocabWordsInVault}
-      />
-
-      {/* Speaking Practice Panel */}
-      <SpeakingPractice
-        isOpen={showSpeakingPractice}
-        onClose={() => setShowSpeakingPractice(false)}
-        isOpenAIConfigured={openAIConfigured}
-      />
-
-      {/* Listening Practice Panel */}
-      <ListeningPractice
-        isOpen={showListeningPractice}
-        onClose={() => setShowListeningPractice(false)}
-        tests={listeningTests}
-        completedTestIds={completedListeningTestIds}
-        stats={listeningStats}
-        onAnswerQuestion={handleAnswerListeningQuestion}
-        onCompleteTest={handleCompleteListeningTest}
-        getProgress={handleGetListeningProgress}
-        onResetProgress={handleResetListeningProgress}
-        onAddToVault={handleAddToVaultGeneric}
-        vocabWordsInVault={vocabWordsInVault}
-      />
-
-      {/* Grammar Lessons Modal */}
-      {showGrammarLessons && (
-        <GrammarLessons onClose={() => setShowGrammarLessons(false)} />
-      )}
-
-      <SentenceLab
-        isOpen={showSentenceLab}
-        onClose={() => setShowSentenceLab(false)}
-      />
-    </div>
+      </section>}
+      {page === '/vocabulary' && <VocabVault isOpen onClose={goHome} vocabWords={vocabWords} onRemoveWord={handleRemoveFromVault} />}
+      {page === '/performance' && <PerformanceTracker isOpen onClose={goHome} stats={performanceStats} recentMistakes={recentMistakes} onClearData={handleClearTrackingData} getMistakesByCategory={handleGetMistakesByCategory} />}
+      {page === '/writing' && <WritingPractice isOpen onClose={goHome} submissions={writingSubmissions} prompts={writingPrompts} onSubmitWriting={handleSubmitWriting} onDeleteSubmission={handleDeleteWritingSubmission} isOpenAIConfigured={openAIConfigured} />}
+      {page === '/reading' && <ReadingComprehension isOpen onClose={goHome} passages={sampleReadingPassages} completedPassageIds={completedPassageIds} stats={readingStats} onAnswerQuestion={handleAnswerReadingQuestion} onCompletePassage={handleCompleteReadingPassage} getProgress={handleGetReadingProgress} onResetProgress={handleResetReadingProgress} onAddToVault={handleAddToVaultGeneric} vocabWordsInVault={vocabWordsInVault} />}
+      {page === '/speaking' && <SpeakingPractice isOpen onClose={goHome} isOpenAIConfigured={openAIConfigured} />}
+      {page === '/listening' && <ListeningPractice isOpen onClose={goHome} tests={listeningTests} completedTestIds={completedListeningTestIds} stats={listeningStats} onAnswerQuestion={handleAnswerListeningQuestion} onCompleteTest={handleCompleteListeningTest} getProgress={handleGetListeningProgress} onResetProgress={handleResetListeningProgress} onAddToVault={handleAddToVaultGeneric} vocabWordsInVault={vocabWordsInVault} />}
+      {page === '/grammar' && <GrammarLessons onClose={goHome} />}
+      {page === '/sentence-lab' && <SentenceLab isOpen onClose={goHome} />}
+      {!validPages.includes(page) && <Navigate to="/" replace />}
+      <ImportExamModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} onImport={handleImportExam} />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode={authMode} />
+    </LearningLayout>
   );
 }
 
 export default App;
-
-
-
-
-
-

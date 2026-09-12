@@ -1,6 +1,6 @@
+import { PageBack } from './LearningLayout';
 import { useState, useMemo } from 'react';
 import { 
-  X, 
   TrendingDown, 
   BarChart3, 
   Target, 
@@ -78,17 +78,15 @@ export const PerformanceTracker = ({
   if (!isOpen) return null;
 
   return (
-    <div className="performance-tracker-overlay" onClick={onClose}>
-      <div className="performance-tracker-panel" onClick={e => e.stopPropagation()}>
+    <div className="activity-page">
+      <div className="performance-tracker-panel activity-panel" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="tracker-header">
           <div className="tracker-title">
             <BarChart3 size={24} />
             <h2>Performans Analizi</h2>
           </div>
-          <button className="close-btn" onClick={onClose}>
-            <X size={24} />
-          </button>
+          <PageBack onClick={onClose} />
         </div>
 
         {/* Tabs */}
