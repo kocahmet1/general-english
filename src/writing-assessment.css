@@ -1,0 +1,68 @@
+.writing-exam-settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.writing-exam-settings h3 { margin: 0 0 8px; }
+.writing-exam-settings p, .writing-assessment-note, .writing-custom-prompt p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+.writing-exam-toggle { display: flex; gap: 6px; flex-shrink: 0; }
+.writing-exam-toggle button {
+  border: 1px solid var(--border-primary);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+.writing-exam-toggle button[aria-pressed="true"] { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+.writing-exam-toggle button:disabled { cursor: wait; opacity: .65; }
+.writing-custom-prompt { display: grid; gap: 10px; margin: 20px 0; }
+.writing-custom-prompt label { font-weight: 600; }
+.writing-custom-prompt textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 105px;
+  resize: vertical;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 14px;
+  font: inherit;
+  line-height: 1.6;
+}
+.writing-exam-assessment { display: grid; gap: 18px; margin: 24px 0; }
+.writing-exam-assessment h3, .writing-coverage-grid h4 { display: flex; align-items: center; gap: 8px; margin: 0; }
+.writing-criteria-grid, .writing-coverage-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.writing-criterion, .writing-coverage-grid > div, .writing-strengths, .writing-model-answer {
+  padding: 20px;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.writing-criterion-title { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.writing-criterion-title h4, .writing-strengths h4 { margin: 0; }
+.writing-criterion-title > strong { color: var(--accent-primary); white-space: nowrap; }
+.writing-criterion p, .writing-coverage-grid p, .writing-exam-assessment li { line-height: 1.7; }
+.writing-criterion-evidence { border-left: 3px solid var(--border-primary); padding-left: 12px; color: var(--text-secondary); }
+.writing-criterion-improvement { margin-top: 16px; }
+.writing-criterion-evidence p, .writing-criterion-improvement p { margin: 6px 0 0; }
+.writing-exam-assessment ul { padding-left: 22px; margin-bottom: 0; }
+.writing-exam-assessment li + li { margin-top: 8px; }
+.writing-model-answer summary { cursor: pointer; font-weight: 600; color: var(--accent-primary); }
+.writing-model-answer .text-box p { white-space: pre-wrap; line-height: 1.8; }
+.writing-model-explanation { line-height: 1.7; color: var(--text-secondary); }
+.writing-no-prompt { border-left: 3px solid var(--accent-primary); padding: 12px 16px; margin: 0; line-height: 1.6; background: var(--bg-secondary); }
+@media (max-width: 900px) {
+  .writing-exam-settings { align-items: flex-start; flex-direction: column; }
+  .writing-criteria-grid, .writing-coverage-grid { grid-template-columns: 1fr; }
+}

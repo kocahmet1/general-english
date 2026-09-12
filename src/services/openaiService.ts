@@ -1,4 +1,4 @@
-import { Question, GrammarCategory, WritingFeedback, SpeakingFeedback, SpeakingQuestion } from '../types';
+import { Question, GrammarCategory, WritingFeedback, WritingEvaluationContext, SpeakingFeedback, SpeakingQuestion } from '../types';
 
 const VALID_CATEGORIES: GrammarCategory[] = [
   'past_perfect', 'present_perfect', 'past_simple', 'present_simple',
@@ -99,44 +99,15 @@ export function extractVocabularyWords(question: Question): string[] {
   });
 }
 
-function getDefaultFeedback(message: string): WritingFeedback {
-  return {
-    overallScore: 0,
-    grammarScore: 0,
-    vocabularyScore: 0,
-    structureScore: 0,
-    errors: [],
-    suggestions: [message],
-    correctedText: '',
-    summary: message,
-  };
-}
-
 export async function getFullWritingFeedback(
   text: string,
-  promptTitle?: string,
+  context: WritingEvaluationContext,
 ): Promise<WritingFeedback> {
-  try {
-    return await apiJson<WritingFeedback>('/full-writing-feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text, promptTitle }),
-    });
-  } catch (error) {
-    console.error('Error getting full writing feedback:', error);
-
-    if (isMissingServerKey(error)) {
-      return getDefaultFeedback('OpenAI sunucuda yapılandırılmamış. Render ortam değişkenlerine OPENAI_API_KEY ekleyin.');
-    }
-
-    return getDefaultFeedback(
-      error instanceof Error
-        ? `Geri bildirim alınırken hata oluştu: ${error.message}`
-        : 'Geri bildirim alınırken bir hata oluştu. Lütfen tekrar deneyin.',
-    );
-  }
+  return apiJson<WritingFeedback>('/full-writing-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, context }),
+  });
 }
 
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {

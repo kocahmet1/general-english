@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { normalizeWritingContext } from './writingFeedback.js';
 import {
   analyzeSpeaking,
   createRealtimeSession,
@@ -98,12 +99,13 @@ app.post('/api/openai/explanation', asyncRoute(async (req, res) => {
 }));
 
 app.post('/api/openai/full-writing-feedback', asyncRoute(async (req, res) => {
-  const { text, promptTitle } = req.body || {};
-  if (!text) {
+  const { text, promptTitle, context } = req.body || {};
+  if (typeof text !== 'string' || !text.trim()) {
     throw createHttpError(400, 'text is required.');
   }
 
-  res.json(await getFullWritingFeedback(text, promptTitle));
+  const evaluationContext = normalizeWritingContext(context === undefined ? { promptTitle } : context);
+  res.json(await getFullWritingFeedback(text, evaluationContext));
 }));
 
 app.post('/api/openai/transcribe', upload.single('audio'), asyncRoute(async (req, res) => {

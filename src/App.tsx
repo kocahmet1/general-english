@@ -10,6 +10,7 @@ import { VocabVault } from './components/VocabVault';
 import { AdminPage } from './components/AdminPage';
 import { PerformanceTracker } from './components/PerformanceTracker';
 import { WritingPractice } from './components/WritingPractice';
+import type { WritingEvaluationContext } from './types';
 import { ReadingComprehension } from './components/ReadingComprehension';
 import { SpeakingPractice } from './components/SpeakingPractice';
 import { ListeningPractice } from './components/ListeningPractice';
@@ -500,8 +501,8 @@ function App() {
 
   const handleSubmitWriting = async (
     text: string,
-    promptId?: string,
-    promptTitle?: string
+    context: WritingEvaluationContext,
+    promptId?: string
   ): Promise<WritingFeedback | null> => {
     // Calculate word count
     const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
@@ -509,7 +510,8 @@ function App() {
     // Save submission first (without feedback)
     const submissionId = await saveWritingSubmission({
       promptId,
-      promptTitle,
+      promptTitle: context.promptTitle,
+      evaluationContext: context,
       originalText: text,
       submittedAt: new Date(),
       wordCount
@@ -522,7 +524,7 @@ function App() {
     // Get AI feedback if OpenAI is configured
     if (openAIConfigured) {
       try {
-        const feedback = await getFullWritingFeedback(text, promptTitle);
+        const feedback = await getFullWritingFeedback(text, context);
 
         // Update submission with feedback
         await updateWritingSubmission(submissionId, { feedback });
@@ -534,7 +536,7 @@ function App() {
       } catch (error) {
         console.error('Failed to get writing feedback:', error);
         await loadWritingSubmissions();
-        return null;
+        throw error;
       }
     } else {
       await loadWritingSubmissions();

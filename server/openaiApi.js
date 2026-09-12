@@ -1,5 +1,6 @@
 ﻿import OpenAI from 'openai';
 import { toFile } from 'openai/uploads';
+import { evaluateWriting } from './writingFeedback.js';
 
 const VALID_CATEGORIES = [
   'past_perfect', 'present_perfect', 'past_simple', 'present_simple',
@@ -30,19 +31,6 @@ function getOpenAIClient() {
 
 function normalizeCategory(category) {
   return VALID_CATEGORIES.includes(category) ? category : 'other';
-}
-
-function getDefaultFeedback(message) {
-  return {
-    overallScore: 0,
-    grammarScore: 0,
-    vocabularyScore: 0,
-    structureScore: 0,
-    errors: [],
-    suggestions: [message],
-    correctedText: '',
-    summary: message
-  };
 }
 
 function getDefaultSpeakingFeedback(message, transcript) {
@@ -181,191 +169,8 @@ SADECE JSON formatında yanıt ver.`;
   }
 }
 
-async function getWritingFeedback(text, promptTitle) {
-  try {
-    const openai = getOpenAIClient();
-
-    const prompt = `You are an expert English language teacher and proofreader. A student has written the following English text. Your job is to find WORD-LEVEL errors: individual misspelled, misused, missing, or extra words.
-
-${promptTitle ? `**Writing Topic:** ${promptTitle}\n\n` : ''}**Student's Text:**
-${text}
-
-## CRITICAL ANALYSIS INSTRUCTIONS
-
-You MUST follow this systematic process:
-
-1. Read the entire text first to understand context and intent.
-2. Go through the text word by word.
-3. For each word, check spelling, verb form, subject-verb agreement, articles, prepositions, pronouns, capitalization, and missing or extra words.
-4. Each error must be 1-3 words maximum.
-5. Do not report style issues or full sentence rewrites.
-6. Do not skip any word-level error.
-
-## RESPONSE FORMAT
-
-Respond ONLY with valid JSON in this exact format:
-
-{
-  "overallScore": <0-100 overall score>,
-  "grammarScore": <0-100 grammar score>,
-  "vocabularyScore": <0-100 vocabulary score>,
-  "structureScore": <0-100 structure score>,
-  "errors": [
-    {
-      "text": "<exact erroneous text>",
-      "startIndex": <character start position>,
-      "endIndex": <character end position>,
-      "suggestion": "<corrected version>",
-      "explanation": "<Türkçe açıklama>",
-      "category": "<category>"
-    }
-  ],
-  "suggestions": ["<Türkçe öneri 1>", "<Türkçe öneri 2>", "<Türkçe öneri 3>"],
-  "correctedText": "<complete corrected text>",
-  "summary": "<Türkçe kısa özet>"
-}
-
-category must be one of: ${VALID_CATEGORIES.join(', ')}
-
-Respond ONLY with valid JSON.`;
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a meticulous English language expert and proofreader. You analyze text systematically and return only JSON. Explanations must be in Turkish.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 16000,
-      response_format: { type: 'json_object' }
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      const refusal = response.choices[0]?.message?.refusal;
-      const finishReason = response.choices[0]?.finish_reason;
-      return getDefaultFeedback(refusal || `Geri bildirim oluşturulamadı. (Sebep: ${finishReason || 'bilinmiyor'})`);
-    }
-
-    const parsed = parseJsonContent(content);
-    if (!parsed) {
-      return getDefaultFeedback('Geri bildirim ayrıştırılamadı.');
-    }
-
-    const errors = (parsed.errors || []).map((err) => ({
-      text: err.text || '',
-      startIndex: typeof err.startIndex === 'number' ? err.startIndex : 0,
-      endIndex: typeof err.endIndex === 'number' ? err.endIndex : 0,
-      suggestion: err.suggestion || '',
-      explanation: err.explanation || '',
-      category: normalizeCategory(err.category),
-      errorLevel: 'surface'
-    }));
-
-    return {
-      overallScore: Math.min(100, Math.max(0, parsed.overallScore || 50)),
-      grammarScore: Math.min(100, Math.max(0, parsed.grammarScore || 50)),
-      vocabularyScore: Math.min(100, Math.max(0, parsed.vocabularyScore || 50)),
-      structureScore: Math.min(100, Math.max(0, parsed.structureScore || 50)),
-      errors,
-      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
-      correctedText: parsed.correctedText || text,
-      summary: parsed.summary || 'Geri bildirim özeti oluşturulamadı.'
-    };
-  } catch (error) {
-    console.error('Error getting writing feedback:', error);
-
-    if (error instanceof Error && /not configured/i.test(error.message)) {
-      return getDefaultFeedback('OpenAI henüz sunucuda yapılandırılmamış. Render ortam değişkenlerine OPENAI_API_KEY ekleyin.');
-    }
-
-    return getDefaultFeedback(
-      error instanceof Error
-        ? `Geri bildirim alınırken hata oluştu: ${error.message}`
-        : 'Geri bildirim alınırken bir hata oluştu. Lütfen tekrar deneyin.'
-    );
-  }
-}
-
-async function getMetaWritingFeedback(text) {
-  try {
-    const openai = getOpenAIClient();
-
-    const prompt = `You are an expert English writing coach specializing in style, fluency, and naturalness. A student has written the following English text. Your job is to find HIGHER-LEVEL issues that go beyond spelling and basic grammar.
-
-**Student's Text:**
-${text}
-
-Focus only on awkward phrasing, L1 interference, register, transitions, sentence structure, redundancy, weak word choices, unclear references, logical flow, and collocation issues.
-
-Respond ONLY with valid JSON:
-{
-  "metaErrors": [
-    {
-      "text": "<exact problematic text>",
-      "startIndex": <character start position>,
-      "endIndex": <character end position>,
-      "suggestion": "<improved version>",
-      "explanation": "<Türkçe açıklama>",
-      "category": "<vocabulary|collocations|word_order|conjunctions|other>"
-    }
-  ]
-}`;
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert English writing style coach. Focus on higher-level writing quality, explain in Turkish, and return only JSON.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 8000,
-      response_format: { type: 'json_object' }
-    });
-
-    const content = response.choices[0]?.message?.content;
-    const parsed = parseJsonContent(content);
-    if (!parsed) {
-      return [];
-    }
-
-    return (parsed.metaErrors || []).map((err) => ({
-      text: err.text || '',
-      startIndex: typeof err.startIndex === 'number' ? err.startIndex : 0,
-      endIndex: typeof err.endIndex === 'number' ? err.endIndex : 0,
-      suggestion: err.suggestion || '',
-      explanation: err.explanation || '',
-      category: normalizeCategory(err.category),
-      errorLevel: 'meta'
-    }));
-  } catch (error) {
-    console.error('Error getting meta writing feedback:', error);
-    return [];
-  }
-}
-
-export async function getFullWritingFeedback(text, promptTitle) {
-  const [surfaceFeedback, metaErrors] = await Promise.all([
-    getWritingFeedback(text, promptTitle),
-    getMetaWritingFeedback(text)
-  ]);
-
-  return {
-    ...surfaceFeedback,
-    errors: [...surfaceFeedback.errors, ...metaErrors]
-  };
+export async function getFullWritingFeedback(text, context) {
+  return evaluateWriting(getOpenAIClient(), text, context, VALID_CATEGORIES);
 }
 
 export async function transcribeAudio({ buffer, mimeType, filename }) {

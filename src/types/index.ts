@@ -134,6 +134,36 @@ export interface VocabWord {
 
 export type WritingPromptType = 'free' | 'topic' | 'sentence_correction' | 'paragraph';
 
+export type WritingExamType = 'ielts' | 'toefl';
+
+export interface WritingEvaluationContext {
+  examType: WritingExamType;
+  promptTitle: string;
+  promptDescription: string;
+  minWords?: number;
+  maxWords?: number;
+  targetLevel?: string;
+}
+
+export interface WritingCriterion {
+  id: 'taskResponse' | 'coherence' | 'vocabulary' | 'grammar';
+  score: number | null;
+  feedback: string;
+  evidence: string;
+  improvement: string;
+}
+
+export interface WritingExamAssessment {
+  examType: WritingExamType;
+  hasPrompt: boolean;
+  criteria: WritingCriterion[];
+  addressedPoints: string[];
+  missingPoints: string[];
+  strengths: string[];
+  modelAnswer: string;
+  modelAnswerExplanation: string;
+}
+
 export interface WritingPrompt {
   id: string;
   type: WritingPromptType;
@@ -151,7 +181,7 @@ export interface GrammarError {
   suggestion: string;     // Corrected version
   explanation: string;    // Why it's wrong
   category: GrammarCategory;
-  errorLevel: 'surface' | 'meta'; // surface = spelling/grammar (red), meta = style/phrasing (purple)
+  errorLevel: 'surface' | 'meta'; // surface = grammar, meta = content/organization/style
 }
 
 export interface WritingFeedback {
@@ -163,12 +193,15 @@ export interface WritingFeedback {
   suggestions: string[];  // General improvement suggestions
   correctedText: string;  // Full corrected version
   summary: string;        // Brief feedback summary
+  contentScore?: number | null; // Not assessed without a question; optional for older submissions
+  examAssessment?: WritingExamAssessment;
 }
 
 export interface WritingSubmission {
   id: string;
   promptId?: string;
   promptTitle?: string;
+  evaluationContext?: WritingEvaluationContext;
   originalText: string;
   feedback?: WritingFeedback;
   submittedAt: Date;

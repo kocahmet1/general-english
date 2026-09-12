@@ -1,7 +1,8 @@
 import { PageBack } from './LearningLayout';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { SpellingForge } from './SpellingForge';
-import { ParagraphSpellingFix } from './ParagraphSpellingFix';
+import { WritingAssessment } from './WritingAssessment';
+import '../writing-assessment.css';
+
 import {
   X,
   PenLine,
@@ -20,13 +21,14 @@ import {
   Sparkles,
   History,
   RotateCcw,
-  ArrowLeft,
-  Keyboard
+  ArrowLeft
 } from 'lucide-react';
 import {
   WritingSubmission,
   WritingPrompt,
   WritingFeedback,
+  WritingEvaluationContext,
+  WritingExamType,
   GrammarError,
   GRAMMAR_CATEGORY_LABELS
 } from '../types';
@@ -37,12 +39,12 @@ interface WritingPracticeProps {
   onClose: () => void;
   submissions: WritingSubmission[];
   prompts: WritingPrompt[];
-  onSubmitWriting: (text: string, promptId?: string, promptTitle?: string) => Promise<WritingFeedback | null>;
+  onSubmitWriting: (text: string, context: WritingEvaluationContext, promptId?: string) => Promise<WritingFeedback | null>;
   onDeleteSubmission: (submissionId: string) => void;
   isOpenAIConfigured: boolean;
 }
 
-type ViewMode = 'write' | 'history' | 'result' | 'spelling' | 'fix_spelling';
+type ViewMode = 'write' | 'history' | 'result';
 
 export const WritingPractice = ({
   isOpen,
@@ -56,6 +58,9 @@ export const WritingPractice = ({
   const [viewMode, setViewMode] = useState<ViewMode>('write');
   const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [writingText, setWritingText] = useState('');
+  const [examType, setExamType] = useState<WritingExamType>('ielts');
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState<WritingFeedback | null>(null);
   const [selectedSubmission, setSelectedSubmission] = useState<WritingSubmission | null>(null);
@@ -82,6 +87,8 @@ export const WritingPractice = ({
       setViewMode('write');
       setSelectedPrompt(null);
       setWritingText('');
+      setCustomPrompt('');
+      setSubmissionError(null);
       setCurrentFeedback(null);
       setSelectedSubmission(null);
       setIsVoiceTutorOpen(false);
@@ -112,41 +119,39 @@ export const WritingPractice = ({
     return null;
   }, [selectedPrompt, wordCount]);
 
-  // Detect single-word spelling errors from feedback
-  const hasSpellingErrors = (feedback: WritingFeedback) => {
-    return feedback.errors.some(e => {
-      if (e.errorLevel !== 'surface') return false;
-      const text = e.text.trim();
-      const suggestion = e.suggestion.trim();
-      if (text.includes(' ') || suggestion.includes(' ')) return false;
-      if (text.toLowerCase() === suggestion.toLowerCase()) return false;
-      const lenRatio = Math.min(text.length, suggestion.length) / Math.max(text.length, suggestion.length);
-      return lenRatio >= 0.4;
-    });
-  };
-
   // Handle submit
   const handleSubmit = async () => {
     if (!writingText.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setSubmissionError(null);
+    setShowPromptSelector(false);
     try {
+      const context: WritingEvaluationContext = {
+        examType,
+        promptTitle: selectedPrompt?.title || (customPrompt.trim() ? 'Özel Sınav Sorusu' : 'Serbest Yazı'),
+        promptDescription: selectedPrompt?.type === 'free' ? '' : selectedPrompt?.description || customPrompt.trim(),
+        ...(selectedPrompt?.minWords ? { minWords: selectedPrompt.minWords } : {}),
+        ...(selectedPrompt?.maxWords ? { maxWords: selectedPrompt.maxWords } : {}),
+        ...(selectedPrompt?.targetLevel ? { targetLevel: selectedPrompt.targetLevel } : {}),
+      };
       const feedback = await onSubmitWriting(
         writingText,
-        selectedPrompt?.id,
-        selectedPrompt?.title || 'Serbest Yazı'
+        context,
+        selectedPrompt?.id
       );
 
       if (feedback) {
         setCurrentFeedback(feedback);
-        // Auto-launch spelling fix if there are spelling errors
-        if (hasSpellingErrors(feedback)) {
-          setViewMode('fix_spelling');
-        } else {
-          setViewMode('result');
-        }
+        setSelectedSubmission(null);
+        setFocusedErrorIndex(-1);
+        setViewMode('result');
         setIsVoiceTutorOpen(true);
+      } else {
+        setSubmissionError('Analiz alınamadı. Yazınız burada duruyor; tekrar deneyebilirsiniz.');
       }
+    } catch {
+      setSubmissionError('Yazı analizi tamamlanamadı. Yazınız burada duruyor; lütfen tekrar deneyin.');
     } finally {
       setIsSubmitting(false);
     }
@@ -157,8 +162,21 @@ export const WritingPractice = ({
     setSelectedSubmission(submission);
     setCurrentFeedback(submission.feedback || null);
     setWritingText(submission.originalText);
-    setViewMode('result');
-    setIsVoiceTutorOpen(true);
+    const savedPrompt = prompts.find(prompt => prompt.id === submission.promptId);
+    setSelectedPrompt(savedPrompt ? {
+      ...savedPrompt,
+      ...(submission.evaluationContext ? {
+        title: submission.evaluationContext.promptTitle,
+        description: submission.evaluationContext.promptDescription,
+        minWords: submission.evaluationContext.minWords,
+        maxWords: submission.evaluationContext.maxWords,
+      } : {}),
+    } : null);
+    setExamType(submission.evaluationContext?.examType || submission.feedback?.examAssessment?.examType || 'ielts');
+    setCustomPrompt(submission.evaluationContext?.promptDescription || '');
+    setSubmissionError(null);
+    setViewMode(submission.feedback ? 'result' : 'write');
+    setIsVoiceTutorOpen(Boolean(submission.feedback));
   };
 
   // Handle new writing
@@ -166,6 +184,8 @@ export const WritingPractice = ({
     setViewMode('write');
     setSelectedPrompt(null);
     setWritingText('');
+    setCustomPrompt('');
+    setSubmissionError(null);
     setCurrentFeedback(null);
     setSelectedSubmission(null);
     setIsVoiceTutorOpen(false);
@@ -400,10 +420,15 @@ export const WritingPractice = ({
                 isOpen={true}
                 onClose={() => setIsVoiceTutorOpen(false)}
                 mode="writing"
-                writingPrompt={selectedPrompt?.title}
+                writingPrompt={selectedSubmission?.evaluationContext?.promptDescription || selectedPrompt?.description || customPrompt || undefined}
                 originalText={writingText}
                 correctedText={currentFeedback.correctedText}
-                feedbackSummary={currentFeedback.summary}
+                feedbackSummary={[
+                  currentFeedback.examAssessment ? `${currentFeedback.examAssessment.examType.toUpperCase()} ölçütlerine göre pratik değerlendirmesi; resmi sınav puanı değildir.` : '',
+                  currentFeedback.summary,
+                  ...(currentFeedback.examAssessment?.criteria.map(criterion => `${criterion.id}: ${criterion.feedback} ${criterion.improvement}`) || []),
+                  ...(currentFeedback.examAssessment?.missingPoints.map(point => `Eksik içerik: ${point}`) || []),
+                ].join('\n')}
                 feedbackErrors={currentFeedback.errors}
                 autoStart={true}
                 inline={true}
@@ -513,13 +538,15 @@ export const WritingPractice = ({
               <button
                 className={`mode-btn ${viewMode === 'write' ? 'active' : ''}`}
                 onClick={handleNewWriting}
+                disabled={isSubmitting}
               >
                 <PenLine size={18} />
                 <span>Yeni Yazı</span>
               </button>
               <button
                 className={`mode-btn ${viewMode === 'history' ? 'active' : ''}`}
-                onClick={() => setViewMode('history')}
+                onClick={() => { setViewMode('history'); setIsVoiceTutorOpen(false); }}
+                disabled={isSubmitting}
               >
                 <History size={18} />
                 <span>Geçmiş</span>
@@ -527,14 +554,7 @@ export const WritingPractice = ({
                   <span className="badge">{submissions.length}</span>
                 )}
               </button>
-              <button
-                className={`mode-btn ${viewMode === 'spelling' ? 'active' : ''}`}
-                onClick={() => setViewMode('spelling')}
-                style={viewMode === 'spelling' ? { background: '#f87171', borderColor: '#f87171', color: 'white' } : {}}
-              >
-                <Keyboard size={18} />
-                <span>Yazım</span>
-              </button>
+
             </div>
             <PageBack onClick={onClose} />
           </div>
@@ -545,6 +565,19 @@ export const WritingPractice = ({
             {/* ── WRITE MODE ── */}
             {viewMode === 'write' && (
               <div className="write-mode">
+                <div className="writing-exam-settings">
+                  <div>
+                    <h3>İyi bir sınav yanıtı yazın</h3>
+                    <p>İçerik, soruya uygunluk, fikirlerin gelişimi ve dilbilgisi için ayrıntılı geri bildirim alın.</p>
+                  </div>
+                  <div className="writing-exam-toggle" role="group" aria-label="Değerlendirme sınavı">
+                    {(['ielts', 'toefl'] as const).map(exam => (
+                      <button key={exam} type="button" aria-pressed={examType === exam} disabled={isSubmitting} onClick={() => setExamType(exam)}>
+                        {exam.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {!isOpenAIConfigured && (
                   <div className="api-warning">
                     <AlertCircle size={20} />
@@ -555,6 +588,7 @@ export const WritingPractice = ({
                 <div className="prompt-selector-container">
                   <button
                     className="prompt-selector-trigger"
+                    disabled={isSubmitting}
                     onClick={() => setShowPromptSelector(!showPromptSelector)}
                   >
                     <FileText size={18} />
@@ -568,7 +602,7 @@ export const WritingPractice = ({
                     <div className="prompt-dropdown">
                       <button
                         className={`prompt-option ${!selectedPrompt ? 'selected' : ''}`}
-                        onClick={() => { setSelectedPrompt(null); setShowPromptSelector(false); }}
+                        onClick={() => { setSelectedPrompt(null); setCustomPrompt(''); setShowPromptSelector(false); }}
                       >
                         <Sparkles size={18} />
                         <div className="prompt-option-content">
@@ -580,7 +614,7 @@ export const WritingPractice = ({
                         <button
                           key={prompt.id}
                           className={`prompt-option ${selectedPrompt?.id === prompt.id ? 'selected' : ''}`}
-                          onClick={() => { setSelectedPrompt(prompt); setShowPromptSelector(false); }}
+                          onClick={() => { setSelectedPrompt(prompt); setCustomPrompt(''); setShowPromptSelector(false); }}
                         >
                           <Target size={18} />
                           <div className="prompt-option-content">
@@ -598,6 +632,16 @@ export const WritingPractice = ({
                     </div>
                   )}
                 </div>
+
+                {(!selectedPrompt || selectedPrompt.type === 'free') && (
+                  <div className="writing-custom-prompt">
+                    <label htmlFor="writing-question">Sınav sorusu / yönerge (isteğe bağlı)</label>
+                    <textarea id="writing-question" value={customPrompt} disabled={isSubmitting}
+                      onChange={event => { setCustomPrompt(event.target.value); setSelectedPrompt(null); }}
+                      placeholder="Sorunun tamamını, varsa tartışma mesajlarını veya kaynak metni buraya yapıştırın..." />
+                    <p>Soru eklemezseniz dil ve anlatım değerlendirilir; soruya uygunluk puanlanmaz.</p>
+                  </div>
+                )}
 
                 {selectedPrompt && (
                   <div className="prompt-info">
@@ -617,6 +661,7 @@ export const WritingPractice = ({
 
                 <div className="writing-area">
                   <textarea
+                    aria-label="İngilizce yanıtınız"
                     value={writingText}
                     onChange={e => setWritingText(e.target.value)}
                     placeholder="İngilizce yazınızı buraya yazın..."
@@ -642,6 +687,7 @@ export const WritingPractice = ({
                     </button>
                   </div>
                 </div>
+                {submissionError && <div className="api-warning" role="alert"><AlertCircle size={20} /><span>{submissionError}</span></div>}
               </div>
             )}
 
@@ -655,7 +701,7 @@ export const WritingPractice = ({
                       <span className="score-value" style={{ color: getScoreColor(currentFeedback.overallScore) }}>
                         {currentFeedback.overallScore}
                       </span>
-                      <span className="score-label">Genel Puan</span>
+                      <span className="score-label">Pratik Puanı / 100</span>
                     </div>
                   </div>
                   <div className="score-card">
@@ -684,6 +730,11 @@ export const WritingPractice = ({
                   </div>
                 </div>
 
+                {currentFeedback.examAssessment && <WritingAssessment assessment={currentFeedback.examAssessment} />}
+                {!currentFeedback.examAssessment && (
+                  <p className="writing-assessment-note">Bu kayıt önceki analiz biçimini kullanıyor. Güncel içerik ve sınav değerlendirmesi için yazınızı yeniden analiz edebilirsiniz.</p>
+                )}
+
                 <div className="feedback-summary">
                   <h3><Sparkles size={20} />Özet Değerlendirme</h3>
                   <p>{currentFeedback.summary}</p>
@@ -692,7 +743,7 @@ export const WritingPractice = ({
                 <div className="text-analysis">
                   <h3>
                     <FileText size={20} />
-                    Yazım ve Dilbilgisi
+                    Dilbilgisi ve Cümle Yapısı
                     {currentFeedback.errors.filter(e => e.errorLevel === 'surface').length > 0 && (
                       <span className="error-count">{currentFeedback.errors.filter(e => e.errorLevel === 'surface').length} hata bulundu</span>
                     )}
@@ -706,8 +757,8 @@ export const WritingPractice = ({
                   <div className="text-analysis">
                     <h3>
                       <Sparkles size={20} />
-                      Stil ve Doğallık
-                      <span className="meta-error-count">{currentFeedback.errors.filter(e => e.errorLevel === 'meta').length} stil hatası</span>
+                      İçerik, Akış ve Anlatım
+                      <span className="meta-error-count">{currentFeedback.errors.filter(e => e.errorLevel === 'meta').length} geliştirme önerisi</span>
                     </h3>
                     <div className="text-box original">
                       {renderHighlightedText(writingText, currentFeedback.errors.filter(e => e.errorLevel === 'meta'))}
@@ -721,11 +772,11 @@ export const WritingPractice = ({
                     {currentFeedback.errors.filter(e => e.errorLevel === 'surface').map((error, idx) => (
                       <div
                         key={idx}
-                        className={`error-item ${focusedErrorIndex === idx ? 'active-error' : ''}`}
-                        data-error-index={idx}
+                        className={`error-item ${focusedErrorIndex === currentFeedback.errors.indexOf(error) ? 'active-error' : ''}`}
+                        data-error-index={currentFeedback.errors.indexOf(error)}
                       >
                         <div className="error-header">
-                          <span className="error-num">#{idx + 1}</span>
+                          <span className="error-num">#{currentFeedback.errors.indexOf(error) + 1}</span>
                           <span className="error-category">{GRAMMAR_CATEGORY_LABELS[error.category]}</span>
                         </div>
                         <div className="error-content">
@@ -743,15 +794,15 @@ export const WritingPractice = ({
 
                 {currentFeedback.errors.filter(e => e.errorLevel === 'meta').length > 0 && (
                   <div className="error-list meta-error-list">
-                    <h3><Sparkles size={20} />Stil ve Yapı Hataları</h3>
+                    <h3><Sparkles size={20} />İçerik ve Anlatım Önerileri</h3>
                     {currentFeedback.errors.filter(e => e.errorLevel === 'meta').map((error, idx) => (
                       <div
                         key={`meta-${idx}`}
-                        className="error-item meta-error-item"
-                        data-error-index={`meta-${idx}`}
+                        className={`error-item meta-error-item ${focusedErrorIndex === currentFeedback.errors.indexOf(error) ? 'active-error' : ''}`}
+                        data-error-index={currentFeedback.errors.indexOf(error)}
                       >
                         <div className="error-header meta-error-header">
-                          <span className="error-num meta-num">#{idx + 1}</span>
+                          <span className="error-num meta-num">#{currentFeedback.errors.indexOf(error) + 1}</span>
                           <span className="error-category meta-category">{GRAMMAR_CATEGORY_LABELS[error.category]}</span>
                         </div>
                         <div className="error-content">
@@ -787,31 +838,10 @@ export const WritingPractice = ({
                   </div>
                 )}
 
-                {/* Fix Spelling CTA — only if spelling errors exist */}
-                {(() => {
-                  const spellingErrors = currentFeedback.errors.filter(e => {
-                    if (e.errorLevel !== 'surface') return false;
-                    const text = e.text.trim();
-                    const suggestion = e.suggestion.trim();
-                    if (text.includes(' ') || suggestion.includes(' ')) return false;
-                    if (text.toLowerCase() === suggestion.toLowerCase()) return false;
-                    const lenRatio = Math.min(text.length, suggestion.length) / Math.max(text.length, suggestion.length);
-                    return lenRatio >= 0.4;
-                  });
-                  if (spellingErrors.length === 0) return null;
-                  return (
-                    <button
-                      className="fix-spelling-cta"
-                      onClick={() => setViewMode('fix_spelling')}
-                    >
-                      <Keyboard size={20} />
-                      <span>Yazımını Düzelt</span>
-                      <span className="cta-count">{spellingErrors.length} yazım hatası</span>
-                    </button>
-                  );
-                })()}
-
                 <div className="result-actions">
+                  <button className="new-writing-btn" onClick={() => { setViewMode('write'); setIsVoiceTutorOpen(false); setSubmissionError(null); }}>
+                    <PenLine size={18} /><span>Düzenle ve Yeniden Analiz Et</span>
+                  </button>
                   <button className="new-writing-btn" onClick={handleNewWriting}>
                     <RotateCcw size={18} />
                     <span>Yeni Yazı Yaz</span>
@@ -880,20 +910,6 @@ export const WritingPractice = ({
               </div>
             )}
 
-            {/* ── FIX SPELLING MODE ── */}
-            {viewMode === 'fix_spelling' && currentFeedback && (
-              <ParagraphSpellingFix
-                originalText={writingText}
-                errors={currentFeedback.errors}
-                onComplete={() => setViewMode('result')}
-                onBack={() => setViewMode('result')}
-              />
-            )}
-
-            {/* ── SPELLING MODE ── */}
-            {viewMode === 'spelling' && (
-              <SpellingForge />
-            )}
           </div>
         </div>
       </div>
