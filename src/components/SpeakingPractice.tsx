@@ -43,6 +43,7 @@ import {
   clearTrackingData
 } from '../services/firebaseUserService';
 import { useAuth } from '../contexts/AuthContext';
+import { useActivitySession } from '../hooks/useActivitySession';
 
 interface SpeakingPracticeProps {
   isOpen: boolean;
@@ -91,6 +92,9 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
   });
 
   const { user } = useAuth();
+
+  // Activity log: the clock runs from the moment a question is shown until it is submitted.
+  const speakingSession = useActivitySession(currentQuestion?.id ?? null);
 
   // History state
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -302,6 +306,43 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
     setIsAnalyzing(true);
     setRecordingState('processing');
 
+    // Freeze the activity clock before waiting on transcription and analysis.
+    const timing = speakingSession.snapshot();
+    const question = currentQuestion;
+    const spokenSeconds = recordingTime;
+    let logged = false;
+    const logSpeaking = (result: SpeakingFeedback | null, sessionId?: string, note?: string) => {
+      if (logged) return;
+      logged = true;
+      const mmss = `${Math.floor(spokenSeconds / 60)}:${String(spokenSeconds % 60).padStart(2, '0')}`;
+      speakingSession.record({
+        type: 'speaking',
+        title: question.topic,
+        subtitle: IELTS_SECTION_LABELS[question.section],
+        itemId: question.id,
+        sourceId: sessionId || undefined,
+        status: 'completed',
+        scoreLabel: result ? `Band ${result.overallBandScore}` : undefined,
+        bandScore: result?.overallBandScore,
+        feedbackSummary: result?.summary,
+        details: [
+          { label: 'Soru', value: question.questionText },
+          { label: 'Konuşma süresi', value: mmss },
+          ...(result ? [
+            { label: 'Akıcılık', value: String(result.fluencyScore) },
+            { label: 'Kelime bilgisi', value: String(result.vocabularyScore) },
+            { label: 'Gramer', value: String(result.grammarScore) },
+            { label: 'Telaffuz', value: String(result.pronunciationScore) },
+            { label: 'Düzeltme sayısı', value: String(result.corrections?.length ?? 0) },
+            ...(result.transcript ? [{ label: 'Transkript', value: result.transcript }] : []),
+          ] : []),
+          ...(note ? [{ label: 'Not', value: note }] : []),
+        ],
+      }, timing);
+      // Recording the same question again counts as a new attempt.
+      speakingSession.restart();
+    };
+
     try {
       // Transcribe audio
       const transcript = await transcribeAudio(audioBlob);
@@ -326,6 +367,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
       };
 
       const sessionId = await saveSpeakingSession(sessionData);
+      logSpeaking(speakingFeedback, sessionId);
       if (sessionId) {
         const newSession = { ...sessionData, id: sessionId };
         setCurrentSession(newSession as SpeakingSession);
@@ -349,6 +391,7 @@ export function SpeakingPractice({ isOpen, onClose, isOpenAIConfigured }: Speaki
 
     } catch (error) {
       console.error('Error analyzing speaking:', error);
+      logSpeaking(null, undefined, `Analiz tamamlanamadı${error instanceof Error ? `: ${error.message}` : ''}`);
       setFeedback({
         overallBandScore: 0,
         fluencyScore: 0,

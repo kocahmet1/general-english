@@ -34,6 +34,7 @@ import {
   LISTENING_QUESTION_TYPE_LABELS,
   ListeningQuestionType
 } from '../types';
+import { useActivitySession, percent, optionLabel } from '../hooks/useActivitySession';
 
 interface ListeningPracticeProps {
   isOpen: boolean;
@@ -95,6 +96,46 @@ export const ListeningPractice = ({
 
   // Vocab vault state
   const [showVocabOptions, setShowVocabOptions] = useState<number | null>(null);
+
+  // Activity log: one attempt per opened test, rewritten after every answer.
+  const listeningSession = useActivitySession(selectedTest?.id ?? null);
+  // Opening a finished test to look at results is not a new attempt.
+  const answeredThisVisitRef = useRef(false);
+  useEffect(() => { answeredThisVisitRef.current = false; }, [selectedTest?.id]);
+  const recordListeningAttempt = (test: ListeningTest, answers: Map<number, ListeningAnswer>, finished: boolean) => {
+    answeredThisVisitRef.current = true;
+    const total = test.questions.length;
+    const correct = Array.from(answers.values()).filter(a => a.isCorrect).length;
+    listeningSession.record({
+      type: 'listening',
+      title: test.title,
+      subtitle: `${LISTENING_PASSAGE_LABELS[test.section]} · ${test.difficulty}`,
+      itemId: test.id,
+      status: finished || answers.size >= total ? 'completed' : 'in_progress',
+      totalQuestions: total,
+      answeredCount: answers.size,
+      correctCount: correct,
+      scorePercent: percent(correct, answers.size),
+      details: [
+        { label: 'Bölüm', value: LISTENING_PASSAGE_LABELS[test.section] },
+        { label: 'Zorluk', value: test.difficulty },
+        { label: 'Ses dinleme sayısı', value: String(audioPlayCount) },
+        ...(finished && answers.size < total ? [{ label: 'Not', value: `Tüm sorular cevaplanmadan bitirildi (${answers.size}/${total})` }] : []),
+      ],
+      questions: test.questions
+        .filter(q => answers.has(q.id))
+        .map(q => {
+          const answer = answers.get(q.id)!;
+          return {
+            prompt: q.questionText,
+            given: optionLabel(q.options, answer.selectedAnswer),
+            expected: optionLabel(q.options, q.correctAnswer),
+            isCorrect: answer.isCorrect,
+            tag: LISTENING_QUESTION_TYPE_LABELS[q.questionType],
+          };
+        }),
+    });
+  };
 
   useEffect(() => {
     setViewMode(selectedTest ? 'test' : 'list');
@@ -227,7 +268,10 @@ export const ListeningPractice = ({
         });
         await onCompleteTest(selectedTest.id, Math.round(correct / selectedTest.questions.length * 100), selectedTest.section, selectedTest.difficulty, questionTypeResults, audioPlayCount);
       }
-      if (activeTestRef.current === selectedTest.id) setCurrentAnswers(newAnswers);
+      if (activeTestRef.current === selectedTest.id) {
+        setCurrentAnswers(newAnswers);
+        recordListeningAttempt(selectedTest, newAnswers, false);
+      }
     } catch {
       if (activeTestRef.current === selectedTest.id) setSaveError('Cevabınız kaydedilemedi. Lütfen aynı cevabı tekrar gönderin.');
     } finally {
@@ -261,7 +305,10 @@ export const ListeningPractice = ({
         if (currentAnswers.get(q.id)?.isCorrect) questionTypeResults[q.questionType].correct++;
       });
       await onCompleteTest(selectedTest.id, Math.round(currentProgress.correct / currentProgress.total * 100), selectedTest.section, selectedTest.difficulty, questionTypeResults, audioPlayCount);
-      if (activeTestRef.current === selectedTest.id) { setViewMode('results'); stopAudio(); setSaveError(''); }
+      if (activeTestRef.current === selectedTest.id) {
+        if (answeredThisVisitRef.current) recordListeningAttempt(selectedTest, currentAnswers, true);
+        setViewMode('results'); stopAudio(); setSaveError('');
+      }
     } catch {
       if (activeTestRef.current === selectedTest.id) setSaveError('Sonuçlar kaydedilemedi. Sonuçlar düğmesiyle tekrar deneyin.');
     } finally { setIsSaving(false); }
@@ -287,6 +334,8 @@ export const ListeningPractice = ({
         setSaveError('Test sıfırlanamadı. Lütfen tekrar deneyin.');
         return;
       }
+      listeningSession.restart();
+      answeredThisVisitRef.current = false;
       setViewMode('test');
       setShowQuestions(false);
       setShowTranscript(false);

@@ -5,6 +5,7 @@ import {
     signOut as firebaseSignOut
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { touchUserProfile } from '../services/activityLogService';
 
 interface AuthContextType {
     user: User | null;
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false);
+            if (currentUser) void touchUserProfile(currentUser);
         });
 
         return () => unsubscribe();

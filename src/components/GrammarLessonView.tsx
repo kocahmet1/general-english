@@ -1,9 +1,10 @@
 import { PageBack } from './LearningLayout';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, AlertCircle, Lightbulb, Award, RotateCcw, Headphones } from 'lucide-react';
-import { GrammarTopic } from '../types/grammarLesson';
+import { GrammarTopic, type ExerciseType } from '../types/grammarLesson';
 import { grammarLessons } from '../data/grammarLessons';
 import { updateLessonProgress } from '../services/grammarLessonService';
+import { useActivitySession, percent } from '../hooks/useActivitySession';
 import { VoiceTutor } from './VoiceTutor';
 import { GrammarTopicIcon } from './GrammarTopicIcon';
 
@@ -15,6 +16,13 @@ interface GrammarLessonViewProps {
 
 
 type ViewMode = 'learn' | 'quiz-selection' | 'practice' | 'results';
+
+const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
+    'fill-in-blank': 'Boşluk doldurma',
+    'multiple-choice': 'Çoktan seçmeli',
+    'error-correction': 'Hata düzeltme',
+    'sentence-reorder': 'Cümle sıralama',
+};
 
 const parseBold = (text: string) => {
     const parts = text.split(/(\*\*.*?\*\*|\*[^*]+\*)/g);
@@ -50,14 +58,52 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
     const [activeSection, setActiveSection] = useState(0);
     const [showVoiceTutor, setShowVoiceTutor] = useState(false);
 
+    // Activity log: one attempt per quiz run, rewritten after every answer.
+    const grammarSession = useActivitySession(viewMode === 'practice' && selectedQuizId != null ? `${topic}-${selectedQuizId}` : null);
+    // Typed answers call handleAnswer on every keystroke, so in-progress saves are debounced.
+    const pendingRecordRef = useRef<number | null>(null);
+    useEffect(() => () => {
+        if (pendingRecordRef.current) window.clearTimeout(pendingRecordRef.current);
+    }, []);
+
     if (!lesson) {
         return <div>Lesson not found</div>;
     }
+
+    const recordGrammarAttempt = (answers: Map<number, string>, finished: boolean) => {
+        if (pendingRecordRef.current) {
+            window.clearTimeout(pendingRecordRef.current);
+            pendingRecordRef.current = null;
+        }
+        const exercises = lesson.exercises.filter(ex => selectedQuizId == null || ex.quizId === selectedQuizId);
+        const answered = exercises.filter(ex => answers.has(ex.id));
+        const correct = answered.filter(ex => answers.get(ex.id) === ex.correctAnswer).length;
+        grammarSession.record({
+            type: 'grammar',
+            title: selectedQuizId != null ? `${lesson.title} · Quiz ${selectedQuizId}` : lesson.title,
+            subtitle: lesson.difficulty,
+            itemId: `${topic}${selectedQuizId != null ? `#${selectedQuizId}` : ''}`,
+            status: finished || answered.length >= exercises.length ? 'completed' : 'in_progress',
+            totalQuestions: exercises.length,
+            answeredCount: answered.length,
+            correctCount: correct,
+            scorePercent: percent(correct, answered.length),
+            questions: answered.map(ex => ({
+                prompt: ex.question,
+                given: answers.get(ex.id) || '',
+                expected: Array.isArray(ex.correctAnswer) ? ex.correctAnswer.join(' ') : ex.correctAnswer,
+                isCorrect: answers.get(ex.id) === ex.correctAnswer,
+                tag: EXERCISE_TYPE_LABELS[ex.type],
+            })),
+        });
+    };
 
     const handleAnswer = (exerciseId: number, answer: string) => {
         const newAnswers = new Map(userAnswers);
         newAnswers.set(exerciseId, answer);
         setUserAnswers(newAnswers);
+        if (pendingRecordRef.current) window.clearTimeout(pendingRecordRef.current);
+        pendingRecordRef.current = window.setTimeout(() => recordGrammarAttempt(newAnswers, false), 1500);
 
         // Show feedback immediately
         const newFeedback = new Map(showFeedback);
@@ -82,6 +128,7 @@ export function GrammarLessonView({ topic, onClose, onComplete }: GrammarLessonV
 
         // Save progress
         updateLessonProgress(topic, exerciseResults, true);
+        recordGrammarAttempt(userAnswers, true);
 
         setViewMode('results');
     };

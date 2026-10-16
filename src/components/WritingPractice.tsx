@@ -33,13 +33,14 @@ import {
   GRAMMAR_CATEGORY_LABELS
 } from '../types';
 import { VoiceTutor } from './VoiceTutor';
+import { useActivitySession, type ActivitySnapshot } from '../hooks/useActivitySession';
 
 interface WritingPracticeProps {
   isOpen: boolean;
   onClose: () => void;
   submissions: WritingSubmission[];
   prompts: WritingPrompt[];
-  onSubmitWriting: (text: string, context: WritingEvaluationContext, promptId?: string) => Promise<WritingFeedback | null>;
+  onSubmitWriting: (text: string, context: WritingEvaluationContext, promptId?: string, timing?: ActivitySnapshot | null) => Promise<WritingFeedback | null>;
   onDeleteSubmission: (submissionId: string) => void;
   isOpenAIConfigured: boolean;
 }
@@ -70,6 +71,15 @@ export const WritingPractice = ({
   const [mobileShowVoice, setMobileShowVoice] = useState(false);
   const [focusedErrorIndex, setFocusedErrorIndex] = useState<number>(-1);
 
+  // Activity log: the writing clock starts at the first character of a new draft.
+  const [draftKey, setDraftKey] = useState<string | null>(null);
+  const writingSession = useActivitySession(draftKey);
+  useEffect(() => {
+    if (!draftKey && viewMode === 'write' && !selectedSubmission && writingText.trim()) {
+      setDraftKey(`draft-${Date.now()}`);
+    }
+  }, [draftKey, viewMode, selectedSubmission, writingText]);
+
   // Handle focus_error from VoiceTutor — move avatar to the discussed error
   const handleFocusError = useCallback((errorIndex: number) => {
     setFocusedErrorIndex(errorIndex);
@@ -93,6 +103,7 @@ export const WritingPractice = ({
       setSelectedSubmission(null);
       setIsVoiceTutorOpen(false);
       setMobileShowVoice(false);
+      setDraftKey(null);
     }
   }, [isOpen]);
 
@@ -138,10 +149,12 @@ export const WritingPractice = ({
       const feedback = await onSubmitWriting(
         writingText,
         context,
-        selectedPrompt?.id
+        selectedPrompt?.id,
+        writingSession.snapshot()
       );
 
       if (feedback) {
+        setDraftKey(null);
         setCurrentFeedback(feedback);
         setSelectedSubmission(null);
         setFocusedErrorIndex(-1);
@@ -181,6 +194,7 @@ export const WritingPractice = ({
 
   // Handle new writing
   const handleNewWriting = () => {
+    setDraftKey(null);
     setViewMode('write');
     setSelectedPrompt(null);
     setWritingText('');

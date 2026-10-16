@@ -57,6 +57,8 @@ import {
   updateListeningStats
 } from './services/firebaseUserService';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from './data/sampleExam';
+import { useActivitySession, percent, optionLabel, type ActivitySnapshot } from './hooks/useActivitySession';
+import { saveActivity } from './services/activityLogService';
 import './App.css';
 import './learning.css';
 
@@ -117,6 +119,45 @@ function App() {
     strongestAreas: []
   });
   const [recentMistakes, setRecentMistakes] = useState<MistakeRecord[]>([]);
+
+  // Activity log: one record per exam attempt, rewritten after every new answer.
+  const examSession = useActivitySession(currentExam?.id ?? null);
+  const loggedExamAnswers = useRef(0);
+
+  useEffect(() => {
+    loggedExamAnswers.current = 0;
+  }, [currentExam?.id]);
+
+  useEffect(() => {
+    if (!currentExam) return;
+    const answered = userAnswers.size;
+    if (answered === 0 || answered === loggedExamAnswers.current) return;
+    loggedExamAnswers.current = answered;
+
+    const total = currentExam.questions.length;
+    const correct = Array.from(userAnswers.values()).filter(a => a.isCorrect).length;
+    examSession.record({
+      type: 'exam',
+      title: currentExam.name,
+      itemId: currentExam.id,
+      status: answered >= total ? 'completed' : 'in_progress',
+      totalQuestions: total,
+      answeredCount: answered,
+      correctCount: correct,
+      scorePercent: percent(correct, answered),
+      questions: currentExam.questions
+        .filter(q => userAnswers.has(q.id))
+        .map(q => {
+          const answer = userAnswers.get(q.id)!;
+          return {
+            prompt: q.questionText,
+            given: optionLabel(q.options, answer.selectedAnswer),
+            expected: optionLabel(q.options, q.correctAnswer),
+            isCorrect: answer.isCorrect,
+          };
+        }),
+    });
+  }, [userAnswers, currentExam, examSession]);
 
   useEffect(() => {
     let isMounted = true;
@@ -475,6 +516,9 @@ function App() {
 
   const handleResetExam = () => {
     setUserAnswers(new Map());
+    // Answering again after a reset is a new attempt.
+    examSession.restart();
+    loggedExamAnswers.current = 0;
   };
 
   const handleClearTrackingData = async () => {
@@ -502,7 +546,8 @@ function App() {
   const handleSubmitWriting = async (
     text: string,
     context: WritingEvaluationContext,
-    promptId?: string
+    promptId?: string,
+    timing?: ActivitySnapshot | null
   ): Promise<WritingFeedback | null> => {
     // Calculate word count
     const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
@@ -521,6 +566,40 @@ function App() {
       return null;
     }
 
+    // Activity log: timing was frozen at submit, so waiting for the AI is not counted.
+    const logWriting = (feedback: WritingFeedback | null, note?: string) => {
+      if (!timing) return;
+      const target = context.minWords && context.maxWords
+        ? `${context.minWords}–${context.maxWords}`
+        : context.minWords ? `en az ${context.minWords}`
+        : context.maxWords ? `en fazla ${context.maxWords}`
+        : undefined;
+      void saveActivity({
+        ...timing,
+        type: 'writing',
+        title: context.promptTitle,
+        subtitle: context.examType.toUpperCase(),
+        itemId: promptId,
+        sourceId: submissionId,
+        status: 'completed',
+        scorePercent: feedback?.overallScore,
+        scoreLabel: feedback ? `${feedback.overallScore}/100` : undefined,
+        feedbackSummary: feedback?.summary,
+        details: [
+          { label: 'Kelime sayısı', value: String(wordCount) },
+          ...(target ? [{ label: 'Kelime hedefi', value: target }] : []),
+          ...(feedback ? [
+            { label: 'Gramer', value: `${feedback.grammarScore}/100` },
+            { label: 'Kelime bilgisi', value: `${feedback.vocabularyScore}/100` },
+            { label: 'Yapı', value: `${feedback.structureScore}/100` },
+            ...(feedback.contentScore != null ? [{ label: 'İçerik', value: `${feedback.contentScore}/100` }] : []),
+            { label: 'Bulunan hata', value: String(feedback.errors?.length ?? 0) },
+          ] : []),
+          ...(note ? [{ label: 'Not', value: note }] : []),
+        ],
+      });
+    };
+
     // Get AI feedback if OpenAI is configured
     if (openAIConfigured) {
       try {
@@ -528,6 +607,7 @@ function App() {
 
         // Update submission with feedback
         await updateWritingSubmission(submissionId, { feedback });
+        logWriting(feedback);
 
         // Reload submissions
         await loadWritingSubmissions();
@@ -535,10 +615,12 @@ function App() {
         return feedback;
       } catch (error) {
         console.error('Failed to get writing feedback:', error);
+        logWriting(null, 'AI değerlendirmesi alınamadı');
         await loadWritingSubmissions();
         throw error;
       }
     } else {
+      logWriting(null, 'AI değerlendirmesi kapalı');
       await loadWritingSubmissions();
       return null;
     }

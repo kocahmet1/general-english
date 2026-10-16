@@ -11,20 +11,20 @@ import {
 } from '../types';
 import { GRAMMAR_CATEGORY_LABELS } from '../types';
 
-// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── helpers ──────────────────────────────────────────────────────────────────
 function fmt(date: Date | string | undefined): string {
-    if (!date) return 'â€”';
+    if (!date) return '—';
     return new Date(date).toLocaleDateString('tr-TR', {
         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 }
 
 function pct(correct: number, total: number): string {
-    if (total === 0) return 'â€”';
+    if (total === 0) return '—';
     return `${Math.round((correct / total) * 100)}%`;
 }
 
-// â”€â”€ sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── sub-components ────────────────────────────────────────────────────────────
 const SectionCard: React.FC<{
     icon: React.ReactNode;
     title: string;
@@ -55,7 +55,7 @@ const StatPill: React.FC<{ label: string; value: string | number; accent?: boole
     </div>
 );
 
-// â”€â”€ main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── main component ────────────────────────────────────────────────────────────
 export const ActivityDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [perfStats, setPerfStats] = useState<{ email: string, stat: PerformanceStats }[]>([]);
@@ -105,7 +105,7 @@ export const ActivityDashboard: React.FC = () => {
         load();
     }, []);
 
-    if (loading) return <div style={{ padding: '2rem' }}>YÃ¼kleniyor...</div>;
+    if (loading) return <div style={{ padding: '2rem' }}>Yükleniyor...</div>;
 
     // Aggregate stats globally
     const aggPerfStats = perfStats.reduce((acc, curr) => {
@@ -153,45 +153,45 @@ export const ActivityDashboard: React.FC = () => {
     return (
         <div className="activity-dashboard">
 
-            {/* â”€â”€ Overview strip â”€â”€ */}
+            {/* ── Overview strip ── */}
             <div className="act-overview">
-                <StatPill label="SÄ±nav Sorusu" value={aggPerfStats.totalAnswered} />
-                <StatPill label="DoÄŸru" value={aggPerfStats.totalCorrect} accent />
+                <StatPill label="Sınav Sorusu" value={aggPerfStats.totalAnswered} />
+                <StatPill label="Doğru" value={aggPerfStats.totalCorrect} accent />
                 <StatPill label="Yazma" value={writings.length} />
-                <StatPill label="Okuma TamamlandÄ±" value={readingProg.filter(p => p.completedAt).length} />
-                <StatPill label="KonuÅŸma SeansÄ±" value={aggSpeakStats.totalSessions} />
+                <StatPill label="Okuma Tamamlandı" value={readingProg.filter(p => p.completedAt).length} />
+                <StatPill label="Konuşma Seansı" value={aggSpeakStats.totalSessions} />
                 <StatPill label="Dinleme Testi" value={aggListenStats.totalTestsCompleted} />
-                <StatPill label="Kelime KasasÄ±" value={vocab.length} />
+                <StatPill label="Kelime Kasası" value={vocab.length} />
                 <StatPill label="Toplam Etkinlik" value={totalSessions} accent />
             </div>
 
-            {/* â”€â”€ Grammar / Exam â”€â”€ */}
-            <SectionCard icon={<BarChart3 size={20} />} title="Gramer & SÄ±nav PerformansÄ±" color="blue">
+            {/* ── Grammar / Exam ── */}
+            <SectionCard icon={<BarChart3 size={20} />} title="Gramer & Sınav Performansı" color="blue">
                 {aggPerfStats.totalAnswered === 0 ? (
-                    <EmptyState label="HenÃ¼z sÄ±nav sorusu Ã§Ã¶zÃ¼lmemiÅŸ." />
+                    <EmptyState label="Henüz sınav sorusu çözülmemiş." />
                 ) : (
                     <>
                         <div className="act-pills-row">
                             <StatPill label="Cevaplanan" value={aggPerfStats.totalAnswered} />
-                            <StatPill label="DoÄŸru" value={aggPerfStats.totalCorrect} accent />
-                            <StatPill label="YanlÄ±ÅŸ" value={aggPerfStats.totalIncorrect} />
-                            <StatPill label="BaÅŸarÄ± %" value={pct(aggPerfStats.totalCorrect, aggPerfStats.totalAnswered)} accent />
+                            <StatPill label="Doğru" value={aggPerfStats.totalCorrect} accent />
+                            <StatPill label="Yanlış" value={aggPerfStats.totalIncorrect} />
+                            <StatPill label="Başarı %" value={pct(aggPerfStats.totalCorrect, aggPerfStats.totalAnswered)} accent />
                         </div>
 
                         {aggPerfStats.categoryBreakdown.length > 0 && (
                             <>
-                                <h4 className="act-sub-title">Kategori KÄ±rÄ±lÄ±mÄ± (YanlÄ±ÅŸa GÃ¶re)</h4>
+                                <h4 className="act-sub-title">Kategori Kırılımı (Yanlışa Göre)</h4>
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>Kategori</th><th>YanlÄ±ÅŸ</th><th>Son 7 gÃ¼n</th></tr>
+                                            <tr><th>Kategori</th><th>Yanlış</th><th>Son 7 gün</th></tr>
                                         </thead>
                                         <tbody>
                                             {aggPerfStats.categoryBreakdown.slice(0, 10).map(c => (
                                                 <tr key={c.category}>
                                                     <td>{GRAMMAR_CATEGORY_LABELS[c.category] || c.category}</td>
                                                     <td><span className="badge-wrong">{c.totalMistakes}</span></td>
-                                                    <td>{c.recentMistakes > 0 ? <span className="badge-recent">{c.recentMistakes}</span> : 'â€”'}</td>
+                                                    <td>{c.recentMistakes > 0 ? <span className="badge-recent">{c.recentMistakes}</span> : '—'}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -202,16 +202,16 @@ export const ActivityDashboard: React.FC = () => {
 
                         {mistakes.length > 0 && (
                             <>
-                                <h4 className="act-sub-title">Son YanlÄ±ÅŸlar</h4>
+                                <h4 className="act-sub-title">Son Yanlışlar</h4>
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>KullanÄ±cÄ±</th><th>Soru (kÄ±sa)</th><th>SeÃ§ilen</th><th>DoÄŸru</th><th>Tarih</th></tr>
+                                            <tr><th>Kullanıcı</th><th>Soru (kısa)</th><th>Seçilen</th><th>Doğru</th><th>Tarih</th></tr>
                                         </thead>
                                         <tbody>
                                             {mistakes.slice(0, 15).map(m => (
                                                 <tr key={m.id}>
-                                                    <td title={m.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{m.userEmail}</td><td title={m.questionText} className="act-truncate">{m.questionText.slice(0, 60)}{m.questionText.length > 60 ? 'â€¦' : ''}</td>
+                                                    <td title={m.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{m.userEmail}</td><td title={m.questionText} className="act-truncate">{m.questionText.slice(0, 60)}{m.questionText.length > 60 ? '…' : ''}</td>
                                                     <td><span className="badge-wrong">{m.selectedAnswer}</span></td>
                                                     <td><span className="badge-correct">{m.correctAnswer}</span></td>
                                                     <td className="act-date">{fmt(m.timestamp)}</td>
@@ -226,14 +226,14 @@ export const ActivityDashboard: React.FC = () => {
                 )}
             </SectionCard>
 
-            {/* â”€â”€ Writing â”€â”€ */}
-            <SectionCard icon={<PenLine size={20} />} title="Yazma PratiÄŸi" color="purple">
+            {/* ── Writing ── */}
+            <SectionCard icon={<PenLine size={20} />} title="Yazma Pratiği" color="purple">
                 {writings.length === 0 ? (
-                    <EmptyState label="HenÃ¼z yazma egzersizi yapÄ±lmamÄ±ÅŸ." />
+                    <EmptyState label="Henüz yazma egzersizi yapılmamış." />
                 ) : (
                     <>
                         <div className="act-pills-row">
-                            <StatPill label="Toplam GÃ¶nderi" value={writings.length} />
+                            <StatPill label="Toplam Gönderi" value={writings.length} />
                             <StatPill label="Ort. Kelime" value={
                                 Math.round(writings.reduce((s, w) => s + (w.wordCount || 0), 0) / writings.length)
                             } accent />
@@ -242,15 +242,15 @@ export const ActivityDashboard: React.FC = () => {
                         <div className="act-table-wrap">
                             <table className="act-table">
                                 <thead>
-                                    <tr><th>KullanÄ±cÄ±</th><th>BaÅŸlÄ±k</th><th>Kelime</th><th>Gramer</th><th>Puan</th><th>Tarih</th></tr>
+                                    <tr><th>Kullanıcı</th><th>Başlık</th><th>Kelime</th><th>Gramer</th><th>Puan</th><th>Tarih</th></tr>
                                 </thead>
                                 <tbody>
                                     {writings.slice(0, 20).map(w => (
                                         <tr key={w.id}>
                                             <td title={w.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{w.userEmail}</td><td>{w.promptTitle || 'Serbest Yazma'}</td>
-                                            <td>{w.wordCount || 'â€”'}</td>
-                                            <td>{w.feedback?.grammarScore != null ? <span className="badge-score">G:{w.feedback.grammarScore}</span> : 'â€”'}</td>
-                                            <td>{w.feedback?.overallScore != null ? <span className="badge-score">{w.feedback.overallScore}/100</span> : 'â€”'}</td>
+                                            <td>{w.wordCount || '—'}</td>
+                                            <td>{w.feedback?.grammarScore != null ? <span className="badge-score">G:{w.feedback.grammarScore}</span> : '—'}</td>
+                                            <td>{w.feedback?.overallScore != null ? <span className="badge-score">{w.feedback.overallScore}/100</span> : '—'}</td>
                                             <td className="act-date">{fmt(w.submittedAt)}</td>
                                         </tr>
                                     ))}
@@ -261,16 +261,16 @@ export const ActivityDashboard: React.FC = () => {
                 )}
             </SectionCard>
 
-            {/* â”€â”€ Reading â”€â”€ */}
+            {/* ── Reading ── */}
             <SectionCard icon={<FileText size={20} />} title="Okuma Anlama" color="green">
                 {aggReadingStats.totalQuestionsAnswered === 0 ? (
-                    <EmptyState label="HenÃ¼z okuma egzersizi yapÄ±lmamÄ±ÅŸ." />
+                    <EmptyState label="Henüz okuma egzersizi yapılmamış." />
                 ) : (
                     <>
                         <div className="act-pills-row">
-                            <StatPill label="ParÃ§a TamamlandÄ±" value={aggReadingStats.totalPassagesCompleted} />
-                            <StatPill label="Soru CevaplandÄ±" value={aggReadingStats.totalQuestionsAnswered} />
-                            <StatPill label="Ort. BaÅŸarÄ±" value={`${aggReadingStats.averageScore}%`} accent />
+                            <StatPill label="Parça Tamamlandı" value={aggReadingStats.totalPassagesCompleted} />
+                            <StatPill label="Soru Cevaplandı" value={aggReadingStats.totalQuestionsAnswered} />
+                            <StatPill label="Ort. Başarı" value={`${aggReadingStats.averageScore}%`} accent />
                         </div>
 
                         {readingProg.filter(p => p.completedAt).length > 0 && (
@@ -279,13 +279,13 @@ export const ActivityDashboard: React.FC = () => {
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>KullanÄ±cÄ±</th><th>ParÃ§a ID</th><th>Puan</th><th>Tarih</th></tr>
+                                            <tr><th>Kullanıcı</th><th>Parça ID</th><th>Puan</th><th>Tarih</th></tr>
                                         </thead>
                                         <tbody>
                                             {readingProg.filter(p => p.completedAt).slice(0, 10).map(p => (
                                                 <tr key={p.passageId}>
                                                     <td title={p.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{p.userEmail}</td><td>{p.passageId}</td>
-                                                    <td>{p.score != null ? <span className="badge-score">{p.score}%</span> : 'â€”'}</td>
+                                                    <td>{p.score != null ? <span className="badge-score">{p.score}%</span> : '—'}</td>
                                                     <td className="act-date">{fmt(p.completedAt)}</td>
                                                 </tr>
                                             ))}
@@ -297,11 +297,11 @@ export const ActivityDashboard: React.FC = () => {
 
                         {false && (
                             <>
-                                <h4 className="act-sub-title">Soru TÃ¼rÃ¼ PerformansÄ±</h4>
+                                <h4 className="act-sub-title">Soru Türü Performansı</h4>
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>TÃ¼r</th><th>DoÄŸru</th><th>Toplam</th><th>%</th></tr>
+                                            <tr><th>Tür</th><th>Doğru</th><th>Toplam</th><th>%</th></tr>
                                         </thead>
                                         <tbody>
                                             {([] as any[]).map(([type, d]) => (
@@ -321,18 +321,18 @@ export const ActivityDashboard: React.FC = () => {
                 )}
             </SectionCard>
 
-            {/* â”€â”€ Speaking â”€â”€ */}
-            <SectionCard icon={<Mic size={20} />} title="KonuÅŸma PratiÄŸi (IELTS)" color="orange">
+            {/* ── Speaking ── */}
+            <SectionCard icon={<Mic size={20} />} title="Konuşma Pratiği (IELTS)" color="orange">
                 {aggSpeakStats.totalSessions === 0 ? (
-                    <EmptyState label="HenÃ¼z konuÅŸma seansÄ± yapÄ±lmamÄ±ÅŸ." />
+                    <EmptyState label="Henüz konuşma seansı yapılmamış." />
                 ) : (
                     <>
                         <div className="act-pills-row">
                             <StatPill label="Toplam Seans" value={aggSpeakStats.totalSessions} />
-                            <StatPill label="Ort. Band" value={'â€”'} accent />
-                            <StatPill label="AkÄ±cÄ±lÄ±k" value={'â€”'} />
-                            <StatPill label="Gramer" value={'â€”'} />
-                            <StatPill label="Telaffuz" value={'â€”'} />
+                            <StatPill label="Ort. Band" value={'—'} accent />
+                            <StatPill label="Akıcılık" value={'—'} />
+                            <StatPill label="Gramer" value={'—'} />
+                            <StatPill label="Telaffuz" value={'—'} />
                         </div>
 
                         {speakSessions.length > 0 && (
@@ -341,15 +341,15 @@ export const ActivityDashboard: React.FC = () => {
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>KullanÄ±cÄ±</th><th>BÃ¶lÃ¼m</th><th>Soru</th><th>Band</th><th>SÃ¼re</th><th>Tarih</th></tr>
+                                            <tr><th>Kullanıcı</th><th>Bölüm</th><th>Soru</th><th>Band</th><th>Süre</th><th>Tarih</th></tr>
                                         </thead>
                                         <tbody>
                                             {speakSessions.slice(0, 15).map(s => (
                                                 <tr key={s.id}>
-                                                    <td title={s.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{s.userEmail}</td><td>{s.question?.section?.replace('section', 'BÃ¶lÃ¼m ') || 'â€”'}</td>
-                                                    <td className="act-truncate" title={s.question?.questionText}>{(s.question?.questionText || '').slice(0, 50)}{(s.question?.questionText || '').length > 50 ? 'â€¦' : ''}</td>
-                                                    <td>{s.feedback?.overallBandScore ? <span className="badge-score">{s.feedback.overallBandScore}</span> : 'â€”'}</td>
-                                                    <td>{s.duration ? `${Math.round(s.duration / 60)}dk` : 'â€”'}</td>
+                                                    <td title={s.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{s.userEmail}</td><td>{s.question?.section?.replace('section', 'Bölüm ') || '—'}</td>
+                                                    <td className="act-truncate" title={s.question?.questionText}>{(s.question?.questionText || '').slice(0, 50)}{(s.question?.questionText || '').length > 50 ? '…' : ''}</td>
+                                                    <td>{s.feedback?.overallBandScore ? <span className="badge-score">{s.feedback.overallBandScore}</span> : '—'}</td>
+                                                    <td>{s.duration ? `${Math.round(s.duration / 60)}dk` : '—'}</td>
                                                     <td className="act-date">{fmt(s.startedAt)}</td>
                                                 </tr>
                                             ))}
@@ -362,16 +362,16 @@ export const ActivityDashboard: React.FC = () => {
                 )}
             </SectionCard>
 
-            {/* â”€â”€ Listening â”€â”€ */}
-            <SectionCard icon={<Headphones size={20} />} title="Dinleme PratiÄŸi (IELTS)" color="teal">
+            {/* ── Listening ── */}
+            <SectionCard icon={<Headphones size={20} />} title="Dinleme Pratiği (IELTS)" color="teal">
                 {aggListenStats.totalTestsCompleted === 0 ? (
-                    <EmptyState label="HenÃ¼z dinleme testi yapÄ±lmamÄ±ÅŸ." />
+                    <EmptyState label="Henüz dinleme testi yapılmamış." />
                 ) : (
                     <>
                         <div className="act-pills-row">
-                            <StatPill label="Test TamamlandÄ±" value={aggListenStats.totalTestsCompleted} />
-                            <StatPill label="Soru CevaplandÄ±" value={aggListenStats.totalQuestionsAnswered} />
-                            <StatPill label="Ort. BaÅŸarÄ±" value={`${aggListenStats.averageScore}%`} accent />
+                            <StatPill label="Test Tamamlandı" value={aggListenStats.totalTestsCompleted} />
+                            <StatPill label="Soru Cevaplandı" value={aggListenStats.totalQuestionsAnswered} />
+                            <StatPill label="Ort. Başarı" value={`${aggListenStats.averageScore}%`} accent />
                         </div>
 
                         {listeningProg.filter(p => p.completedAt).length > 0 && (
@@ -380,13 +380,13 @@ export const ActivityDashboard: React.FC = () => {
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>KullanÄ±cÄ±</th><th>Test ID</th><th>Puan</th><th>Tarih</th></tr>
+                                            <tr><th>Kullanıcı</th><th>Test ID</th><th>Puan</th><th>Tarih</th></tr>
                                         </thead>
                                         <tbody>
                                             {listeningProg.filter(p => p.completedAt).slice(0, 10).map(p => (
                                                 <tr key={p.testId}>
                                                     <td title={p.userEmail} className="act-truncate" style={{ maxWidth: '100px' }}>{p.userEmail}</td><td>{p.testId}</td>
-                                                    <td>{p.score != null ? <span className="badge-score">{p.score}%</span> : 'â€”'}</td>
+                                                    <td>{p.score != null ? <span className="badge-score">{p.score}%</span> : '—'}</td>
                                                     <td className="act-date">{fmt(p.completedAt)}</td>
                                                 </tr>
                                             ))}
@@ -398,11 +398,11 @@ export const ActivityDashboard: React.FC = () => {
 
                         {false && (
                             <>
-                                <h4 className="act-sub-title">Soru TÃ¼rÃ¼ PerformansÄ±</h4>
+                                <h4 className="act-sub-title">Soru Türü Performansı</h4>
                                 <div className="act-table-wrap">
                                     <table className="act-table">
                                         <thead>
-                                            <tr><th>TÃ¼r</th><th>DoÄŸru</th><th>Toplam</th><th>%</th></tr>
+                                            <tr><th>Tür</th><th>Doğru</th><th>Toplam</th><th>%</th></tr>
                                         </thead>
                                         <tbody>
                                             {([] as any[]).map(([type, d]) => (
@@ -423,10 +423,10 @@ export const ActivityDashboard: React.FC = () => {
             </SectionCard>
 
 
-            {/* â”€â”€ Vocabulary â”€â”€ */}
-            <SectionCard icon={<BookMarked size={20} />} title="Kelime KasasÄ±" color="pink">
+            {/* ── Vocabulary ── */}
+            <SectionCard icon={<BookMarked size={20} />} title="Kelime Kasası" color="pink">
                 {vocab.length === 0 ? (
-                    <EmptyState label="HenÃ¼z kelime kasasÄ±na kelime eklenmemiÅŸ." />
+                    <EmptyState label="Henüz kelime kasasına kelime eklenmemiş." />
                 ) : (
                     <>
                         <div className="act-pills-row">
@@ -446,7 +446,7 @@ export const ActivityDashboard: React.FC = () => {
                                     ))}
                                 </tbody>
                             </table>
-                            {vocab.length > 30 && <p className="act-more">ve {vocab.length - 30} kelime dahaâ€¦</p>}
+                            {vocab.length > 30 && <p className="act-more">ve {vocab.length - 30} kelime daha…</p>}
                         </div>
                     </>
                 )}

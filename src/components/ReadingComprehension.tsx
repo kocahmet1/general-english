@@ -27,6 +27,7 @@ import {
   ReadingStats,
   READING_QUESTION_TYPE_LABELS
 } from '../types';
+import { useActivitySession, percent, optionLabel } from '../hooks/useActivitySession';
 
 interface ReadingComprehensionProps {
   isOpen: boolean;
@@ -66,6 +67,41 @@ export const ReadingComprehension = ({
   const [showPassageInQuestions, setShowPassageInQuestions] = useState(true);
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
   const [showVocabOptions, setShowVocabOptions] = useState<number | null>(null);
+
+  // Activity log: one attempt per opened passage, rewritten after every answer.
+  const readingSession = useActivitySession(selectedPassage?.id ?? null);
+  const recordReadingAttempt = (passage: ReadingPassage, answers: Map<number, ReadingAnswer>) => {
+    const total = passage.questions.length;
+    const correct = Array.from(answers.values()).filter(a => a.isCorrect).length;
+    readingSession.record({
+      type: 'reading',
+      title: passage.title,
+      subtitle: passage.difficulty,
+      itemId: passage.id,
+      status: answers.size >= total ? 'completed' : 'in_progress',
+      totalQuestions: total,
+      answeredCount: answers.size,
+      correctCount: correct,
+      scorePercent: percent(correct, answers.size),
+      details: [
+        { label: 'Seviye', value: passage.difficulty },
+        { label: 'Konu', value: passage.topic },
+        { label: 'Metin uzunluğu', value: `${passage.wordCount} kelime` },
+      ],
+      questions: passage.questions
+        .filter(q => answers.has(q.id))
+        .map(q => {
+          const answer = answers.get(q.id)!;
+          return {
+            prompt: q.questionText,
+            given: optionLabel(q.options, answer.selectedAnswer),
+            expected: optionLabel(q.options, q.correctAnswer),
+            isCorrect: answer.isCorrect,
+            tag: READING_QUESTION_TYPE_LABELS[q.questionType],
+          };
+        }),
+    });
+  };
 
   useEffect(() => {
     setViewMode(selectedPassage ? 'reading' : 'list');
@@ -164,6 +200,7 @@ export const ReadingComprehension = ({
     const newAnswers = new Map(currentAnswers);
     newAnswers.set(questionId, answer);
     setCurrentAnswers(newAnswers);
+    recordReadingAttempt(selectedPassage, newAnswers);
 
     // Track the answer
     await onAnswerQuestion(
@@ -212,6 +249,7 @@ export const ReadingComprehension = ({
   const handleReset = async () => {
     if (selectedPassage) {
       await onResetProgress(selectedPassage.id);
+      readingSession.restart();
       setCurrentAnswers(new Map());
       setCurrentQuestionIndex(0);
     }

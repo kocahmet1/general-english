@@ -308,8 +308,12 @@ export async function getAllReadingProgress(): Promise<ReadingProgress[]> {
 
 export async function saveReadingProgress(progress: ReadingProgress): Promise<void> {
     const userId = getUserId();
+    // getReadingProgress returns score: undefined until completion, and Firestore
+    // rejects undefined fields, which made every answer after the first fail to save.
+    const { score, ...rest } = progress;
     await setDoc(doc(db, 'users', userId, 'readingProgress', progress.passageId), {
-        ...progress,
+        ...rest,
+        ...(score !== undefined ? { score } : {}),
         answers: helperMapToObj(progress.answers),
         startedAt: Timestamp.fromDate(progress.startedAt),
         completedAt: progress.completedAt ? Timestamp.fromDate(progress.completedAt) : null
@@ -527,8 +531,11 @@ export async function getAllListeningProgress(): Promise<ListeningProgress[]> {
 
 export async function saveListeningProgress(progress: ListeningProgress): Promise<void> {
     const userId = getUserId();
+    // Same as reading: drop the undefined score so later answers can be saved.
+    const { score, ...rest } = progress;
     await setDoc(doc(db, 'users', userId, 'listeningProgress', progress.testId), {
-        ...progress,
+        ...rest,
+        ...(score !== undefined ? { score } : {}),
         answers: helperMapToObj(progress.answers),
         startedAt: Timestamp.fromDate(progress.startedAt),
         completedAt: progress.completedAt ? Timestamp.fromDate(progress.completedAt) : null

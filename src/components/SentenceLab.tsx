@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import '../sentence-lab.css';
 import { sentenceLabExercises } from '../data/sentenceLabExercises';
+import { useActivitySession, percent } from '../hooks/useActivitySession';
 import {
   clearSentenceLabAttempts,
   evaluateSentenceLabExercise,
@@ -133,6 +134,39 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
 
   const activeExercises = activeType ? EXERCISES_BY_TYPE[activeType] : [];
   const currentExercise = currentIndex < activeExercises.length ? activeExercises[currentIndex] : null;
+
+  // Activity log: one attempt per run through an exercise type, rewritten after every answer.
+  const labSession = useActivitySession(activeType);
+  const recordLabAttempt = (results: SentenceLabEvaluation[]) => {
+    if (!activeType) return;
+    const correct = results.filter(r => r.isCorrect).length;
+    const averageScore = results.length > 0
+      ? Math.round(results.reduce((sum, r) => sum + r.overallScore, 0) / results.length)
+      : 0;
+    labSession.record({
+      type: 'sentenceLab',
+      title: SENTENCE_LAB_TYPE_LABELS[activeType],
+      itemId: activeType,
+      status: results.length >= activeExercises.length ? 'completed' : 'in_progress',
+      totalQuestions: activeExercises.length,
+      answeredCount: results.length,
+      correctCount: correct,
+      scorePercent: percent(correct, results.length),
+      scoreLabel: `Ort. puan ${averageScore}`,
+      details: [{ label: 'Ortalama cümle puanı', value: `${averageScore}/100` }],
+      questions: results.map(r => {
+        const exercise = activeExercises.find(ex => ex.id === r.exerciseId);
+        return {
+          prompt: exercise?.turkishPrompt ? `${r.exerciseTitle} — ${exercise.turkishPrompt}` : r.exerciseTitle,
+          given: r.submittedAnswer,
+          expected: r.referenceAnswer,
+          isCorrect: r.isCorrect,
+          tag: SENTENCE_LAB_LEVEL_LABELS[r.level],
+          score: r.overallScore,
+        };
+      }),
+    });
+  };
   const isSessionComplete = Boolean(activeType) && currentIndex >= activeExercises.length;
   const shuffledBuilderChunks = useMemo(() => {
     if (!currentExercise || currentExercise.type !== 'sentence_builder') {
@@ -198,6 +232,7 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
 
   const handleStartType = (type: SentenceLabExerciseType) => {
     const exercises = EXERCISES_BY_TYPE[type];
+    if (type === activeType) labSession.restart();
     setActiveType(type);
     setCurrentIndex(0);
     setSessionResults([]);
@@ -239,6 +274,7 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
       return;
     }
 
+    labSession.restart();
     setCurrentIndex(0);
     setSessionResults([]);
     setShuffleVersion((prev) => prev + 1);
@@ -330,10 +366,9 @@ export function SentenceLab({ isOpen, onClose }: SentenceLabProps) {
     const result = evaluateSentenceLabExercise(currentExercise, submission);
     saveSentenceLabAttempt(result);
     setEvaluation(result);
-    setSessionResults((prev) => {
-      const withoutCurrent = prev.filter((item) => item.exerciseId !== result.exerciseId);
-      return [...withoutCurrent, result];
-    });
+    const nextResults = [...sessionResults.filter((item) => item.exerciseId !== result.exerciseId), result];
+    setSessionResults(nextResults);
+    recordLabAttempt(nextResults);
     loadStoredData();
   };
 

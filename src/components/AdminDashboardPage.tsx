@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import '../admin-dashboard.css';
 import {
     Plus, Trash2, FileText, Database,
-    BarChart3, AlertTriangle, Shield
+    BarChart3, AlertTriangle, Shield, UserSearch
 } from 'lucide-react';
 import { ActivityDashboard } from './ActivityDashboard';
+import { StudentActivityReport } from './StudentActivityReport';
 import {
     getLocalExams,
     createLocalExam,
@@ -14,10 +16,18 @@ import { ImportExamModal } from './ImportExamModal';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from '../data/sampleExam';
 import { parseExamText } from '../services/examService';
 
-type Tab = 'exams' | 'activity';
+type Tab = 'students' | 'exams' | 'activity';
+const TABS: Tab[] = ['students', 'activity', 'exams'];
 
 export const AdminDashboardPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<Tab>('activity');
+    // The tab lives in the URL so a refresh or a shared link reopens the same view.
+    const [params, setParams] = useSearchParams();
+    const activeTab: Tab = TABS.includes(params.get('tab') as Tab) ? params.get('tab') as Tab : 'students';
+    const setActiveTab = (tab: Tab) => setParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.set('tab', tab);
+        return next;
+    });
     const [exams, setExams] = useState(() => getLocalExams());
     const [showImport, setShowImport] = useState(false);
     const [importError, setImportError] = useState<string | null>(null);
@@ -69,6 +79,13 @@ export const AdminDashboardPage: React.FC = () => {
             {/* ── Tab bar ── */}
             <div className="adm-tabs">
                 <button
+                    className={`adm-tab${activeTab === 'students' ? ' adm-tab--active' : ''}`}
+                    onClick={() => setActiveTab('students')}
+                >
+                    <UserSearch size={17} />
+                    Öğrenci Raporu
+                </button>
+                <button
                     className={`adm-tab${activeTab === 'activity' ? ' adm-tab--active' : ''}`}
                     onClick={() => setActiveTab('activity')}
                 >
@@ -86,6 +103,7 @@ export const AdminDashboardPage: React.FC = () => {
 
             {/* ── Content ── */}
             <main className="adm-content">
+                {activeTab === 'students' && <StudentActivityReport />}
                 {activeTab === 'activity' && <ActivityDashboard />}
 
                 {activeTab === 'exams' && (
