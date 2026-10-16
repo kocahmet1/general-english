@@ -35,6 +35,17 @@
   font-style: italic;
 }
 
+.adm-header__account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-btn--sm {
+  padding: 7px 14px;
+  font-size: .82rem;
+}
+
 .adm-tabs {
   display: flex;
   gap: 4px;

@@ -10,6 +10,7 @@ import {
   ACTIVITY_TYPE_LABELS, ACTIVITY_TYPE_ORDER, type ActivityRecord, type ActivityType,
 } from '../types/activity';
 import { IDLE_CAP_MS } from '../services/activityTimer';
+import { useAuth } from '../contexts/AuthContext';
 
 // ───────────────────────── helpers ─────────────────────────
 
@@ -423,6 +424,8 @@ export const StudentActivityReport: React.FC = () => {
 
   const [students, setStudents] = useState<AdminStudent[]>([]);
   const [studentWarnings, setStudentWarnings] = useState<string[]>([]);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const { user } = useAuth();
   const [loadingStudents, setLoadingStudents] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -448,10 +451,12 @@ export const StudentActivityReport: React.FC = () => {
     const result = await listStudents();
     setStudents(result.students);
     setStudentWarnings(result.warnings);
+    setPermissionDenied(result.permissionDenied);
     setLoadingStudents(false);
   };
 
-  useEffect(() => { void loadStudents(); }, []);
+  // Reload after signing in or out: what Firestore lets us read depends on the account.
+  useEffect(() => { void loadStudents(); }, [user?.uid]);
 
   // reloadToken re-reads "now" so Bugün/Son 7 gün stay current after a refresh.
   const range = useMemo(() => computeRange(rangeKey, fromParam, toParam), [rangeKey, fromParam, toParam, reloadToken]);
@@ -467,7 +472,7 @@ export const StudentActivityReport: React.FC = () => {
       .catch(error => { if (!cancelled) setReportError(error instanceof Error ? error.message : String(error)); })
       .finally(() => { if (!cancelled) setLoadingReport(false); });
     return () => { cancelled = true; };
-  }, [selectedUid, range]);
+  }, [selectedUid, range, user?.uid]);
 
   // Don't show the previous student's numbers while the next one loads.
   useEffect(() => { setTypeFilter('all'); setReport(null); }, [selectedUid]);
@@ -535,6 +540,16 @@ export const StudentActivityReport: React.FC = () => {
               </li>
             ))}
           </ul>
+        )}
+        {permissionDenied && (
+          <div className="sr-warning">
+            <AlertTriangle size={14} />
+            <span>
+              {user
+                ? `${user.email} hesabının öğrenci verilerini okuma izni yok. Firestore kurallarında bu e-postayı admin olarak tanımlayın.`
+                : 'Öğrenci verilerini görmek için sağ üstteki "Admin girişi" ile admin hesabınızla giriş yapın.'}
+            </span>
+          </div>
         )}
         {studentWarnings.length > 0 && (
           <div className="sr-warning"><AlertTriangle size={14} /> {studentWarnings.join(' · ')}</div>

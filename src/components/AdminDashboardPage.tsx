@@ -3,8 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import '../admin-dashboard.css';
 import {
     Plus, Trash2, FileText, Database,
-    BarChart3, AlertTriangle, Shield, UserSearch
+    BarChart3, AlertTriangle, Shield, UserSearch, LogIn, LogOut
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { AuthModal } from './AuthModal';
 import { ActivityDashboard } from './ActivityDashboard';
 import { StudentActivityReport } from './StudentActivityReport';
 import {
@@ -22,6 +24,9 @@ const TABS: Tab[] = ['students', 'activity', 'exams'];
 export const AdminDashboardPage: React.FC = () => {
     // The tab lives in the URL so a refresh or a shared link reopens the same view.
     const [params, setParams] = useSearchParams();
+    // Firestore rules decide what the admin can read, so the page needs a signed-in account.
+    const { user, logout } = useAuth();
+    const [showLogin, setShowLogin] = useState(false);
     const activeTab: Tab = TABS.includes(params.get('tab') as Tab) ? params.get('tab') as Tab : 'students';
     const setActiveTab = (tab: Tab) => setParams(prev => {
         const next = new URLSearchParams(prev);
@@ -73,8 +78,22 @@ export const AdminDashboardPage: React.FC = () => {
                     <Shield size={26} />
                     <span>Admin Paneli</span>
                 </div>
-                <span className="adm-header__hint">Bu sayfaya doğrudan URL ile erişilir</span>
+                <div className="adm-header__account">
+                    {user ? (
+                        <>
+                            <span className="adm-header__hint">Giriş: {user.email}</span>
+                            <button className="adm-btn adm-btn--secondary adm-btn--sm" onClick={() => void logout()}>
+                                <LogOut size={15} /> Çıkış
+                            </button>
+                        </>
+                    ) : (
+                        <button className="adm-btn adm-btn--primary adm-btn--sm" onClick={() => setShowLogin(true)}>
+                            <LogIn size={15} /> Admin girişi
+                        </button>
+                    )}
+                </div>
             </header>
+            <AuthModal isOpen={showLogin} onClose={() => setShowLogin(false)} initialMode="login" />
 
             {/* ── Tab bar ── */}
             <div className="adm-tabs">

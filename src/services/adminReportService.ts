@@ -66,9 +66,10 @@ const describeError = (error: unknown): string => {
  * doc, so their ids are also discovered from data they left behind; those show
  * up without an email until they visit the app again.
  */
-export async function listStudents(): Promise<{ students: AdminStudent[]; warnings: string[] }> {
+export async function listStudents(): Promise<{ students: AdminStudent[]; warnings: string[]; permissionDenied: boolean }> {
   const byId = new Map<string, AdminStudent>();
   const warnings: string[] = [];
+  let permissionDenied = false;
 
   try {
     const snap = await getDocs(collection(db, 'users'));
@@ -82,7 +83,8 @@ export async function listStudents(): Promise<{ students: AdminStudent[]; warnin
       });
     });
   } catch (error) {
-    warnings.push(`Kullanıcı listesi okunamadı: ${describeError(error)}`);
+    permissionDenied = (error as { code?: string })?.code === 'permission-denied';
+    if (!permissionDenied) warnings.push(`Kullanıcı listesi okunamadı: ${describeError(error)}`);
   }
 
   // Best effort: collection-group reads need their own Firestore rule. The small
@@ -103,7 +105,7 @@ export async function listStudents(): Promise<{ students: AdminStudent[]; warnin
     return (a.email || `~${a.uid}`).localeCompare(b.email || `~${b.uid}`);
   });
 
-  return { students, warnings };
+  return { students, warnings, permissionDenied };
 }
 
 // ───────────────────────── per-student report ─────────────────────────
