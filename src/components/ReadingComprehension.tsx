@@ -18,7 +18,9 @@ import {
   Eye,
   CheckCircle,
   BookPlus,
-  Lightbulb
+  Lightbulb,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import {
   ReadingPassage,
@@ -84,6 +86,9 @@ export const ReadingComprehension = ({
   // Typed answers for completion questions, kept until the student checks them.
   const [textDrafts, setTextDrafts] = useState<Record<number, string>>({});
   const passageTextRef = useRef<HTMLDivElement>(null);
+  // Full-screen reading: passage and questions fill the screen, each scrolling on its own.
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const readingViewRef = useRef<HTMLDivElement>(null);
 
   // Activity log: one attempt per opened passage, rewritten after every answer.
   const readingSession = useActivitySession(selectedPassage?.id ?? null);
@@ -119,6 +124,45 @@ export const ReadingComprehension = ({
         }),
     });
   };
+
+  const enterFocusMode = () => {
+    setIsFocusMode(true);
+    // Real browser full screen where allowed (not on iPhone Safari); the CSS layout covers the screen either way.
+    const element = readingViewRef.current;
+    if (element?.requestFullscreen && !document.fullscreenElement) {
+      element.requestFullscreen().catch(() => {});
+    }
+  };
+
+  const exitFocusMode = () => {
+    setIsFocusMode(false);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  };
+
+  useEffect(() => {
+    if (!isFocusMode) return;
+    // Esc leaves browser full screen; follow it, and handle Esc ourselves when only the CSS layout is used.
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) setIsFocusMode(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !document.fullscreenElement) setIsFocusMode(false);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isFocusMode]);
+
+  // Results, the passage list and stats are normal pages again.
+  useEffect(() => {
+    if (viewMode !== 'reading' && isFocusMode) exitFocusMode();
+  }, [viewMode]);
 
   useEffect(() => {
     setViewMode(selectedPassage ? 'reading' : 'list');
@@ -697,14 +741,26 @@ export const ReadingComprehension = ({
 
           {/* Reading View */}
           {viewMode === 'reading' && selectedPassage && currentQuestion && (
-            <div className="reading-view">
+            <div className={`reading-view${isFocusMode ? ' focus-mode' : ''}`} ref={readingViewRef}>
               {/* Progress Bar */}
               <div className="reading-progress-bar">
                 <div className="progress-info">
                   <span>{currentProgress.answered} / {currentProgress.total} soru cevaplandı</span>
-                  <span className="correct-count">
-                    <Check size={14} />
-                    {currentProgress.correct} doğru
+                  <span className="progress-actions">
+                    <span className="correct-count">
+                      <Check size={14} />
+                      {currentProgress.correct} doğru
+                    </span>
+                    <button
+                      type="button"
+                      className="focus-toggle-btn"
+                      onClick={isFocusMode ? exitFocusMode : enterFocusMode}
+                      aria-pressed={isFocusMode}
+                      title={isFocusMode ? 'Tam ekrandan çık (Esc)' : 'Metni ve soruları tam ekranda aç'}
+                    >
+                      {isFocusMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                      <span>{isFocusMode ? 'Tam ekrandan çık' : 'Tam ekran'}</span>
+                    </button>
                   </span>
                 </div>
                 <div className="progress-track">
@@ -715,7 +771,7 @@ export const ReadingComprehension = ({
                 </div>
               </div>
 
-              <div className="reading-layout">
+              <div className={`reading-layout${!showPassageInQuestions ? ' passage-hidden' : ''}`}>
                 {/* Passage Section */}
                 {showPassageInQuestions && (
                   <div className="passage-section">
