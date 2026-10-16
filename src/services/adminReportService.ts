@@ -11,6 +11,7 @@ import { db } from '../config/firebase';
 import { getAllExams } from './examService';
 import { getLocalExams } from './localStorageService';
 import { sampleReadingPassages } from '../data/readingPassages';
+import { formatReadingAnswer } from './readingAnswers';
 import { listeningTests } from '../data/listeningQuestions';
 import { optionLabel, percent } from '../hooks/useActivitySession';
 import {
@@ -297,8 +298,8 @@ export async function getStudentReport(uid: string, from: Date, to: Date): Promi
       const q = passage?.questions.find(item => item.id === a.questionId);
       return {
         prompt: q?.questionText || `Soru ${a.questionId}`,
-        given: q ? optionLabel(q.options, a.selectedAnswer) : a.selectedAnswer,
-        expected: q ? optionLabel(q.options, q.correctAnswer) : undefined,
+        given: q && passage ? formatReadingAnswer(passage, q, a.selectedAnswer) : a.selectedAnswer,
+        expected: q && passage ? formatReadingAnswer(passage, q, q.correctAnswer) : undefined,
         isCorrect: a.isCorrect,
         tag: q ? READING_QUESTION_TYPE_LABELS[q.questionType] : undefined,
       };

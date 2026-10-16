@@ -1,6 +1,6 @@
 import { PageBack } from './LearningLayout';
 import { useSearchParams } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, Fragment } from 'react';
 import {
   X,
   BookOpen,
@@ -17,17 +17,30 @@ import {
   List,
   Eye,
   CheckCircle,
-  BookPlus
+  BookPlus,
+  Lightbulb
 } from 'lucide-react';
 import {
   ReadingPassage,
   ReadingQuestion,
+  ReadingQuestionGroup,
   ReadingAnswer,
   ReadingProgress,
   ReadingStats,
   READING_QUESTION_TYPE_LABELS
 } from '../types';
-import { useActivitySession, percent, optionLabel } from '../hooks/useActivitySession';
+import { useActivitySession, percent } from '../hooks/useActivitySession';
+import {
+  countAnswerWords,
+  evaluateReadingAnswer,
+  formatReadingAnswer,
+  getAnswerFormat,
+  getGroupRange,
+  getQuestionGroup,
+  getQuestionOptions,
+  isOverWordLimit
+} from '../services/readingAnswers';
+import '../reading-ielts.css';
 
 interface ReadingComprehensionProps {
   isOpen: boolean;
@@ -66,7 +79,11 @@ export const ReadingComprehension = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showPassageInQuestions, setShowPassageInQuestions] = useState(true);
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
+  const [filterFormat, setFilterFormat] = useState<'all' | 'ielts' | 'classic'>('all');
   const [showVocabOptions, setShowVocabOptions] = useState<number | null>(null);
+  // Typed answers for completion questions, kept until the student checks them.
+  const [textDrafts, setTextDrafts] = useState<Record<number, string>>({});
+  const passageTextRef = useRef<HTMLDivElement>(null);
 
   // Activity log: one attempt per opened passage, rewritten after every answer.
   const readingSession = useActivitySession(selectedPassage?.id ?? null);
@@ -94,8 +111,8 @@ export const ReadingComprehension = ({
           const answer = answers.get(q.id)!;
           return {
             prompt: q.questionText,
-            given: optionLabel(q.options, answer.selectedAnswer),
-            expected: optionLabel(q.options, q.correctAnswer),
+            given: formatReadingAnswer(passage, q, answer.selectedAnswer),
+            expected: formatReadingAnswer(passage, q, q.correctAnswer),
             isCorrect: answer.isCorrect,
             tag: READING_QUESTION_TYPE_LABELS[q.questionType],
           };
@@ -107,6 +124,7 @@ export const ReadingComprehension = ({
     setViewMode(selectedPassage ? 'reading' : 'list');
     setCurrentQuestionIndex(0);
     setCurrentAnswers(new Map());
+    setTextDrafts({});
   }, [selectedPassage?.id]);
 
   // Reset state when modal closes
@@ -150,11 +168,14 @@ export const ReadingComprehension = ({
     return () => { isMounted = false; };
   }, [selectedPassage, getProgress]);
 
-  // Filter passages by difficulty
+  // Filter passages by format and difficulty
+  const hasIeltsPassages = passages.some(p => p.format === 'ielts');
   const filteredPassages = useMemo(() => {
-    if (filterDifficulty === 'all') return passages;
-    return passages.filter(p => p.difficulty === filterDifficulty);
-  }, [passages, filterDifficulty]);
+    return passages.filter(p =>
+      (filterDifficulty === 'all' || p.difficulty === filterDifficulty) &&
+      (filterFormat === 'all' || (p.format ?? 'classic') === filterFormat)
+    );
+  }, [passages, filterDifficulty, filterFormat]);
 
   // Get unique difficulties for filter
   const difficulties = useMemo(() => {
@@ -182,14 +203,16 @@ export const ReadingComprehension = ({
   };
 
   // Handle answering a question
-  const handleAnswer = async (questionId: number, selectedAnswer: string) => {
+  const handleAnswer = async (questionId: number, rawAnswer: string) => {
     if (!selectedPassage) return;
     if (currentAnswers.has(questionId)) return; // Already answered
 
     const question = selectedPassage.questions.find(q => q.id === questionId);
     if (!question) return;
 
-    const isCorrect = selectedAnswer === question.correctAnswer;
+    const selectedAnswer = rawAnswer.trim().replace(/\s+/g, ' ');
+    if (!selectedAnswer) return;
+    const { isCorrect } = evaluateReadingAnswer(selectedPassage, question, selectedAnswer);
     const answer: ReadingAnswer = {
       questionId,
       selectedAnswer,
@@ -251,7 +274,9 @@ export const ReadingComprehension = ({
       await onResetProgress(selectedPassage.id);
       readingSession.restart();
       setCurrentAnswers(new Map());
+      setTextDrafts({});
       setCurrentQuestionIndex(0);
+      setViewMode('reading');
     }
   };
 
@@ -275,12 +300,15 @@ export const ReadingComprehension = ({
   };
 
   // Extract vocabulary words from question text and options
-  const extractVocabWords = (question: ReadingQuestion): string[] => {
+  const extractVocabWords = (passage: ReadingPassage, question: ReadingQuestion): string[] => {
     const words: string[] = [];
-    // Extract words from options (they often contain key vocabulary)
-    question.options.forEach(opt => {
+    // Options often contain key vocabulary; IELTS statements and gap sentences carry it in the question itself.
+    const sources = getAnswerFormat(question) === 'choice'
+      ? getQuestionOptions(passage, question).map(opt => opt.text)
+      : [question.questionText, question.correctAnswer];
+    sources.forEach(text => {
       // Extract individual words that might be vocabulary items
-      const optionWords = opt.text.split(/[\s,;.!?()]+/)
+      const optionWords = text.split(/[\s,;.!?()]+/)
         .filter(w => w.length > 4 && /^[a-zA-Z]+$/.test(w))
         .map(w => w.toLowerCase());
       words.push(...optionWords);
@@ -296,9 +324,243 @@ export const ReadingComprehension = ({
     }
   };
 
+  const currentQuestion = selectedPassage?.questions[currentQuestionIndex];
+  const currentAnswer = currentQuestion ? currentAnswers.get(currentQuestion.id) : undefined;
+  // Once a question is answered, show the student where the answer is in the passage.
+  const highlightedEvidence = currentAnswer ? currentQuestion?.evidence : undefined;
+
+  useEffect(() => {
+    const container = passageTextRef.current;
+    const mark = container?.querySelector<HTMLElement>('.evidence-highlight');
+    if (!container || !mark) return;
+    const offset = mark.getBoundingClientRect().top - container.getBoundingClientRect().top;
+    if (offset < 40 || offset > container.clientHeight - 60) {
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      container.scrollTo({ top: container.scrollTop + offset - 80, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
+  }, [highlightedEvidence, showPassageInQuestions]);
+
+  const renderParagraph = (text: string) => {
+    const at = highlightedEvidence ? text.indexOf(highlightedEvidence) : -1;
+    if (!highlightedEvidence || at === -1) return text;
+    return (
+      <>
+        {text.slice(0, at)}
+        <mark className="evidence-highlight">{highlightedEvidence}</mark>
+        {text.slice(at + highlightedEvidence.length)}
+      </>
+    );
+  };
+
+  const renderSummary = (passage: ReadingPassage, group: ReadingQuestionGroup, question: ReadingQuestion) => {
+    const parts = (group.summary ?? '').split(/\[\[(\d+)\]\]/);
+    return (
+      <div className="ielts-summary" lang="en">
+        {group.summaryTitle && <h4>{group.summaryTitle}</h4>}
+        <p>
+          {parts.map((part, i) => {
+            if (i % 2 === 0) return <Fragment key={i}>{part}</Fragment>;
+            const gapId = Number(part);
+            const index = passage.questions.findIndex(q => q.id === gapId);
+            const answer = currentAnswers.get(gapId);
+            const classes = ['summary-gap'];
+            if (gapId === question.id) classes.push('current');
+            if (answer) classes.push(answer.isCorrect ? 'correct' : 'incorrect');
+            return (
+              <button
+                key={i}
+                type="button"
+                className={classes.join(' ')}
+                onClick={() => index >= 0 && setCurrentQuestionIndex(index)}
+                aria-label={`Soru ${index + 1}${answer ? `: ${answer.selectedAnswer}` : ''}`}
+                aria-current={gapId === question.id ? 'true' : undefined}
+              >
+                <span className="summary-gap-number">{index + 1}</span>
+                {answer && <span className="summary-gap-text">{answer.selectedAnswer}</span>}
+              </button>
+            );
+          })}
+        </p>
+      </div>
+    );
+  };
+
+  const renderGroupCard = (passage: ReadingPassage, question: ReadingQuestion, group: ReadingQuestionGroup) => {
+    const range = getGroupRange(passage, group.id);
+    const exampleOption = group.example && group.options?.find(o => o.letter === group.example!.answer);
+    return (
+      <div className="ielts-group">
+        {range && (
+          <p className="ielts-group-range">
+            {range[0] === range[1] ? `Soru ${range[0]}` : `Sorular ${range[0]}–${range[1]}`}
+          </p>
+        )}
+        <p className="ielts-group-instructions" lang="en">{group.instructions}</p>
+        {group.example && (
+          <p className="ielts-group-example">
+            <strong>Örnek:</strong> {group.example.prompt} → {exampleOption ? `${exampleOption.letter}) ${exampleOption.text}` : group.example.answer}
+          </p>
+        )}
+        {group.summary && renderSummary(passage, group, question)}
+        {group.tip && (
+          <div className="ielts-tip">
+            <Lightbulb size={16} aria-hidden="true" />
+            <p>{group.tip}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const optionClassName = (base: string, question: ReadingQuestion, answer: ReadingAnswer | undefined, letter: string) => {
+    const isSelected = answer?.selectedAnswer === letter;
+    const isCorrect = letter === question.correctAnswer;
+    let className = base;
+    if (answer) {
+      if (isCorrect) className += ' correct';
+      else if (isSelected) className += ' incorrect';
+    }
+    if (isSelected) className += ' selected';
+    return className;
+  };
+
+  const renderTextAnswer = (question: ReadingQuestion, group: ReadingQuestionGroup | undefined, answer: ReadingAnswer | undefined) => {
+    const value = answer ? answer.selectedAnswer : (textDrafts[question.id] ?? '');
+    const { words, numbers } = countAnswerWords(value);
+    const overLimit = isOverWordLimit(value, group);
+    const inputId = `reading-answer-${question.id}`;
+    return (
+      <form
+        className="text-answer"
+        onSubmit={e => {
+          e.preventDefault();
+          void handleAnswer(question.id, value);
+        }}
+      >
+        <label className="reading-sr-only" htmlFor={inputId}>Soru {currentQuestionIndex + 1} cevabı</label>
+        <div className="text-answer-row">
+          <input
+            id={inputId}
+            className={`text-answer-input${answer ? (answer.isCorrect ? ' correct' : ' incorrect') : ''}`}
+            value={value}
+            onChange={e => setTextDrafts(previous => ({ ...previous, [question.id]: e.target.value }))}
+            disabled={answer !== undefined}
+            placeholder="Cevabınızı yazın"
+            autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+          {!answer && (
+            <button type="submit" className="text-answer-submit" disabled={!value.trim()}>
+              Kontrol Et
+            </button>
+          )}
+        </div>
+        {group?.maxWords && !answer && (
+          <p className={`text-answer-limit${overLimit ? ' over' : ''}`} aria-live="polite">
+            Sınır: en fazla {group.maxWords} kelime{group.allowNumber ? ' ve/veya bir sayı' : ''}
+            {value.trim() && ` · Yazdığınız: ${words} kelime${numbers ? ` + ${numbers} sayı` : ''}`}
+            {overLimit && ' — sınırı aştınız, bu haliyle yanlış sayılır'}
+          </p>
+        )}
+      </form>
+    );
+  };
+
+  const renderAnswerArea = (passage: ReadingPassage, question: ReadingQuestion) => {
+    const answer = currentAnswers.get(question.id);
+    const format = getAnswerFormat(question);
+    const group = getQuestionGroup(passage, question);
+    if (format === 'text') return renderTextAnswer(question, group, answer);
+
+    const options = getQuestionOptions(passage, question);
+
+    if (format === 'tfng') {
+      return (
+        <div className="tfng-options">
+          {options.map(option => (
+            <button
+              key={option.letter}
+              type="button"
+              className={optionClassName('reading-option tfng-option', question, answer, option.letter)}
+              onClick={() => handleAnswer(question.id, option.letter)}
+              disabled={answer !== undefined}
+            >
+              <span className="tfng-label">{option.letter}</span>
+              <span className="tfng-hint">{option.text}</span>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    if (group?.compactOptions) {
+      return (
+        <div className="letter-options" role="group" aria-label="Paragraf seçin">
+          {options.map(option => (
+            <button
+              key={option.letter}
+              type="button"
+              className={optionClassName('reading-option letter-option', question, answer, option.letter)}
+              onClick={() => handleAnswer(question.id, option.letter)}
+              disabled={answer !== undefined}
+              aria-label={option.text}
+            >
+              {option.letter}
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    // Matching headings: show which headings are already taken, as students cross them out on paper.
+    const takenBy = new Map<string, string>();
+    if (question.questionType === 'matching_headings' && group) {
+      if (group.example) takenBy.set(group.example.answer, 'Örnekte kullanıldı');
+      passage.questions.forEach(other => {
+        const otherAnswer = currentAnswers.get(other.id);
+        if (other.groupId === group.id && other.id !== question.id && otherAnswer) {
+          takenBy.set(otherAnswer.selectedAnswer, `${other.questionText} için seçildi`);
+        }
+      });
+    }
+
+    return (
+      <div className={`options-list${group?.options ? ' shared-options' : ''}`}>
+        {group?.optionsTitle && <p className="shared-options-title" lang="en">{group.optionsTitle}</p>}
+        {options.map(option => {
+          const isSelected = answer?.selectedAnswer === option.letter;
+          const isCorrect = option.letter === question.correctAnswer;
+          const taken = takenBy.get(option.letter);
+          return (
+            <button
+              key={option.letter}
+              type="button"
+              className={optionClassName('reading-option', question, answer, option.letter) + (taken && !answer ? ' taken' : '')}
+              onClick={() => handleAnswer(question.id, option.letter)}
+              disabled={answer !== undefined}
+            >
+              <span className="option-letter">{option.letter}</span>
+              <span className="option-text" lang="en">
+                {option.text}
+                {taken && !answer && <span className="option-taken">{taken}</span>}
+              </span>
+              {answer && isCorrect && <Check size={18} className="option-icon" />}
+              {answer && isSelected && !isCorrect && <X size={18} className="option-icon" />}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (!isOpen) return null;
 
-  const currentQuestion = selectedPassage?.questions[currentQuestionIndex];
+  const currentGroup = selectedPassage && currentQuestion ? getQuestionGroup(selectedPassage, currentQuestion) : undefined;
+  const currentIssue = selectedPassage && currentQuestion && currentAnswer && !currentAnswer.isCorrect
+    ? evaluateReadingAnswer(selectedPassage, currentQuestion, currentAnswer.selectedAnswer).issue
+    : undefined;
 
   return (
     <div className="activity-page">
@@ -354,6 +616,22 @@ export const ReadingComprehension = ({
                     </button>
                   ))}
                 </div>
+                {hasIeltsPassages && (
+                  <>
+                    <span className="filter-label">Tür:</span>
+                    <div className="filter-buttons">
+                      {([['all', 'Tümü'], ['ielts', 'IELTS'], ['classic', 'Çoktan Seçmeli']] as const).map(([value, label]) => (
+                        <button
+                          key={value}
+                          className={`filter-btn ${filterFormat === value ? 'active' : ''}`}
+                          onClick={() => setFilterFormat(value)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Passage Cards */}
@@ -371,11 +649,14 @@ export const ReadingComprehension = ({
                       className={`passage-card ${isCompleted ? 'completed' : ''}`}
                     >
                       <div className="passage-card-header">
-                        <span
-                          className="difficulty-tag"
-                          style={{ backgroundColor: getDifficultyColor(passage.difficulty) }}
-                        >
-                          {passage.difficulty}
+                        <span className="passage-card-tags">
+                          <span
+                            className="difficulty-tag"
+                            style={{ backgroundColor: getDifficultyColor(passage.difficulty) }}
+                          >
+                            {passage.difficulty}
+                          </span>
+                          {passage.format === 'ielts' && <span className="format-tag">IELTS</span>}
                         </span>
                         {isCompleted && (
                           <span className="completed-badge">
@@ -448,9 +729,17 @@ export const ReadingComprehension = ({
                         Gizle
                       </button>
                     </div>
-                    <div className="passage-text">
+                    <div
+                      className={`passage-text${selectedPassage.labelParagraphs ? ' labelled' : ''}`}
+                      ref={passageTextRef}
+                    >
                       {selectedPassage.passage.split('\n\n').map((paragraph, idx) => (
-                        <p key={idx}>{paragraph}</p>
+                        <p key={idx}>
+                          {selectedPassage.labelParagraphs && (
+                            <span className="paragraph-label">{String.fromCharCode(65 + idx)}</span>
+                          )}
+                          {renderParagraph(paragraph)}
+                        </p>
                       ))}
                     </div>
                   </div>
@@ -480,44 +769,28 @@ export const ReadingComprehension = ({
                     </span>
                   </div>
 
-                  <div className="question-content">
-                    <p className="question-text">{currentQuestion.questionText}</p>
+                  <div className={`question-content${currentGroup ? ' ielts-question' : ''}`}>
+                    {currentGroup && renderGroupCard(selectedPassage, currentQuestion, currentGroup)}
 
-                    <div className="options-list">
-                      {currentQuestion.options.map(option => {
-                        const answer = currentAnswers.get(currentQuestion.id);
-                        const isSelected = answer?.selectedAnswer === option.letter;
-                        const isCorrect = option.letter === currentQuestion.correctAnswer;
-                        const showResult = answer !== undefined;
+                    <p className={`question-text${currentGroup ? ' ielts-question-text' : ''}`} lang="en">
+                      {currentGroup && <span className="ielts-question-number">{currentQuestionIndex + 1}</span>}
+                      <span>
+                        {currentQuestion.questionText.split(/_{3,}/).map((part, idx) => (
+                          <Fragment key={idx}>
+                            {idx > 0 && <span className="gap-blank" aria-label="boşluk" />}
+                            {part}
+                          </Fragment>
+                        ))}
+                      </span>
+                    </p>
 
-                        let optionClass = 'reading-option';
-                        if (showResult) {
-                          if (isCorrect) optionClass += ' correct';
-                          else if (isSelected) optionClass += ' incorrect';
-                        }
-                        if (isSelected) optionClass += ' selected';
-
-                        return (
-                          <button
-                            key={option.letter}
-                            className={optionClass}
-                            onClick={() => handleAnswer(currentQuestion.id, option.letter)}
-                            disabled={answer !== undefined}
-                          >
-                            <span className="option-letter">{option.letter}</span>
-                            <span className="option-text">{option.text}</span>
-                            {showResult && isCorrect && <Check size={18} className="option-icon" />}
-                            {showResult && isSelected && !isCorrect && <X size={18} className="option-icon" />}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    {renderAnswerArea(selectedPassage, currentQuestion)}
 
                     {/* Explanation */}
-                    {currentAnswers.has(currentQuestion.id) && currentQuestion.explanation && (
-                      <div className={`question-explanation ${currentAnswers.get(currentQuestion.id)?.isCorrect ? 'correct' : 'incorrect'}`}>
+                    {currentAnswer && (currentQuestion.explanation || getAnswerFormat(currentQuestion) === 'text') && (
+                      <div className={`question-explanation ${currentAnswer.isCorrect ? 'correct' : 'incorrect'}`}>
                         <div className="explanation-header">
-                          {currentAnswers.get(currentQuestion.id)?.isCorrect ? (
+                          {currentAnswer.isCorrect ? (
                             <>
                               <Check size={18} />
                               <span>Doğru!</span>
@@ -529,7 +802,33 @@ export const ReadingComprehension = ({
                             </>
                           )}
                         </div>
-                        <p>{currentQuestion.explanation}</p>
+                        {getAnswerFormat(currentQuestion) === 'text' && !currentAnswer.isCorrect && (
+                          <p className="explanation-answer">
+                            Doğru cevap: <strong>{currentQuestion.correctAnswer}</strong>
+                            {currentQuestion.acceptedAnswers?.length
+                              ? ` (kabul edilen: ${currentQuestion.acceptedAnswers.join(', ')})`
+                              : ''}
+                          </p>
+                        )}
+                        {currentIssue === 'word_limit' && (
+                          <p className="explanation-issue">
+                            Kelime sınırını aştınız. IELTS'te sınırı aşan cevap, doğru kelimeleri içerse bile yanlış sayılır.
+                          </p>
+                        )}
+                        {currentIssue === 'plural' && (
+                          <p className="explanation-issue">
+                            Kelime doğru ama tekil/çoğul biçimi yanlış. IELTS'te bu da yanlış sayılır: boşluğa uyan biçimi metinden aynen alın.
+                          </p>
+                        )}
+                        {currentIssue === 'spelling' && (
+                          <p className="explanation-issue">
+                            Çok yaklaştınız ama yazım hatası var. IELTS'te yanlış yazılmış kelime yanlış sayılır.
+                          </p>
+                        )}
+                        {currentQuestion.explanation && <p>{currentQuestion.explanation}</p>}
+                        {currentQuestion.evidence && showPassageInQuestions && (
+                          <p className="explanation-evidence-note">Cevabın geçtiği yer metinde işaretlendi.</p>
+                        )}
                       </div>
                     )}
 
@@ -555,7 +854,7 @@ export const ReadingComprehension = ({
 
                           {showVocabOptions === currentQuestion.id && (
                             <div className="vocab-options">
-                              {extractVocabWords(currentQuestion).map(word => {
+                              {extractVocabWords(selectedPassage, currentQuestion).map(word => {
                                 const isInVault = vocabWordsInVault.includes(word.toLowerCase());
                                 return (
                                   <button
@@ -701,10 +1000,10 @@ export const ReadingComprehension = ({
                       {!answer?.isCorrect && (
                         <div className="review-answer">
                           <span className="wrong-answer">
-                            Cevabınız: {answer?.selectedAnswer}
+                            Cevabınız: {formatReadingAnswer(selectedPassage, question, answer?.selectedAnswer) || '—'}
                           </span>
                           <span className="correct-answer">
-                            Doğru: {question.correctAnswer}
+                            Doğru: {formatReadingAnswer(selectedPassage, question, question.correctAnswer)}
                           </span>
                         </div>
                       )}

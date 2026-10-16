@@ -1,6 +1,7 @@
 import { ReadingPassage } from '../types';
+import { ieltsReadingPassages } from './ieltsReadingPassages';
 
-export const sampleReadingPassages: ReadingPassage[] = [
+const classicReadingPassages: ReadingPassage[] = [
   {
     id: 'passage_1',
     title: 'The History of Coffee',
@@ -869,3 +870,6 @@ Successful adult learners usually accept that mistakes are part of the process. 
     createdAt: new Date('2024-03-20')
   }
 ];
+
+// IELTS-format passages come first so they are easy to find in the list.
+export const sampleReadingPassages: ReadingPassage[] = [...ieltsReadingPassages, ...classicReadingPassages];
