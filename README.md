@@ -64,6 +64,12 @@ To regenerate recordings after editing a passage, explicitly run `node --env-fil
 
 Run `node --test tests/listening-content.test.mjs` to validate the library and recordings. During development, `/tests/listening-qa.html` provides an isolated UI fixture with in-memory progress and simulated save failures; it never writes to Firebase and is excluded from the production build. Completed TOEFL attempts use the `toefl-listening` stats document; previous IELTS progress is retained separately.
 
+## IELTS-style reading
+
+The reading library starts with two IELTS Academic-style passages (`src/data/ieltsReadingPassages.ts`), pitched at roughly band 5.5–6.5. Besides multiple choice, reading questions can now be TRUE/FALSE/NOT GIVEN, matching headings, matching information (which paragraph), matching features (people), sentence completion and summary completion. Questions are grouped with the exam rubric, a short Turkish strategy tip, and an optional shared list or summary. Typed answers are checked against the word limit, accept listed alternatives (e.g. `60`/`sixty`), and treat a leading article as optional; plural slips and near-miss spellings are marked wrong with their own explanation. After each answer the supporting sentence (`evidence`) is highlighted in the passage.
+
+Run `node --test tests/reading-content.test.mjs` after editing a passage: it checks that every evidence quote appears word for word, every typed answer comes from the passage and fits its word limit, and every choice answer exists. `/tests/reading-qa.html` is an isolated UI fixture with in-memory progress (no Firebase writes).
+
 ## Production build
 
 ```bash

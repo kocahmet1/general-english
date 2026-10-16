@@ -220,7 +220,14 @@ export type ReadingQuestionType =
   | 'purpose'             // Author's purpose
   | 'tone'                // Author's tone/attitude
   | 'structure'           // Text organization
-  | 'reference';          // What does "it/they/this" refer to?
+  | 'reference'           // What does "it/they/this" refer to?
+  // IELTS Academic reading task types
+  | 'true_false_not_given'
+  | 'matching_headings'   // Match a heading to each paragraph
+  | 'matching_information' // Which paragraph contains this information?
+  | 'matching_features'   // Match statements to people, places, etc.
+  | 'sentence_completion'
+  | 'summary_completion';
 
 export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> = {
   main_idea: 'Ana Fikir',
@@ -230,18 +237,51 @@ export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> =
   purpose: 'Yazarın Amacı',
   tone: 'Ton/Tutum',
   structure: 'Metin Yapısı',
-  reference: 'Referans'
+  reference: 'Referans',
+  true_false_not_given: 'True / False / Not Given',
+  matching_headings: 'Başlık Eşleştirme',
+  matching_information: 'Paragraf Eşleştirme',
+  matching_features: 'Kişi Eşleştirme',
+  sentence_completion: 'Cümle Tamamlama',
+  summary_completion: 'Özet Tamamlama'
 };
+
+/**
+ * How a reading question is answered.
+ * - choice: pick one of the options (the question's own, or the group's shared list)
+ * - tfng: TRUE / FALSE / NOT GIVEN
+ * - text: type words from the passage (checked against correctAnswer + acceptedAnswers)
+ */
+export type ReadingAnswerFormat = 'choice' | 'tfng' | 'text';
 
 export interface ReadingQuestion {
   id: number;
   questionText: string;
-  options: Option[];
-  correctAnswer: string;
+  options: Option[];           // Empty when the group supplies a shared list, or for tfng/text
+  correctAnswer: string;       // Option letter, TRUE/FALSE/NOT GIVEN, or the expected words
   questionType: ReadingQuestionType;
   explanation?: string;        // Pre-written explanation for this question
   highlightStart?: number;     // Optional: highlight relevant part of passage
   highlightEnd?: number;
+  answerFormat?: ReadingAnswerFormat; // Defaults to 'choice'
+  acceptedAnswers?: string[];  // text: other spellings/forms that also count as correct
+  groupId?: string;            // IELTS question group with shared instructions
+  evidence?: string;           // Exact passage excerpt highlighted after answering
+}
+
+/** An IELTS-style block of questions sharing one instruction (e.g. "Questions 1–5"). */
+export interface ReadingQuestionGroup {
+  id: string;
+  instructions: string;        // English exam rubric, e.g. "Write TRUE if ..."
+  tip?: string;                // Short Turkish strategy note for the student
+  options?: Option[];          // Shared list: headings, paragraph letters, people
+  optionsTitle?: string;       // e.g. "List of Headings"
+  compactOptions?: boolean;    // Render the shared list as letter chips (paragraph letters)
+  example?: { prompt: string; answer: string }; // Worked example, e.g. Paragraph A → iii
+  maxWords?: number;           // text answers: word limit
+  allowNumber?: boolean;       // text answers: "AND/OR A NUMBER"
+  summaryTitle?: string;
+  summary?: string;            // Summary text; [[n]] marks the gap for question n
 }
 
 export interface ReadingPassage {
@@ -254,6 +294,9 @@ export interface ReadingPassage {
   estimatedTime: number;      // Minutes to complete
   questions: ReadingQuestion[];
   createdAt: Date;
+  format?: 'classic' | 'ielts'; // Defaults to 'classic' (multiple choice only)
+  labelParagraphs?: boolean;  // Show A, B, C… before paragraphs (needed for matching tasks)
+  questionGroups?: ReadingQuestionGroup[];
 }
 
 export interface ReadingAnswer {

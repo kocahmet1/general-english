@@ -1,0 +1,235 @@
+/* IELTS-format reading tasks: question groups, TRUE/FALSE/NOT GIVEN, matching and typed answers.
+   Builds on the reading styles in App.css and the learning.css tokens. */
+
+.passage-card-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.format-tag {
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--learning-blue-soft, transparent);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+
+/* Passage: paragraph letters and the answer location */
+.passage-text.labelled p { position: relative; padding-left: 38px; }
+.paragraph-label {
+  position: absolute;
+  left: 0;
+  top: .2em;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: .85rem;
+  font-weight: 750;
+  line-height: 1;
+}
+.evidence-highlight {
+  background: rgba(239, 199, 125, .45);
+  background: color-mix(in srgb, var(--accent-yellow) 26%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 1px 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Group header: question range, exam rubric, example, strategy tip */
+.ielts-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+.ielts-group-range {
+  font-size: .8rem;
+  font-weight: 750;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+}
+.ielts-group-instructions { font-size: .95rem; line-height: 1.6; color: var(--text-primary); }
+.ielts-group-example { font-size: .9rem; color: var(--text-secondary); }
+.ielts-tip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-primary);
+  color: var(--text-secondary);
+  font-size: .875rem;
+  line-height: 1.55;
+}
+.ielts-tip svg { flex-shrink: 0; margin-top: 2px; color: var(--accent-yellow); }
+
+/* Summary completion: the whole summary with numbered gaps */
+.ielts-summary {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
+}
+.ielts-summary h4 { font-size: .95rem; margin-bottom: 6px; color: var(--text-primary); }
+.ielts-summary p { font-size: .95rem; line-height: 2.1; color: var(--text-primary); }
+.summary-gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 74px;
+  min-height: 28px;
+  margin: 0 3px;
+  padding: 0 8px;
+  vertical-align: middle;
+  border: 0;
+  border-bottom: 2px solid var(--border-control, var(--border-primary));
+  border-radius: 6px 6px 0 0;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font: inherit;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.summary-gap:hover { background: var(--bg-hover); }
+.summary-gap.current { border-bottom-color: var(--accent-primary); background: var(--learning-blue-soft, var(--bg-hover)); }
+.summary-gap.correct { border-bottom-color: var(--accent-green); background: var(--accent-green-bg); }
+.summary-gap.incorrect { border-bottom-color: var(--accent-red); background: var(--accent-red-bg); }
+.summary-gap-number { font-size: .75rem; font-weight: 750; color: var(--text-secondary); }
+.summary-gap.current .summary-gap-number { color: var(--accent-primary); }
+.summary-gap-text { font-weight: 600; }
+
+/* Question line with the exam-style number */
+.ielts-question-text { display: flex; gap: 12px; align-items: flex-start; }
+.ielts-question-number {
+  flex-shrink: 0;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 2px solid var(--text-primary);
+  font-size: .9rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+/* TRUE / FALSE / NOT GIVEN */
+.tfng-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.reading-option.tfng-option {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-height: 72px;
+}
+.tfng-label { font-weight: 750; letter-spacing: .3px; }
+.tfng-hint { font-size: .8rem; line-height: 1.4; color: var(--text-secondary); }
+
+/* Paragraph letters as compact choices */
+.letter-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.reading-option.letter-option {
+  width: 52px;
+  height: 52px;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+/* Shared lists (headings, researchers) */
+.shared-options-title {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+.reading-option.taken .option-text { color: var(--text-muted); }
+.option-taken {
+  display: block;
+  margin-top: 2px;
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+/* Typed answers */
+.text-answer { display: flex; flex-direction: column; gap: 8px; }
+.text-answer-row { display: flex; gap: 10px; }
+.text-answer-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 50px;
+  padding: 10px 14px;
+  border: 2px solid var(--border-control, var(--border-primary));
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+.text-answer-input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--learning-blue-soft, transparent); }
+.text-answer-input:disabled { opacity: 1; cursor: default; }
+.text-answer-input.correct { border-color: var(--accent-green); background: var(--accent-green-bg); }
+.text-answer-input.incorrect { border-color: var(--accent-red); background: var(--accent-red-bg); }
+.text-answer-submit {
+  flex-shrink: 0;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #285bd4;
+  color: #fff;
+  font-weight: 650;
+  cursor: pointer;
+}
+.text-answer-submit:hover:not(:disabled) { background: #204cbb; }
+.text-answer-submit:disabled { background: var(--bg-tertiary); color: var(--text-muted); }
+.text-answer-limit { font-size: .85rem; color: var(--text-secondary); }
+.text-answer-limit.over { color: var(--accent-red); font-weight: 600; }
+
+/* Feedback additions */
+.question-explanation p.explanation-answer { color: var(--text-primary); font-size: .95rem; margin-bottom: 6px; }
+.question-explanation p.explanation-issue { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+.question-explanation p.explanation-evidence-note { margin-top: 6px; font-size: .8rem; color: var(--text-muted); }
+
+.reading-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .tfng-options { grid-template-columns: 1fr; }
+  .reading-option.tfng-option { min-height: 0; }
+  .text-answer-row { flex-direction: column; }
+  .ielts-group { padding: 14px; }
+}
+
+/* Room between the answers and the question navigation bar */
+.question-content.ielts-question { padding-bottom: 20px; }
+.shared-options .reading-option .option-letter { width: 48px; min-width: 48px; padding: 0; }
+.gap-blank {
+  display: inline-block;
+  width: 88px;
+  height: 1.1em;
+  margin: 0 4px;
+  vertical-align: text-bottom;
+  border-bottom: 2px solid var(--text-secondary);
+}
