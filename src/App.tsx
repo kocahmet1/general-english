@@ -14,6 +14,7 @@ import type { WritingEvaluationContext } from './types';
 import { ReadingComprehension } from './components/ReadingComprehension';
 import { SpeakingPractice } from './components/SpeakingPractice';
 import { ListeningPractice } from './components/ListeningPractice';
+import { IeltsListening } from './components/IeltsListening';
 import { GrammarLessons } from './components/GrammarLessons';
 import { SentenceLab } from './components/SentenceLab';
 import { Exam, UserAnswer, VocabWord, PerformanceStats, MistakeRecord, GrammarCategory, WritingSubmission, WritingPrompt, WritingFeedback, ReadingProgress, ReadingStats, ReadingQuestionType, ListeningProgress, ListeningStats, ListeningQuestionType, ListeningPassageType } from './types';
@@ -22,6 +23,8 @@ import { getAllVocabWords, addVocabWord, removeVocabWord } from './services/voca
 import { getExplanation, getFullWritingFeedback } from './services/openaiService';
 import { sampleReadingPassages } from './data/readingPassages';
 import { listeningTests } from './data/listeningQuestions';
+import { ieltsListeningTests } from './data/ieltsListeningTests';
+import { ieltsListeningAudio } from './data/ieltsListeningAudioManifest';
 import {
   isFirebaseConfigured,
   getLocalExams,
@@ -54,7 +57,9 @@ import {
   saveListeningProgress,
   deleteListeningProgress,
   getListeningStats,
-  updateListeningStats
+  updateListeningStats,
+  getIeltsListeningProgress,
+  saveIeltsListeningProgress
 } from './services/firebaseUserService';
 import { sampleExamQuestions, sampleExamName, sampleExamDescription } from './data/sampleExam';
 import { useActivitySession, percent, optionLabel, type ActivitySnapshot } from './hooks/useActivitySession';
@@ -845,7 +850,9 @@ function App() {
 
   const vocabWordsInVault = vocabWords.map(w => w.word.toLowerCase());
 
-  const validPages = ['/', '/exams', '/exams/manage', '/grammar', '/reading', '/speaking', '/listening', '/writing', '/sentence-lab', '/performance', '/vocabulary'];
+  const validPages = ['/', '/exams', '/exams/manage', '/grammar', '/reading', '/speaking', '/listening', '/listening/toefl', '/writing', '/sentence-lab', '/performance', '/vocabulary'];
+  // TOEFL listening moved from /listening to /listening/toefl; keep old links to a TOEFL test working.
+  const legacyToeflTest = page === '/listening' && searchParams.get('test')?.startsWith('toefl-') ? searchParams.get('test') : null;
 
   return (
     <LearningLayout
@@ -891,7 +898,20 @@ function App() {
       {page === '/writing' && <WritingPractice isOpen onClose={goHome} submissions={writingSubmissions} prompts={writingPrompts} onSubmitWriting={handleSubmitWriting} onDeleteSubmission={handleDeleteWritingSubmission} isOpenAIConfigured={openAIConfigured} />}
       {page === '/reading' && <ReadingComprehension isOpen onClose={goHome} passages={sampleReadingPassages} completedPassageIds={completedPassageIds} stats={readingStats} onAnswerQuestion={handleAnswerReadingQuestion} onCompletePassage={handleCompleteReadingPassage} getProgress={handleGetReadingProgress} onResetProgress={handleResetReadingProgress} onAddToVault={handleAddToVaultGeneric} vocabWordsInVault={vocabWordsInVault} />}
       {page === '/speaking' && <SpeakingPractice isOpen onClose={goHome} isOpenAIConfigured={openAIConfigured} />}
-      {page === '/listening' && <ListeningPractice isOpen onClose={goHome} tests={listeningTests} completedTestIds={completedListeningTestIds} stats={listeningStats} onAnswerQuestion={handleAnswerListeningQuestion} onCompleteTest={handleCompleteListeningTest} getProgress={handleGetListeningProgress} onResetProgress={handleResetListeningProgress} onAddToVault={handleAddToVaultGeneric} vocabWordsInVault={vocabWordsInVault} />}
+      {page === '/listening' && (legacyToeflTest
+        ? <Navigate to={`/listening/toefl?test=${encodeURIComponent(legacyToeflTest)}`} replace />
+        : <IeltsListening
+          key={user?.uid ?? 'guest'}
+          tests={ieltsListeningTests}
+          audio={ieltsListeningAudio}
+          canSave={Boolean(user)}
+          draftKey={user?.uid ?? 'guest'}
+          loadProgress={getIeltsListeningProgress}
+          saveProgress={saveIeltsListeningProgress}
+          resetProgress={deleteListeningProgress}
+          onClose={goHome}
+        />)}
+      {page === '/listening/toefl' && <ListeningPractice isOpen onClose={goHome} tests={listeningTests} completedTestIds={completedListeningTestIds} stats={listeningStats} onAnswerQuestion={handleAnswerListeningQuestion} onCompleteTest={handleCompleteListeningTest} getProgress={handleGetListeningProgress} onResetProgress={handleResetListeningProgress} onAddToVault={handleAddToVaultGeneric} vocabWordsInVault={vocabWordsInVault} />}
       {page === '/grammar' && <GrammarLessons onClose={goHome} />}
       {page === '/sentence-lab' && <SentenceLab isOpen onClose={goHome} />}
       {!validPages.includes(page) && <Navigate to="/" replace />}

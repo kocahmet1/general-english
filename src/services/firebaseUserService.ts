@@ -28,6 +28,7 @@ import {
     ListeningPassageType,
     ListeningQuestionType
 } from '../types';
+import type { IeltsListeningProgress } from '../types/ieltsListening';
 
 // Helper to get current user ID
 const getUserId = () => {
@@ -622,3 +623,48 @@ export async function updateListeningStats(
     });
 }
 
+// ===================================
+// IELTS LISTENING (4-part tests)
+// ===================================
+// Stored next to the TOEFL attempts in listeningProgress/{testId}, marked with format: 'ielts'.
+
+export async function getIeltsListeningProgress(testId: string): Promise<IeltsListeningProgress | null> {
+    const userId = auth?.currentUser?.uid;
+    if (!userId) return null;
+    const docSnap = await getDoc(doc(db, 'users', userId, 'listeningProgress', testId));
+    if (!docSnap.exists()) return null;
+    const data = docSnap.data();
+    if (data.format !== 'ielts') return null;
+    const responses: Record<number, string> = {};
+    Object.entries((data.responses ?? {}) as Record<string, unknown>).forEach(([key, value]) => {
+        if (typeof value === 'string') responses[Number(key)] = value;
+    });
+    return {
+        testId,
+        format: 'ielts',
+        mode: data.mode === 'exam' ? 'exam' : 'practice',
+        responses,
+        submittedParts: Array.isArray(data.submittedParts) ? data.submittedParts.map(Number) : [],
+        startedAt: data.startedAt?.toDate?.() ?? new Date(),
+        ...(data.completedAt ? { completedAt: data.completedAt.toDate() } : {}),
+        ...(typeof data.rawScore === 'number' ? { rawScore: data.rawScore } : {}),
+        ...(typeof data.band === 'number' ? { band: data.band } : {}),
+    };
+}
+
+export async function saveIeltsListeningProgress(progress: IeltsListeningProgress): Promise<void> {
+    const userId = getUserId();
+    const responses: Record<string, string> = {};
+    Object.entries(progress.responses).forEach(([key, value]) => { if (value) responses[key] = value; });
+    await setDoc(doc(db, 'users', userId, 'listeningProgress', progress.testId), {
+        testId: progress.testId,
+        format: 'ielts',
+        mode: progress.mode,
+        responses,
+        submittedParts: progress.submittedParts,
+        startedAt: Timestamp.fromDate(progress.startedAt),
+        completedAt: progress.completedAt ? Timestamp.fromDate(progress.completedAt) : null,
+        ...(progress.rawScore !== undefined ? { rawScore: progress.rawScore, score: Math.round((progress.rawScore / 40) * 100) } : {}),
+        ...(progress.band !== undefined ? { band: progress.band } : {}),
+    });
+}

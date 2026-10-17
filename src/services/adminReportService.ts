@@ -327,6 +327,8 @@ export async function getStudentReport(uid: string, from: Date, to: Date): Promi
 
   listeningDocs.forEach(docSnap => {
     const data = docSnap.data();
+    // IELTS listening tests are only reported through the activity log.
+    if (data.format === 'ielts') return;
     const testId = String(data.testId || docSnap.id);
     const startedAt = toDate(data.startedAt);
     const completedAt = toDate(data.completedAt);

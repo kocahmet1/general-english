@@ -1,6 +1,7 @@
 import { useListeningAudio } from '../hooks/useListeningAudio';
 import '../listening.css';
 import { PageBack } from './LearningLayout';
+import { ListeningFormatTabs } from './ListeningFormatTabs';
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import {
@@ -425,8 +426,9 @@ export const ListeningPractice = ({
         <div className="listening-header">
           <div className="listening-title">
             <Headphones size={24} />
-            <h2>TOEFL Dinleme</h2>
+            <h2>Dinleme</h2>
           </div>
+          <ListeningFormatTabs active="toefl" />
           <div className="listening-header-actions">
             <button
               className={`mode-btn ${viewMode === 'list' ? 'active' : ''}`}

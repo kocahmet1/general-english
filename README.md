@@ -52,7 +52,31 @@ npm run dev
 - The Express API runs on `http://localhost:3001`
 - Vite proxies `/api` to the local server
 
+## IELTS-style listening tests
+
+`/listening` opens two full IELTS-format listening tests (`src/data/ieltsListeningTests.ts`): four parts and 40 questions each, with the real exam's question types (form, note, table and flow-chart completion, multiple choice, "Choose TWO", map/plan labelling, matching), rubrics and word limits. They are original and deliberately easier than a real paper, for a student moving from band 4.5–5 towards 6.5: slower recordings (about 140 words per minute in Test 1 and 150 in Test 2, against roughly 160–180 in real conversations), everyday vocabulary, fewer distractors and clearer signposting. Test 1 (Kolay) is the easier one; Test 2 (Orta) uses more paraphrase and distractors.
+
+- **Practice mode** (recommended first): pause, rewind 5 s, seek, 0.85× speed, skip the reading time; each part is marked as soon as it is submitted, with Turkish explanations, a strategy tip per question group, the transcript with the answer lines marked, and "Cevabı dinle" to replay exactly where each answer is heard.
+- **Exam mode**: parts in order, each recording plays once without seeking, marking and explanations only after all four parts.
+- Results: raw score out of 40, the IELTS listening band conversion, distance to band 6.5 (26/40), scores per part and per question type, and every wrong answer. The page notes that these tests run slightly easier than the real exam.
+- Typed answers are marked like the exam: word limits, accepted alternatives (`9.30`/`9:30`, `£54`/`54`), case and a leading article ignored; plural and spelling slips are wrong but explained.
+- Progress is saved per test in `users/{uid}/listeningProgress/{testId}` (with `format: 'ielts'`), unsubmitted answers are also kept in the browser, and each submitted part is written to the activity log, so the admin student report shows the attempt, the band and each answer.
+
+Recordings are in `public/audio/ielts/` with cue timings in `src/data/ieltsListeningAudioManifest.ts`. They are made with Kokoro, a free text-to-speech model that runs on your own computer (no API key, no cost); announcer lines, reading time and checking time follow the real recording layout. To re-render after editing a script:
+
+```bash
+npm install --no-save kokoro-js
+node scripts/generate-ielts-listening-audio.mjs            # add --test <id> --part <n> to render one part
+```
+
+It needs ffmpeg like the TOEFL script, downloads the model (~330 MB) into `.tools/kokoro-models` on first run and reuses unchanged lines from `.tools/ielts-listening-audio-cache/`.
+
+Run `node --test tests/ielts-listening-content.test.mjs` after editing a test: it checks numbering, that every evidence quote is copied exactly from the script, that typed answers are heard in the recording and fit the word limit, that multiple-choice keys are not concentrated on one letter, and that every script line has a cue in the recording. `/tests/ielts-listening-qa.html` is an isolated UI fixture with in-memory progress (no Firebase writes).
+
 ## TOEFL-style listening practice
+
+The TOEFL practice moved to `/listening/toefl` (old `/listening?test=toefl-…` links redirect there); the IELTS/TOEFL switch sits at the top of both pages.
+
 
 The listening library contains two original campus conversations (five questions each) and four academic lectures (six questions each), with 34 questions in total. Topics include research planning, a library exhibit, urban heat, retrieval practice, archaeological trade evidence, and exoplanets.
 
