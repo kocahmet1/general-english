@@ -1,7 +1,7 @@
 /* A shared, page-based learning workspace. Activity content and scoring stay in
    their existing components; these tokens and layouts govern presentation. */
 :root, [data-theme="light"] {
-  --bg-primary: #eaf0f8;
+  --bg-primary: #eff4fc;
   --bg-secondary: #fff;
   --bg-tertiary: #e4ecf7;
   --bg-card: #fff;
@@ -32,7 +32,7 @@
 }
 
 [data-theme="dark"] {
-  --bg-primary: #0d1726;
+  --bg-primary: #101a2a;
   --bg-secondary: #18253a;
   --bg-tertiary: #22324a;
   --bg-card: #1b2a40;
