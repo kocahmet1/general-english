@@ -24,9 +24,9 @@ const { ieltsListeningAudio } = await loadModule('../src/data/ieltsListeningAudi
 const { markTest, markGroup, markTextAnswer, isOverWordLimit, bandForRaw, rawForBand, questionPrompt, expectedLabel } = scoring;
 const TIME = /^\d{1,2}\.\d{2}/;
 
-test('two tests with unique ids', () => {
-  assert.equal(ieltsListeningTests.length, 2);
-  assert.equal(new Set(ieltsListeningTests.map(t => t.id)).size, 2);
+test('three tests with unique ids', () => {
+  assert.equal(ieltsListeningTests.length, 3);
+  assert.equal(new Set(ieltsListeningTests.map(t => t.id)).size, 3);
 });
 
 test('band conversion follows the IELTS listening table', () => {

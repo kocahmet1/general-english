@@ -18,8 +18,9 @@ import type {
 //   - fewer distractors, and when there is one it is corrected clearly
 //     ("I thought… but actually…"),
 //   - more time between answers and clear signposting in Parts 2 and 4.
-// Test 1 is the easier of the two; Test 2 uses more paraphrase and more
-// distractors and is closer to the real exam.
+// Test 1 is the easiest; Test 2 uses more paraphrase and more distractors;
+// Test 3 is a step closer to the real exam again (a distractor in almost every
+// question, every multiple-choice option mentioned, slightly faster speech).
 //
 // Every evidence quote is copied word for word from its script line and every
 // typed answer appears in the script; tests/ielts-listening-content.test.mjs
@@ -45,8 +46,9 @@ const ONE_WORD_ONLY: IeltsWordLimit = { maxWords: 1, allowNumber: false, label: 
 // Kokoro voices and speeds. Kokoro reads faster than IELTS speakers, so most
 // voices are slowed down (never below speed 0.82, where artefacts start); voices
 // still too fast at 0.82 get an extra pitch-preserving slow-down (`tempo`).
-// Measured speech rate after rendering: about 140 words/min in Test 1 and
-// 150 in Test 2, against roughly 160–180 in real IELTS conversations.
+// Measured speech rate after rendering: about 140 words/min in Test 1, 150 in
+// Test 2 and 155–160 in Test 3, against roughly 160–180 in real IELTS
+// conversations.
 const VOICE = {
   tom: { voice: 'bm_george', speed: 0.84 },
   sophie: { voice: 'af_bella', speed: 0.83, tempo: 0.95 },
@@ -60,6 +62,12 @@ const VOICE = {
   lucy: { voice: 'af_heart', speed: 0.82, tempo: 0.96 },
   sam: { voice: 'am_puck', speed: 0.82, tempo: 0.94 },
   lewis: { voice: 'af_kore', speed: 0.84 },
+  gary: { voice: 'bm_fable', speed: 0.82 },
+  rachel: { voice: 'af_aoede', speed: 0.88 },
+  laura: { voice: 'bf_emma', speed: 0.82, tempo: 0.94 },
+  hannah: { voice: 'af_bella', speed: 0.88 },
+  ben: { voice: 'am_fenrir', speed: 0.88 },
+  morgan: { voice: 'bm_george', speed: 0.96 },
 } as const;
 
 /* ═══════════════════════════════════ TEST 1 ═══════════════════════════════════ */
@@ -1129,4 +1137,546 @@ const test2: IeltsListeningTest = {
   ],
 };
 
-export const ieltsListeningTests: IeltsListeningTest[] = [test1, test2];
+/* ═══════════════════════════════════ TEST 3 ═══════════════════════════════════ */
+// A step closer to the real exam than Test 2: a distractor in almost every
+// question, every multiple-choice option is mentioned in the recording, the
+// notes paraphrase what is said, and the speech is a little faster.
+
+const test3: IeltsListeningTest = {
+  id: 'ielts-listening-practice-3',
+  title: 'IELTS Listening Practice Test 3',
+  level: 'Orta–İleri',
+  difficulty: 'hard',
+  description: 'Taşınma şirketiyle bir telefon görüşmesi, bir doğa sporları merkezi, süpermarketlerin satış taktikleri ve deniz fenerlerinin tarihi. Test 2’den bir adım daha zor: hemen her soruda çeldirici var ve konuşma biraz daha hızlı.',
+  parts: [
+    /* ───────────── Part 1 ───────────── */
+    {
+      number: 1,
+      context: 'You will hear a woman telephoning a removal company about moving house.',
+      speakers: [
+        { id: 'gary', name: 'Gary', role: 'Removal company employee', gender: 'male', accent: 'british', ...VOICE.gary },
+        { id: 'rachel', name: 'Rachel', role: 'Caller', gender: 'female', accent: 'american', ...VOICE.rachel },
+      ],
+      script: [
+        L('p1-l1', 'gary', 'Good afternoon, Hartley Removals, Gary speaking.'),
+        L('p1-l2', 'rachel', "Hi. I'm moving house next month, and a friend recommended you. I'd like to get a price and, if it's reasonable, book a date."),
+        L('p1-l3', 'gary', 'Sure, I can help with both. Can I start with your name?'),
+        L('p1-l4', 'rachel', "It's Rachel Whitcombe."),
+        L('p1-l5', 'gary', 'Could you spell the surname for me?'),
+        L('p1-l6', 'rachel', "Yes, it's W-H-I-T-C-O-M-B-E. People usually forget the H."),
+        L('p1-l7', 'gary', 'Thanks. And when are you planning to move?'),
+        L('p1-l8', 'rachel', "Well, I was hoping for Saturday the 7th of March, but the people in my new house have just told me they can't move out until the following week. So could we say Saturday the 14th instead?"),
+        L('p1-l9', 'gary', "Let me check. Yes, the 14th is still free, so I'll put you down for that. Now, tell me about where you're living at the moment. Is it a house or a flat?"),
+        L('p1-l10', 'rachel', "A flat. It's on the fourth floor, and I should warn you, the lift is tiny. You can just about get two people in it, but certainly not a sofa."),
+        L('p1-l11', 'gary', "That's useful to know. We'll send an extra person to help with the stairs, then. What about parking? Can the van stop outside the building?"),
+        L('p1-l12', 'rachel', "Not really. The street's very narrow, and there are yellow lines everywhere. Delivery vans sometimes stop outside the bank on the corner, but they usually get a parking ticket. The best place is behind the church. It's only about fifty metres from my door."),
+        L('p1-l13', 'gary', 'Behind the church, fine. And are there any items that need special care? Anything very valuable or fragile?'),
+        L('p1-l14', 'rachel', "My TV's still in its original box, so that should be OK. The thing I'm really worried about is a large mirror that belonged to my grandmother. It's quite old, and the frame's very delicate."),
+        L('p1-l15', 'gary', "Don't worry. We'll wrap the mirror in blankets and put it in a wooden crate, so it won't move an inch."),
+        L('p1-l16', 'rachel', 'Great. So, roughly how much will all this cost?'),
+        L('p1-l17', 'gary', "For a two-bedroom flat, with the extra person for the stairs, our basic price would be £580. But that doesn't include packing. If you'd like us to pack everything for you, it comes to £640."),
+        L('p1-l18', 'rachel', "I'll definitely want you to do the packing. I simply don't have the time."),
+        L('p1-l19', 'gary', "OK, so that's £640 for the full service."),
+        BREAK(7, 10),
+        L('p1-l20', 'rachel', 'Before I book, could I ask about a few of your other services?'),
+        L('p1-l21', 'gary', "Of course. Well, as you're having the full service, the price includes all the packing materials, so you'll get boxes and tape from us. A lot of companies charge extra for those, but we don't."),
+        L('p1-l22', 'rachel', "That's good. And what if my new house isn't ready in time? Do you offer storage?"),
+        L('p1-l23', 'gary', "We do. It's £25 a week for a two-bedroom flat. Some companies keep your things in metal containers outside in a yard, but we keep everything in a warehouse, so it all stays dry."),
+        L('p1-l24', 'rachel', 'Hopefully I won\'t need it. One last thing: I have to leave the flat clean for the landlord. Do you do cleaning?'),
+        L('p1-l25', 'gary', "Yes. Two cleaners can come in once we've emptied the flat. It's £90, but they're very busy at this time of year, so you'd need to book them by Friday."),
+        L('p1-l26', 'rachel', 'This Friday?'),
+        L('p1-l27', 'gary', "That's right. The weekend slots go very quickly."),
+        L('p1-l28', 'rachel', "OK. Let me check my diary, and I'll call you back tomorrow to confirm everything."),
+      ],
+      questionGroups: [
+        {
+          id: 't3-g1',
+          type: 'gap_fill',
+          layout: 'form',
+          instructions: 'Complete the form below.\nWrite ONE WORD AND/OR A NUMBER for each answer.',
+          title: 'Hartley Removals – Booking enquiry',
+          wordLimit: ONE_WORD_AND_OR_NUMBER,
+          tip: 'Bu testte hemen her bilgide bir tuzak var: önce bir tarih, bir yer ya da bir fiyat söyleniyor, sonra değişiyor. Kalemi hazır tutun ama formdaki etikete göre karar verin: "Price including packing" paketlemeli fiyatı ister. Harf harf söylenen isimde her harfi yazın: Whitcombe gibi isimlerde okunuşta duyulmayan harfler (buradaki H) kolayca atlanır.',
+          blocks: [
+            { kind: 'field', label: 'Number of bedrooms:', value: 'two', example: true },
+            { kind: 'field', label: 'Name:', value: 'Rachel {{1}}' },
+            { kind: 'field', label: 'Moving date:', value: 'Saturday {{2}} March' },
+            { kind: 'field', label: 'Current home:', value: 'flat on the {{3}} floor (small lift)' },
+            { kind: 'field', label: 'Parking:', value: 'van should stop behind the {{4}}' },
+            { kind: 'field', label: 'Needs special care:', value: 'an old {{5}}' },
+            { kind: 'field', label: 'Price including packing:', value: '£{{6}}' },
+          ],
+          questions: [
+            {
+              number: 1,
+              answer: text('Whitcombe'),
+              evidence: [ev('p1-l6', "it's W-H-I-T-C-O-M-B-E")],
+              explanation: "Soyadı harf harf veriliyor: W-H-I-T-C-O-M-B-E. Rachel 'People usually forget the H' diyerek ikinci harfi özellikle vurguluyor; H olmadan yazılırsa yanlış sayılır.",
+            },
+            {
+              number: 2,
+              answer: text('14th', '14', 'fourteenth'),
+              evidence: [ev('p1-l8', 'So could we say Saturday the 14th instead?')],
+              explanation: "Rachel önce 7 Mart'ı düşünmüş, ama yeni evdeki kişiler bir hafta sonrasına kadar çıkamıyor. Yeni tarih 14 Mart; 7th çeldirici.",
+            },
+            {
+              number: 3,
+              answer: text('fourth', '4th'),
+              evidence: [ev('p1-l10', "It's on the fourth floor")],
+              explanation: "Rachel'ın şu anki dairesi dördüncü katta: 'on the fourth floor'. Asansör küçük olduğu için şirket fazladan bir kişi gönderecek.",
+            },
+            {
+              number: 4,
+              answer: text('church'),
+              evidence: [ev('p1-l12', 'The best place is behind the church.')],
+              explanation: "Teslimat araçları bazen köşedeki bankanın önünde duruyor ama ceza yiyor (bank çeldirici). Rachel'ın önerdiği yer kilisenin arkası: 'behind the church'.",
+            },
+            {
+              number: 5,
+              answer: text('mirror'),
+              evidence: [ev('p1-l14', 'a large mirror that belonged to my grandmother')],
+              explanation: "Televizyon kendi kutusunda olduğu için sorun değil (çeldirici). Özel dikkat gereken eşya büyükannesinden kalan eski ayna: 'a large mirror'.",
+            },
+            {
+              number: 6,
+              answer: text('640'),
+              evidence: [ev('p1-l19', "OK, so that's £640 for the full service.")],
+              explanation: "Temel fiyat £580, ama paketleme dahil değil. Rachel paketlemeyi istediği için toplam £640. Formdaki etiket 'Price including packing' olduğu için 580 yanlış.",
+            },
+          ],
+        },
+        {
+          id: 't3-g2',
+          type: 'gap_fill',
+          layout: 'table',
+          instructions: 'Complete the table below.\nWrite ONE WORD AND/OR A NUMBER for each answer.',
+          title: 'Extra services',
+          wordLimit: ONE_WORD_AND_OR_NUMBER,
+          tip: 'Tabloyu satır satır okuyun: her satır bir hizmet, her sütun bir bilgi türü. Boşluktan önceki kelime ipucu verir: "a ___" tekil bir isim, "includes ___ and tape" çoğul bir isim bekleyebilir.',
+          table: {
+            columns: ['Service', 'Cost', 'Notes'],
+            rows: [
+              ['Packing materials', 'free with the full service', 'includes {{7}} and tape'],
+              ['Storage', '£{{8}} per week', 'everything kept dry in a {{9}}'],
+              ['Cleaning', '£90', 'must be booked by {{10}}'],
+            ],
+          },
+          questions: [
+            {
+              number: 7,
+              answer: text('boxes'),
+              evidence: [ev('p1-l21', "so you'll get boxes and tape from us")],
+              explanation: "Tam hizmette paketleme malzemeleri ücretsiz: 'boxes and tape'. Kutular çoğul söyleniyor; tekil 'box' yanlış sayılır.",
+            },
+            {
+              number: 8,
+              answer: text('25'),
+              evidence: [ev('p1-l23', "It's £25 a week for a two-bedroom flat.")],
+              explanation: "Depolama iki yatak odalı bir daire için haftalık £25. Tabloda £ ve 'per week' yazılı olduğu için sadece 25 yazılır.",
+            },
+            {
+              number: 9,
+              answer: text('warehouse'),
+              evidence: [ev('p1-l23', 'but we keep everything in a warehouse')],
+              explanation: "Bazı şirketler eşyaları açık alandaki metal konteynerlerde tutuyor (containers çeldirici); bu şirket bir depo binası kullanıyor: 'a warehouse'.",
+            },
+            {
+              number: 10,
+              answer: text('Friday'),
+              evidence: [ev('p1-l25', "so you'd need to book them by Friday")],
+              explanation: "Temizlikçiler bu dönemde çok yoğun, bu yüzden en geç cuma gününe kadar ayırtmak gerekiyor: 'book them by Friday'. 'Weekend' hafta sonu randevularıyla ilgili, son tarih değil.",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 2 ───────────── */
+    {
+      number: 2,
+      context: 'You will hear the manager of an outdoor activity centre talking to a group of guests on their first evening.',
+      speakers: [
+        { id: 'laura', name: 'Laura', role: 'Centre manager', gender: 'female', accent: 'british', ...VOICE.laura },
+      ],
+      script: [
+        L('p2-l1', 'laura', "Good evening, everyone, and welcome to Lakeside Outdoor Centre. I'm Laura, the centre manager. I know you've had a long journey, so I'll keep this short, but there are a few things you need to know before your activities start tomorrow morning."),
+        L('p2-l2', 'laura', 'First, a little history. A lot of guests assume this building used to be a hotel, because the dining room is so large. In fact, it started life as a farmhouse, and then, for about forty years, it was a school for children from the city. When the school closed in 1996, the building was turned into the activity centre you see today.'),
+        L('p2-l3', 'laura', "Now, mealtimes. Breakfast is served from half past seven until half past eight, and please don't be late, because activities start at nine on the dot. Lunch is a packed lunch, which you collect from the kitchen before you go out. If you have any food allergies, please don't wait until breakfast to mention them. Tell the kitchen staff this evening, so they have time to plan your meals."),
+        L('p2-l4', 'laura', "Next, your rooms. Every bedroom has its own bathroom, and towels are provided, so there's no need to use your own. The doors lock automatically when they close, so please keep your key card with you at all times. And I'm afraid there's no Wi-Fi in the bedroom blocks. The walls are very thick, so you'll need to come over to the main house to get online."),
+        L('p2-l5', 'laura', "As for the weather, you're in the mountains now, and it changes very quickly. Even if it's sunny when you set off, take a waterproof jacket. If you haven't brought one, we can lend you one from the store room. Walking boots are a different matter. We can't lend those, but the shop in the village sells them at a reasonable price, and it also sells maps of the local walks."),
+        L('p2-l6', 'laura', "Finally, safety. If you hear the fire alarm, leave the building by the nearest exit. Please don't gather on the front lawn, because that's where the minibuses turn round, and don't go down to the boathouse either. The meeting point is the car park, next to the main gate."),
+        L('p2-l7', 'laura', "Right. Let me tell you a little about each of the activities. You'll each choose three for the week, and you can sign up at reception tonight."),
+        BREAK(16, 20),
+        L('p2-l8', 'laura', "Kayaking takes place on the lake, and we provide all the equipment: the kayaks, paddles, helmets and buoyancy aids. It's ideal for complete beginners. The one thing to be aware of is the wind. The lake is very exposed, so if the wind gets too strong, we have to call the session off and offer you something else instead."),
+        L('p2-l9', 'laura', "Rock climbing happens on the cliffs behind the centre, or on our indoor wall when it's raining, so it goes ahead whatever the weather. Because of our insurance, though, it's only open to guests aged sixteen and over. Younger guests can still use the low climbing wall in the sports hall."),
+        L('p2-l10', 'laura', "Archery is something we've only just started offering. We built the range in the spring, so you're among the first groups to try it. It's very relaxing, and you don't need to be particularly fit."),
+        L('p2-l11', 'laura', "For mountain biking, we take you along the forest trails on the other side of the valley. Unlike everything else, it isn't included in the price of your stay. Bike hire costs an extra fifteen pounds a day, although you're welcome to bring your own bike if you have one."),
+        L('p2-l12', 'laura', "And finally, orienteering, where you find your way around the forest with a map and a compass. It might not sound very exciting, but more guests choose it than any other activity, and a lot of people tell us it was the highlight of their stay."),
+        L('p2-l13', 'laura', "OK, that's all from me. Reception is open until ten tonight, so go and sign up, and I'll see you all at breakfast."),
+      ],
+      questionGroups: [
+        {
+          id: 't3-g3',
+          type: 'mcq_single',
+          instructions: 'Choose the correct letter, A, B or C.',
+          tip: 'Bu bölümde üç seçeneğin üçü de kayıtta geçiyor. Konuşmacı birini düzeltiyor ("A lot of guests assume… In fact…"), birini reddediyor ("Please don\'t…", "We can\'t…"). Soruyu dikkatle okuyun: "immediately before" gibi bir ifade cevabı değiştirir.',
+          questions: [
+            {
+              number: 11,
+              prompt: 'What was the main building used for immediately before it became an activity centre?',
+              options: abc('a hotel', 'a farmhouse', 'a school'),
+              answer: choice('C'),
+              evidence: [ev('p2-l2', 'for about forty years, it was a school for children from the city')],
+              explanation: "Birçok misafir binanın otel olduğunu sanıyor ama değil (A yanlış). Bina önce bir çiftlik eviymiş (B daha eski kullanım), sonra yaklaşık kırk yıl okul olmuş ve 1996'da okul kapanınca merkeze dönüşmüş. Soru 'immediately before' (hemen önce) dediği için cevap okul.",
+            },
+            {
+              number: 12,
+              prompt: 'When should guests tell the staff about food allergies?',
+              options: abc('this evening', 'at breakfast', 'when they collect their lunch'),
+              answer: choice('A'),
+              evidence: [ev('p2-l3', 'Tell the kitchen staff this evening, so they have time to plan your meals.')],
+              explanation: "Laura kahvaltıyı beklemeyin diyor ('don't wait until breakfast', B yanlış). Paket öğle yemeği de geçiyor ama alerji için değil (C). Mutfak personeline bu akşam söylenmeli.",
+            },
+            {
+              number: 13,
+              prompt: 'What does Laura say about the bedrooms?',
+              options: abc('Guests need to bring their own towels.', 'There is no internet connection in them.', 'Guests have to lock the doors themselves.'),
+              answer: choice('B'),
+              evidence: [ev('p2-l4', "And I'm afraid there's no Wi-Fi in the bedroom blocks.")],
+              explanation: "Havlular veriliyor (A yanlış), kapılar kapanınca kendiliğinden kilitleniyor (C yanlış). Yatak odası bloklarında Wi-Fi yok; internete bağlanmak için ana binaya gitmek gerekiyor. 'Wi-Fi' sorunun 'internet connection' ifadesiyle anlatılmış.",
+            },
+            {
+              number: 14,
+              prompt: 'What can guests borrow from the centre?',
+              options: abc('walking boots', 'maps', 'waterproof jackets'),
+              answer: choice('C'),
+              evidence: [ev('p2-l5', 'we can lend you one from the store room')],
+              explanation: "Yağmurluğu olmayanlara merkez ödünç yağmurluk veriyor ('we can lend you one'). Bot ödünç verilmiyor (A yanlış), haritalar köydeki dükkânda satılıyor (B yanlış).",
+            },
+            {
+              number: 15,
+              prompt: 'Where should guests go if the fire alarm rings?',
+              options: abc('the front lawn', 'the car park', 'the boathouse'),
+              answer: choice('B'),
+              evidence: [ev('p2-l6', 'The meeting point is the car park, next to the main gate.')],
+              explanation: "Ön çimenlikte toplanmamak gerekiyor çünkü minibüsler orada dönüyor (A yanlış); kayıkhaneye de gidilmemeli (C yanlış). Toplanma noktası ana kapının yanındaki otopark.",
+            },
+          ],
+        },
+        {
+          id: 't3-g4',
+          type: 'matching',
+          variant: 'list',
+          instructions: 'What does Laura say about each activity?\nChoose FIVE answers from the box and write the correct letter, A–G, next to Questions 16–20.',
+          optionsTitle: 'Features',
+          tip: 'Kutudaki yedi seçenekten ikisi kullanılmayacak. Her aktivite için birden fazla bilgi duyacaksınız; sadece kutudaki bir seçenekle aynı anlama geleni seçin. Örneğin "call the session off" = iptal etmek.',
+          options: [
+            { key: 'A', text: 'It is only for guests aged 16 or over.' },
+            { key: 'B', text: 'Guests pay extra for it.' },
+            { key: 'C', text: 'It may be cancelled because of the weather.' },
+            { key: 'D', text: 'It has been introduced recently.' },
+            { key: 'E', text: 'It is chosen by more guests than any other activity.' },
+            { key: 'F', text: 'Guests must bring their own equipment.' },
+            { key: 'G', text: 'It is suitable for young children.' },
+          ],
+          questions: [
+            {
+              number: 16,
+              prompt: 'Kayaking',
+              answer: choice('C'),
+              evidence: [ev('p2-l8', 'if the wind gets too strong, we have to call the session off')],
+              explanation: "Rüzgâr çok güçlenirse kano seansı iptal ediliyor: 'call the session off' = iptal etmek (C). Ekipmanı merkez veriyor, bu yüzden F yanlış.",
+            },
+            {
+              number: 17,
+              prompt: 'Rock climbing',
+              answer: choice('A'),
+              evidence: [ev('p2-l9', "it's only open to guests aged sixteen and over")],
+              explanation: "Sigorta nedeniyle kaya tırmanışı yalnızca 16 yaş ve üstüne açık (A). Yağmurda kapalı duvara geçildiği için havaya bağlı olarak iptal edilmiyor; C bu aktivite için yanlış.",
+            },
+            {
+              number: 18,
+              prompt: 'Archery',
+              answer: choice('D'),
+              evidence: [ev('p2-l10', "Archery is something we've only just started offering.")],
+              explanation: "Okçuluk yeni başlamış: 'only just started offering', atış alanı ilkbaharda yapılmış. 'Introduced recently' (yakın zamanda başlatıldı) bunun farklı ifadesi (D).",
+            },
+            {
+              number: 19,
+              prompt: 'Mountain biking',
+              answer: choice('B'),
+              evidence: [ev('p2-l11', 'Bike hire costs an extra fifteen pounds a day')],
+              explanation: "Dağ bisikleti konaklama ücretine dahil değil; bisiklet kiralamak için günlük 15 sterlin ek ödeniyor (B). Kendi bisikletinizi getirebilirsiniz ama zorunlu değil, bu yüzden F yanlış.",
+            },
+            {
+              number: 20,
+              prompt: 'Orienteering',
+              answer: choice('E'),
+              evidence: [ev('p2-l12', 'more guests choose it than any other activity')],
+              explanation: "Yön bulma sporu kulağa heyecanlı gelmese de en çok seçilen aktivite: 'more guests choose it than any other activity' (E).",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 3 ───────────── */
+    {
+      number: 3,
+      context: 'You will hear two business students, Hannah and Ben, discussing a project on how supermarkets influence shoppers.',
+      speakers: [
+        { id: 'hannah', name: 'Hannah', role: 'Student', gender: 'female', accent: 'american', ...VOICE.hannah },
+        { id: 'ben', name: 'Ben', role: 'Student', gender: 'male', accent: 'american', ...VOICE.ben },
+      ],
+      script: [
+        L('p3-l1', 'ben', 'Hi, Hannah. Have you got a few minutes to go over our supermarket project before the tutorial on Thursday?'),
+        L('p3-l2', 'hannah', "Sure. I've just finished writing up the notes from the three supermarkets we visited."),
+        L('p3-l3', 'ben', 'Great. So, looking back, which part of the research do you think was the most useful? For me, it was the interviews with the store managers.'),
+        L('p3-l4', 'hannah', 'They were interesting, but the managers were very careful about what they told us. I think we learned far more from simply watching the shoppers. You could see exactly where people slowed down and what they picked up.'),
+        L('p3-l5', 'ben', "That's true. The questionnaire was a bit of a disappointment, though."),
+        L('p3-l6', 'hannah', 'Yes, hardly anyone wanted to stop and fill it in.'),
+        L('p3-l7', 'ben', "Right. So, the first thing we looked at was the entrance. All three shops put the fruit and vegetables right by the door. I'd always assumed that was because fresh food sells better when people can see it."),
+        L('p3-l8', 'hannah', "That's part of it, and the colours are attractive too. But the manager at Fresco gave a different reason. She said that if shoppers start by choosing healthy food, they feel good about themselves, so they don't feel so guilty about buying treats later on. She was quite clear that that was the main reason."),
+        L('p3-l9', 'ben', 'Interesting. Next, the music. I was surprised how slow it was in all three shops. I assumed it was just there to make people feel relaxed.'),
+        L('p3-l10', 'hannah', "Actually, the research says it's about speed rather than mood. Slow music makes people walk more slowly, so they spend longer in the shop and buy more. But one study found that it only really works when the shop is fairly quiet. When it's crowded, people hardly notice the music."),
+        L('p3-l11', 'ben', "So it's less effective at busy times. That's a limitation we should mention."),
+        L('p3-l12', 'hannah', 'Agreed. Now, how should we divide up the presentation? I was thinking we could just take half each.'),
+        L('p3-l13', 'ben', "I thought so too, but Dr Patel said she'd prefer each of us to talk about the parts we researched ourselves, even if one person ends up speaking for longer."),
+        L('p3-l14', 'hannah', "That makes sense. I did more of the observations, so I'll present those."),
+        L('p3-l15', 'ben', 'And for the handout, should we include all our data?'),
+        L('p3-l16', 'hannah', "That would be far too much. Let's just give a one-page summary of the main findings, and put the full data on the course website for anyone who wants it."),
+        L('p3-l17', 'ben', "Good idea. That'll save on printing, too."),
+        BREAK(26, 30),
+        L('p3-l18', 'hannah', 'OK, the last section is our evaluation of the techniques. Shall we agree on what we think of each one?'),
+        L('p3-l19', 'ben', "Sure. Let's start with sweets at the checkout."),
+        L('p3-l20', 'hannah', "Well, it obviously works. Children see the sweets while their parents are queuing, and the parents give in. But I think it's taking advantage of families, and that isn't really fair."),
+        L('p3-l21', 'ben', "I agree. Next, moving products to different places in the store. I'd have thought that would really annoy people."),
+        L('p3-l22', 'hannah', "Apparently not. The managers say hardly anyone complains, and that it helps customers discover new products. But how would anyone know? There's no real way of telling whether people buy more because of it."),
+        L('p3-l23', 'ben', "No, it's almost impossible to prove. What about free samples? I honestly didn't expect them to make much difference, except perhaps in a small shop where the staff know everyone."),
+        L('p3-l24', 'hannah', 'Me neither, but Fresco is enormous, and sales of the cheese they were giving away went up by nearly a third that week. I was amazed.'),
+        L('p3-l25', 'ben', 'Then there\'s putting products at eye level.'),
+        L('p3-l26', 'hannah', "That one's interesting, because the brands actually pay the supermarket for those shelves. So really, it's the companies that make the products who gain the most, not the shop."),
+        L('p3-l27', 'ben', 'And finally, the smell of fresh bread. People always mention that one.'),
+        L('p3-l28', 'hannah', "They do, but hardly any supermarkets bake their own bread these days. Most of it arrives already baked, so the trick isn't really used much any more."),
+        L('p3-l29', 'ben', "OK. Let's each write those up tonight and send them to each other."),
+      ],
+      questionGroups: [
+        {
+          id: 't3-g5',
+          type: 'mcq_single',
+          instructions: 'Choose the correct letter, A, B or C.',
+          tip: '"That\'s part of it… But…", "She was quite clear that…", "Actually…" gibi ifadeler konuşmacının asıl görüşünü getirir. Soruda "mainly" ya da "most" varsa, kısmen doğru olan seçenekleri eleyip ana nedeni seçin.',
+          questions: [
+            {
+              number: 21,
+              prompt: 'Which part of the research does Hannah think was the most useful?',
+              options: abc('the interviews with managers', 'the questionnaire', 'observing shoppers'),
+              answer: choice('C'),
+              evidence: [ev('p3-l4', 'I think we learned far more from simply watching the shoppers.')],
+              explanation: "Röportajları seçen Ben (A, Hannah'nın görüşü değil). Anket hayal kırıklığıydı (B). Hannah'ya göre en çok müşterileri izleyerek öğrendiler: 'watching the shoppers' = observing shoppers.",
+            },
+            {
+              number: 22,
+              prompt: 'According to the manager at Fresco, fruit and vegetables are placed near the entrance mainly because',
+              options: abc('they make shoppers feel less guilty about buying treats.', 'their bright colours attract customers.', 'fresh food sells better when it can be seen.'),
+              answer: choice('A'),
+              evidence: [ev('p3-l8', "so they don't feel so guilty about buying treats later on")],
+              explanation: "Hannah görünür olmanın (C) ve renklerin (B) de etkili olduğunu kabul ediyor ('That's part of it'), ama müdürün asıl nedeni farklı: sağlıklı ürünlerle başlayan müşteri sonra abur cubur alırken daha az suçluluk duyuyor. Soru 'mainly' dediği için cevap A.",
+            },
+            {
+              number: 23,
+              prompt: 'What do the students say about slow music?',
+              options: abc('It has little effect on how much people spend.', 'It mainly makes customers feel calm.', 'It works less well when a shop is busy.'),
+              answer: choice('C'),
+              evidence: [ev('p3-l11', "So it's less effective at busy times.")],
+              explanation: "Yavaş müzik insanların daha fazla harcamasını sağlıyor (A'nın tersi). Ben rahatlatmak için olduğunu sanmış ama Hannah bunun ruh hâliyle değil hızla ilgili olduğunu söylüyor (B yanlış). Kalabalıkta müzik pek fark edilmiyor, yani yoğun saatlerde daha az etkili (C).",
+            },
+            {
+              number: 24,
+              prompt: 'How will the students divide the presentation?',
+              options: abc('Each student will present half.', 'Each student will talk about their own research.', 'Dr Patel will decide who presents each part.'),
+              answer: choice('B'),
+              evidence: [ev('p3-l13', 'each of us to talk about the parts we researched ourselves')],
+              explanation: "İkisi de önce yarı yarıya bölmeyi düşünmüş (A), ama Dr Patel herkesin kendi araştırdığı kısmı sunmasını tercih ediyor ve öyle yapacaklar. Dr Patel kimin sunacağına karar vermiyor, sadece bir tercih belirtiyor (C yanlış).",
+            },
+            {
+              number: 25,
+              prompt: 'What will the students put in the handout?',
+              options: abc('all of their data', 'a summary of their main findings', 'a link to the course website'),
+              answer: choice('B'),
+              evidence: [ev('p3-l16', "Let's just give a one-page summary of the main findings")],
+              explanation: "Tüm veriler çok fazla olur (A yanlış); onlar dersin web sitesine konacak. El notunda tek sayfalık bir özet olacak. Web sitesi geçiyor ama el notuna link konacağı söylenmiyor (C).",
+            },
+          ],
+        },
+        {
+          id: 't3-g6',
+          type: 'matching',
+          variant: 'list',
+          instructions: 'What do the students think about each technique?\nChoose FIVE answers from the box and write the correct letter, A–G, next to Questions 26–30.',
+          optionsTitle: 'Opinions',
+          tip: 'Kutudaki ifadeler kayıttakinin aynısı değil, eş anlamlısı: "no real way of telling" = "difficult to prove", "the companies that make the products" = "manufacturers". Her teknik için öğrencilerin vardığı sonucu dinleyin.',
+          options: [
+            { key: 'A', text: 'It works but is unfair to customers.' },
+            { key: 'B', text: 'It is rarely used nowadays.' },
+            { key: 'C', text: 'Its effect is difficult to prove.' },
+            { key: 'D', text: 'It works better in small shops.' },
+            { key: 'E', text: 'It was more effective than they had expected.' },
+            { key: 'F', text: 'It mainly benefits manufacturers.' },
+            { key: 'G', text: 'It annoys most customers.' },
+          ],
+          questions: [
+            {
+              number: 26,
+              prompt: 'sweets at the checkout',
+              answer: choice('A'),
+              evidence: [ev('p3-l20', "But I think it's taking advantage of families, and that isn't really fair.")],
+              explanation: "Kasadaki şekerler işe yarıyor ('it obviously works'), ama Hannah bunun aileleri istismar ettiğini ve adil olmadığını düşünüyor: işe yarıyor ama haksız (A).",
+            },
+            {
+              number: 27,
+              prompt: 'moving products to different places',
+              answer: choice('C'),
+              evidence: [ev('p3-l23', "it's almost impossible to prove")],
+              explanation: "Ben bunun müşterileri kızdıracağını düşünmüş, ama Hannah neredeyse kimsenin şikâyet etmediğini söylüyor (G yanlış). Müdürler yeni ürün keşfettirdiğini söylüyor, ama satışları artırıp artırmadığını anlamanın yolu yok: 'almost impossible to prove' (C).",
+            },
+            {
+              number: 28,
+              prompt: 'free samples',
+              answer: choice('E'),
+              evidence: [ev('p3-l24', 'went up by nearly a third that week. I was amazed.')],
+              explanation: "İkisi de ücretsiz numunelerin pek etkisi olacağını beklemiyormuş ('I honestly didn't expect…', 'Me neither'), ama peynir satışları neredeyse üçte bir arttı. Beklediklerinden daha etkili (E). Ben küçük dükkânları anıyor ama Fresco çok büyük bir mağaza, bu yüzden D yanlış.",
+            },
+            {
+              number: 29,
+              prompt: 'products at eye level',
+              answer: choice('F'),
+              evidence: [ev('p3-l26', "it's the companies that make the products who gain the most, not the shop")],
+              explanation: "Markalar göz hizasındaki raflar için süpermarkete para ödüyor, yani en çok kazanan ürünleri yapan şirketler: 'manufacturers' (F).",
+            },
+            {
+              number: 30,
+              prompt: 'the smell of fresh bread',
+              answer: choice('B'),
+              evidence: [ev('p3-l28', "so the trick isn't really used much any more")],
+              explanation: "Artık çok az süpermarket kendi ekmeğini pişiriyor; ekmek hazır geliyor. Bu yüzden taze ekmek kokusu taktiği artık pek kullanılmıyor: 'rarely used nowadays' (B).",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 4 ───────────── */
+    {
+      number: 4,
+      context: 'You will hear part of a lecture about the history of lighthouses.',
+      speakers: [
+        { id: 'morgan', name: 'Dr Alan Morgan', role: 'Lecturer', gender: 'male', accent: 'british', ...VOICE.morgan },
+      ],
+      script: [
+        L('p4-l1', 'morgan', "Good morning, everyone. Today we're continuing our series on the history of navigation, and I want to look at a structure that has saved countless lives at sea: the lighthouse. I'll trace how lighthouses developed, what life was like for the people who ran them, and why their role has changed so dramatically in recent decades."),
+        L('p4-l2', 'morgan', 'The earliest warning lights were very simple. Long before anyone built a tower, people living on dangerous coasts would light fires on hilltops at night to guide boats safely home. The first purpose-built lighthouse that we know much about was the Pharos of Alexandria in Egypt, completed about two thousand three hundred years ago. It was probably over a hundred metres tall, and sailors reported seeing its light from fifty kilometres away. It survived for more than fifteen centuries, until a series of earthquakes in the fourteenth century finally brought it down.'),
+        L('p4-l3', 'morgan', 'In medieval Europe, there was no government organisation responsible for lights. In some ports, merchants paid a fee to keep a light going, but most of them were kept burning by monks, who saw it as a religious duty to protect travellers.'),
+        L('p4-l4', 'morgan', 'For centuries, the light itself came from burning wood or candles. By the seventeenth century, most lighthouses in Britain were burning coal in large open baskets at the top of the tower. Coal gave a strong light, but it had a serious drawback: in wet or windy weather the fire was hard to control, and the smoke blackened the windows, so the light was often much weaker than it should have been.'),
+        L('p4-l5', 'morgan', 'The real breakthrough came in 1822, when a French engineer, Augustin Fresnel, designed a new kind of lens. Instead of one thick piece of glass, it was made of many thin rings of glass arranged around the lamp. This concentrated the light into a powerful beam that could be seen more than thirty kilometres out to sea, and it used far less fuel.'),
+        L('p4-l6', 'morgan', 'Around the same time, engineers realised that sailors needed to know not just that there was a lighthouse nearby, but which one it was. So each lighthouse was given its own pattern of flashes, a bit like a signature. A captain who counted three flashes every ten seconds, for example, could look at his chart and know exactly where he was.'),
+        L('p4-l7', 'morgan', "Now let's turn to the keepers. Life in a lighthouse was demanding and often lonely, especially on rock towers far out at sea, where keepers might spend six or eight weeks at a time away from their families. Their main task was to keep the lamp burning from sunset to sunrise, but they also had to record the weather every few hours, and those records are still extremely useful to scientists today."),
+        L('p4-l8', 'morgan', 'During the twentieth century, lighthouses were gradually automated. The last keeper in Britain left in 1998, and today every lighthouse is monitored by computer from control centres that may be hundreds of kilometres away. If a lamp fails, a back-up switches on automatically and an engineer is sent out.'),
+        L('p4-l9', 'morgan', 'So, do we still need lighthouses at all? Most large ships now rely on satellite navigation, and some lights have been switched off. But smaller boats still depend on them, and they remain an important back-up if electronic systems fail. Meanwhile, many old lighthouses have found a new purpose. Some have become museums, others have been turned into holiday cottages, and for a growing number of them, tourism is now their main source of income.'),
+        L('p4-l10', 'morgan', "In our next session, we'll look at how satellite navigation actually works, and at what happens when it goes wrong."),
+      ],
+      questionGroups: [
+        {
+          id: 't3-g7',
+          type: 'gap_fill',
+          layout: 'notes',
+          instructions: 'Complete the notes below.\nWrite ONE WORD ONLY for each answer.',
+          title: 'Lighthouses',
+          wordLimit: ONE_WORD_ONLY,
+          tip: 'Notlar dersi kısaltarak ve farklı kelimelerle anlatır: "destroyed by ___" ↔ "brought it down", "maintained by ___" ↔ "kept burning by". Ders boyunca hangi başlıkta olduğunuzu takip edin; cevaplar notlarla aynı sırada gelir. Tekil/çoğul biçimine dikkat edin.',
+          blocks: [
+            { kind: 'heading', text: 'Early lights' },
+            { kind: 'bullet', text: 'before towers were built, people lit {{31}} on hills to guide boats' },
+            { kind: 'bullet', text: 'Pharos of Alexandria: over 100 m tall; light seen 50 km away; destroyed by {{32}} in the 1300s' },
+            { kind: 'heading', text: 'Medieval Europe' },
+            { kind: 'bullet', text: 'most lights were maintained by {{33}} as a religious duty' },
+            { kind: 'heading', text: 'Improvements' },
+            { kind: 'bullet', text: '17th century: {{34}} burned in open baskets – smoke made the light weaker' },
+            { kind: 'bullet', text: "1822: Fresnel's {{35}}, made of many rings of glass, gave a stronger beam and saved fuel" },
+            { kind: 'bullet', text: 'each lighthouse had its own pattern of flashes, similar to a {{36}}' },
+            { kind: 'heading', text: 'Keepers' },
+            { kind: 'bullet', text: 'on rock towers, often spent weeks away from their {{37}}' },
+            { kind: 'bullet', text: 'kept the lamp burning and regularly recorded the {{38}} – still valuable to scientists' },
+            { kind: 'heading', text: 'Lighthouses today' },
+            { kind: 'bullet', text: 'today: all monitored by {{39}} from distant control centres' },
+            { kind: 'bullet', text: 'many are now museums or holiday homes; {{40}} is their main source of income' },
+          ],
+          questions: [
+            {
+              number: 31,
+              answer: text('fires'),
+              evidence: [ev('p4-l2', 'would light fires on hilltops at night to guide boats safely home')],
+              explanation: "Kule yapılmadan çok önce, tehlikeli kıyılarda yaşayanlar geceleri tepelerde ateş yakıyordu: 'light fires on hilltops'. Notta 'lit ___' çoğul bir isim bekliyor; 'fires' yazılmalı.",
+            },
+            {
+              number: 32,
+              answer: text('earthquakes'),
+              evidence: [ev('p4-l2', 'until a series of earthquakes in the fourteenth century finally brought it down')],
+              explanation: "İskenderiye Feneri 14. yüzyıldaki bir dizi depremle yıkıldı: 'a series of earthquakes… brought it down'. 'Destroyed by' = 'brought it down'; 'a series of' çoğul olduğunu gösteriyor.",
+            },
+            {
+              number: 33,
+              answer: text('monks'),
+              evidence: [ev('p4-l3', 'most of them were kept burning by monks')],
+              explanation: "Bazı limanlarda tüccarlar ücret ödüyordu (merchants çeldirici), ama fenerlerin çoğunu dini bir görev olarak keşişler yakıyordu: 'kept burning by monks'.",
+            },
+            {
+              number: 34,
+              answer: text('coal'),
+              evidence: [ev('p4-l4', 'most lighthouses in Britain were burning coal in large open baskets')],
+              explanation: "Odun ve mum daha önceki yakıtlardı (çeldirici). 17. yüzyılda İngiltere'deki fenerlerin çoğu açık sepetlerde kömür yakıyordu ve duman ışığı zayıflatıyordu.",
+            },
+            {
+              number: 35,
+              answer: text('lens'),
+              evidence: [ev('p4-l5', 'designed a new kind of lens')],
+              explanation: "1822'de Fresnel, tek kalın cam yerine birçok ince cam halkadan oluşan yeni bir mercek (lens) tasarladı. Kayıtta tekil geçiyor: 'a new kind of lens'.",
+            },
+            {
+              number: 36,
+              answer: text('signature'),
+              evidence: [ev('p4-l6', 'its own pattern of flashes, a bit like a signature')],
+              explanation: "Her fenerin kendine özgü bir yanıp sönme düzeni vardı, tıpkı bir imza gibi: 'a bit like a signature'. Notta 'similar to' = 'a bit like'.",
+            },
+            {
+              number: 37,
+              answer: text('families'),
+              evidence: [ev('p4-l7', 'six or eight weeks at a time away from their families')],
+              explanation: "Denizdeki kayalık fenerlerde bekçiler bir seferde altı-sekiz hafta ailelerinden uzak kalabiliyordu: 'away from their families'. Çoğul yazılmalı.",
+            },
+            {
+              number: 38,
+              answer: text('weather'),
+              evidence: [ev('p4-l7', 'they also had to record the weather every few hours')],
+              explanation: "Bekçilerin asıl görevi lambayı yanık tutmaktı, ama birkaç saatte bir hava durumunu da kaydediyorlardı ve bu kayıtlar bugün de bilim insanları için değerli: 'record the weather'.",
+            },
+            {
+              number: 39,
+              answer: text('computer'),
+              evidence: [ev('p4-l8', 'today every lighthouse is monitored by computer')],
+              explanation: "1998'den beri bekçi yok; bütün fenerler uzaktaki kontrol merkezlerinden bilgisayarla izleniyor: 'monitored by computer'. Kayıtta tekil ve artikelsiz geçiyor, bu yüzden 'computer' yazılmalı.",
+            },
+            {
+              number: 40,
+              answer: text('tourism'),
+              evidence: [ev('p4-l9', 'tourism is now their main source of income')],
+              explanation: "Birçok eski fener müze ya da tatil evi oldu (museums ve holiday cottages bu bilgiyi destekliyor ama boşluğa uymuyor). Giderek daha fazlası için ana gelir kaynağı turizm: 'tourism is now their main source of income'.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const ieltsListeningTests: IeltsListeningTest[] = [test1, test2, test3];
