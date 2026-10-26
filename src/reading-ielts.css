@@ -233,3 +233,17 @@
   vertical-align: text-bottom;
   border-bottom: 2px solid var(--text-secondary);
 }
+
+/* Notes: one point per line */
+.ielts-summary.is-notes p { line-height: 1.9; margin-bottom: 4px; }
+.ielts-summary.is-notes p:last-child { margin-bottom: 0; }
+
+/* Summary with a list of words: compact grid instead of a long list */
+.options-list.word-box { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.options-list.word-box .shared-options-title { grid-column: 1 / -1; }
+.options-list.word-box .reading-option { padding: 8px 10px; gap: 8px; min-height: 48px; }
+.options-list.word-box .reading-option .option-letter { width: 30px; min-width: 30px; height: 30px; }
+.options-list.word-box .reading-option .option-icon { display: none; }
+@media (max-width: 640px) {
+  .options-list.word-box { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

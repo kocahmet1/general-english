@@ -353,34 +353,42 @@ export const ReadingComprehension = ({
   };
 
   const renderSummary = (passage: ReadingPassage, group: ReadingQuestionGroup, question: ReadingQuestion) => {
-    const parts = (group.summary ?? '').split(/\[\[(\d+)\]\]/);
+    // Each line is its own paragraph, so notes can be written as a list of points.
+    const lines = (group.summary ?? '').split('\n').filter(line => line.trim());
     return (
-      <div className="ielts-summary" lang="en">
+      <div className={`ielts-summary${lines.length > 1 ? ' is-notes' : ''}`} lang="en">
         {group.summaryTitle && <h4>{group.summaryTitle}</h4>}
-        <p>
-          {parts.map((part, i) => {
-            if (i % 2 === 0) return <Fragment key={i}>{part}</Fragment>;
-            const gapId = Number(part);
-            const index = passage.questions.findIndex(q => q.id === gapId);
-            const answer = currentAnswers.get(gapId);
-            const classes = ['summary-gap'];
-            if (gapId === question.id) classes.push('current');
-            if (answer) classes.push(answer.isCorrect ? 'correct' : 'incorrect');
-            return (
-              <button
-                key={i}
-                type="button"
-                className={classes.join(' ')}
-                onClick={() => index >= 0 && setCurrentQuestionIndex(index)}
-                aria-label={`Soru ${index + 1}${answer ? `: ${answer.selectedAnswer}` : ''}`}
-                aria-current={gapId === question.id ? 'true' : undefined}
-              >
-                <span className="summary-gap-number">{index + 1}</span>
-                {answer && <span className="summary-gap-text">{answer.selectedAnswer}</span>}
-              </button>
-            );
-          })}
-        </p>
+        {lines.map((line, lineIndex) => (
+          <p key={lineIndex}>
+            {line.split(/\[\[(\d+)\]\]/).map((part, i) => {
+              if (i % 2 === 0) return <Fragment key={i}>{part}</Fragment>;
+              const gapId = Number(part);
+              const index = passage.questions.findIndex(q => q.id === gapId);
+              const gapQuestion = passage.questions[index];
+              const answer = currentAnswers.get(gapId);
+              // A word-list answer is stored as its letter; show the word in the gap.
+              const shown = answer && gapQuestion && getAnswerFormat(gapQuestion) === 'choice'
+                ? getQuestionOptions(passage, gapQuestion).find(o => o.letter === answer.selectedAnswer)?.text ?? answer.selectedAnswer
+                : answer?.selectedAnswer;
+              const classes = ['summary-gap'];
+              if (gapId === question.id) classes.push('current');
+              if (answer) classes.push(answer.isCorrect ? 'correct' : 'incorrect');
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={classes.join(' ')}
+                  onClick={() => index >= 0 && setCurrentQuestionIndex(index)}
+                  aria-label={`Soru ${index + 1}${shown ? `: ${shown}` : ''}`}
+                  aria-current={gapId === question.id ? 'true' : undefined}
+                >
+                  <span className="summary-gap-number">{index + 1}</span>
+                  {shown && <span className="summary-gap-text">{shown}</span>}
+                </button>
+              );
+            })}
+          </p>
+        ))}
       </div>
     );
   };
@@ -476,7 +484,7 @@ export const ReadingComprehension = ({
 
     const options = getQuestionOptions(passage, question);
 
-    if (format === 'tfng') {
+    if (format === 'tfng' || format === 'ynng') {
       return (
         <div className="tfng-options">
           {options.map(option => (
@@ -516,18 +524,21 @@ export const ReadingComprehension = ({
 
     // Matching headings: show which headings are already taken, as students cross them out on paper.
     const takenBy = new Map<string, string>();
-    if (question.questionType === 'matching_headings' && group) {
+    if (group && (question.questionType === 'matching_headings' || group.wordBox)) {
       if (group.example) takenBy.set(group.example.answer, 'Örnekte kullanıldı');
-      passage.questions.forEach(other => {
+      passage.questions.forEach((other, otherIndex) => {
         const otherAnswer = currentAnswers.get(other.id);
         if (other.groupId === group.id && other.id !== question.id && otherAnswer) {
-          takenBy.set(otherAnswer.selectedAnswer, `${other.questionText} için seçildi`);
+          takenBy.set(
+            otherAnswer.selectedAnswer,
+            question.questionType === 'matching_headings' ? `${other.questionText} için seçildi` : `${otherIndex + 1}. soruda kullanıldı`
+          );
         }
       });
     }
 
     return (
-      <div className={`options-list${group?.options ? ' shared-options' : ''}`}>
+      <div className={`options-list${group?.options ? ' shared-options' : ''}${group?.wordBox ? ' word-box' : ''}`}>
         {group?.optionsTitle && <p className="shared-options-title" lang="en">{group.optionsTitle}</p>}
         {options.map(option => {
           const isSelected = answer?.selectedAnswer === option.letter;
