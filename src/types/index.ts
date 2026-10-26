@@ -227,7 +227,10 @@ export type ReadingQuestionType =
   | 'matching_information' // Which paragraph contains this information?
   | 'matching_features'   // Match statements to people, places, etc.
   | 'sentence_completion'
-  | 'summary_completion';
+  | 'summary_completion'
+  | 'note_completion'
+  | 'yes_no_not_given'    // The writer's views or claims
+  | 'multiple_choice';
 
 export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> = {
   main_idea: 'Ana Fikir',
@@ -243,16 +246,20 @@ export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> =
   matching_information: 'Paragraf Eşleştirme',
   matching_features: 'Kişi Eşleştirme',
   sentence_completion: 'Cümle Tamamlama',
-  summary_completion: 'Özet Tamamlama'
+  summary_completion: 'Özet Tamamlama',
+  note_completion: 'Not Tamamlama',
+  yes_no_not_given: 'Yes / No / Not Given',
+  multiple_choice: 'Çoktan Seçmeli (IELTS)'
 };
 
 /**
  * How a reading question is answered.
  * - choice: pick one of the options (the question's own, or the group's shared list)
  * - tfng: TRUE / FALSE / NOT GIVEN
+ * - ynng: YES / NO / NOT GIVEN (the writer's views)
  * - text: type words from the passage (checked against correctAnswer + acceptedAnswers)
  */
-export type ReadingAnswerFormat = 'choice' | 'tfng' | 'text';
+export type ReadingAnswerFormat = 'choice' | 'tfng' | 'ynng' | 'text';
 
 export interface ReadingQuestion {
   id: number;
@@ -277,11 +284,12 @@ export interface ReadingQuestionGroup {
   options?: Option[];          // Shared list: headings, paragraph letters, people
   optionsTitle?: string;       // e.g. "List of Headings"
   compactOptions?: boolean;    // Render the shared list as letter chips (paragraph letters)
+  wordBox?: boolean;           // Render the shared list as a grid of words (summary with a word list)
   example?: { prompt: string; answer: string }; // Worked example, e.g. Paragraph A → iii
   maxWords?: number;           // text answers: word limit
   allowNumber?: boolean;       // text answers: "AND/OR A NUMBER"
   summaryTitle?: string;
-  summary?: string;            // Summary text; [[n]] marks the gap for question n
+  summary?: string;            // Summary or notes; [[n]] marks the gap for question n, new lines are kept
 }
 
 export interface ReadingPassage {

@@ -434,5 +434,436 @@ Perhaps the most puzzling fact about octopuses is how short their lives are. Mos
       }
     ],
     createdAt: new Date('2026-10-17')
+  },
+  {
+    id: 'ielts_3',
+    title: 'How the Bicycle Changed the World',
+    topic: 'History & Society',
+    difficulty: 'Intermediate',
+    format: 'ielts',
+    labelParagraphs: true,
+    wordCount: 644,
+    estimatedTime: 20,
+    passage: `Today, the bicycle is so common that it is easy to forget how unusual it once was. There are thought to be about a billion bicycles in the world, and in the Netherlands there are more bicycles than people. Yet the machine we know today took most of the nineteenth century to develop, and along the way it changed the lives of millions of people in ways that its inventors could never have imagined.
+
+The story usually begins in Germany in 1817, when an inventor called Karl Drais showed the public his 'running machine'. It had two wooden wheels, a seat and a simple way to steer, but no pedals. The rider sat on the seat and pushed the machine along the ground with his feet, rather like a child on a modern balance bike. Nobody knows for certain why Drais built it. Some historians believe that he was looking for a replacement for the horse, because many horses had died or been killed when food was scarce after the terrible harvests of 1816, but there is no clear proof of this.
+
+The next important step came in France in the 1860s, when pedals were attached directly to the front wheel. For the first time, a rider could move along without touching the ground. These machines were called velocipedes, but in English they soon gained another name: 'boneshakers'. Their wheels were made of wood with iron rims, and on the stone streets of the time, every bump travelled straight through the frame to the rider's body.
+
+Because the pedals turned the front wheel directly, a bigger wheel covered more ground with each turn of the pedals, which made the machine faster. By the 1870s, this idea had produced the high-wheeler, with a front wheel that could be one and a half metres tall and a much smaller wheel at the back. In Britain it was later nicknamed the 'penny-farthing', after two coins of very different sizes. It was fast, but it was also dangerous. A sudden stop could throw the rider over the front wheel, and such falls often caused serious injuries. As a result, high-wheelers were ridden mainly by young, athletic men who could afford to buy one.
+
+The solution was the 'safety bicycle'. In 1885, John Kemp Starley, an English manufacturer, produced the Rover, which had two wheels of similar size and a chain that connected the pedals to the back wheel. The rider sat lower and could easily put a foot on the ground, so falls were far less serious. In 1888, a Scottish vet called John Boyd Dunlop, who was living in Belfast, produced an air-filled rubber tyre for his young son's tricycle. Dunlop's tyre made riding much more comfortable, and it was soon being fitted to bicycles.
+
+In the 1890s, mass production made bicycles cheaper, and cycling became enormously popular in Europe and North America. For working people, a bicycle meant that they no longer had to live within walking distance of their factory or office. For women, the effect was even greater. A bicycle allowed a woman to travel on her own, without asking a man for help, and the long, heavy skirts of the time were gradually replaced by more practical clothes. The American campaigner Susan B. Anthony said in 1896 that the bicycle had done more to free women than anything else in the world.
+
+Cyclists also changed the landscape. In the United States, cycling clubs campaigned for smooth, paved roads in the 1880s and 1890s, years before cars became common; when cars arrived, they used the roads that cyclists had demanded. The bicycle even played a part in the history of flight. Wilbur and Orville Wright ran a bicycle shop in Ohio, and the skills and money they gained from repairing and building bicycles helped them to build the first successful powered aeroplane in 1903.`,
+    questionGroups: [
+      {
+        id: 'notes',
+        instructions:
+          'Complete the notes below. Choose ONE WORD AND/OR A NUMBER from the passage for each answer.',
+        tip: 'Notlar metindeki sırayı takip eder. Her satırdaki tarihi metinde bulun; cevap genelde o tarihin hemen yakınındadır. Sadece bir kelime ya da bir sayı yazın.',
+        maxWords: 1,
+        allowNumber: true,
+        summaryTitle: 'The development of the bicycle',
+        summary: [
+          "1817 – Drais's 'running machine': no pedals; the rider pushed it along with his [[1]]",
+          "1860s – pedals fixed to the [[2]] wheel; called 'boneshakers' because of the iron rims and the [[3]] streets",
+          '1870s – the high-wheeler: its big front wheel made it [[4]], but falls were dangerous',
+          "1885 – Starley's Rover: wheels of similar size and a [[5]] that drove the back wheel",
+          "[[6]] – Dunlop's air-filled tyre made riding more comfortable"
+        ].join('\n')
+      },
+      {
+        id: 'tfng',
+        instructions: TFNG_INSTRUCTIONS,
+        tip: TFNG_TIP
+      },
+      {
+        id: 'information',
+        instructions:
+          'The passage has seven paragraphs, A–G. Which paragraph contains the following information? NB You may use any letter more than once.',
+        tip: 'Bu sorular metindeki sırayı takip etmez. Önce ifadedeki anahtar fikrin eş anlamlısını düşünün ("money" → "coins", "work" → "factory or office"), sonra paragrafları hızlıca tarayın.',
+        options: paragraphLetters(7),
+        compactOptions: true
+      }
+    ],
+    questions: [
+      {
+        id: 1,
+        groupId: 'notes',
+        questionText: 'The rider pushed the running machine along with his ________.',
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'feet',
+        evidence: 'pushed the machine along the ground with his feet',
+        explanation: 'Paragraph B: the rider "pushed the machine along the ground with his feet". The machine had no pedals, so the feet did the work.'
+      },
+      {
+        id: 2,
+        groupId: 'notes',
+        questionText: 'In the 1860s, pedals were fixed to the ________ wheel.',
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'front',
+        evidence: 'pedals were attached directly to the front wheel',
+        explanation: 'Paragraph C: "pedals were attached directly to the front wheel". "Attached" in the passage = "fixed" in the notes.'
+      },
+      {
+        id: 3,
+        groupId: 'notes',
+        questionText: 'Boneshakers were uncomfortable on the ________ streets of the time.',
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'stone',
+        evidence: 'on the stone streets of the time',
+        explanation: 'Paragraph C: "on the stone streets of the time, every bump travelled straight through the frame to the rider\'s body". The gap needs a word that describes the streets: "stone".'
+      },
+      {
+        id: 4,
+        groupId: 'notes',
+        questionText: "The high-wheeler's big front wheel made it ________.",
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'faster',
+        acceptedAnswers: ['fast'],
+        evidence: 'which made the machine faster',
+        explanation: 'Paragraph D: a bigger wheel covered more ground with each turn, "which made the machine faster". After "made it" we need an adjective: "faster" ("fast" is also accepted, because the passage says "It was fast").'
+      },
+      {
+        id: 5,
+        groupId: 'notes',
+        questionText: 'The Rover had a ________ that drove the back wheel.',
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'chain',
+        evidence: 'a chain that connected the pedals to the back wheel',
+        explanation: 'Paragraph E: the Rover had "a chain that connected the pedals to the back wheel".'
+      },
+      {
+        id: 6,
+        groupId: 'notes',
+        questionText: "Dunlop's air-filled tyre was produced in ________.",
+        questionType: 'note_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: '1888',
+        evidence: 'In 1888, a Scottish vet called John Boyd Dunlop',
+        explanation: 'Paragraph E: "In 1888, a Scottish vet called John Boyd Dunlop ... produced an air-filled rubber tyre". The gap is at the start of a line in the notes, where the other lines have a date.'
+      },
+      {
+        id: 7,
+        groupId: 'tfng',
+        questionText: 'Historians agree about why Drais built his running machine.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: 'Nobody knows for certain why Drais built it.',
+        explanation: 'FALSE. Paragraph B says "Nobody knows for certain why Drais built it". Only "some historians" believe the horse theory, and "there is no clear proof". So historians do not agree.'
+      },
+      {
+        id: 8,
+        groupId: 'tfng',
+        questionText: 'Falls from high-wheelers often led to serious injuries.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'TRUE',
+        evidence: 'such falls often caused serious injuries',
+        explanation: 'TRUE. Paragraph D: "such falls often caused serious injuries". "Caused" = "led to".'
+      },
+      {
+        id: 9,
+        groupId: 'tfng',
+        questionText: 'The Rover cost more to buy than a high-wheeler.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'NOT GIVEN',
+        evidence: 'produced the Rover, which had two wheels of similar size',
+        explanation: 'NOT GIVEN. Paragraph E describes how the Rover was built and why it was safer, but it never compares its price with the high-wheeler. Paragraph F says bicycles became cheaper in the 1890s, but that is not a comparison of these two machines.'
+      },
+      {
+        id: 10,
+        groupId: 'tfng',
+        questionText: 'Dunlop first made his air-filled tyre for a racing bicycle.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: "produced an air-filled rubber tyre for his young son's tricycle",
+        explanation: 'FALSE. Paragraph E says Dunlop made the tyre "for his young son\'s tricycle", not for a racing bicycle.'
+      },
+      {
+        id: 11,
+        groupId: 'information',
+        questionText: 'an explanation of how cycling allowed people to live further from their work',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'F',
+        evidence: 'they no longer had to live within walking distance of their factory or office',
+        explanation: 'Paragraph F: with a bicycle, working people "no longer had to live within walking distance of their factory or office". "Factory or office" = "work".'
+      },
+      {
+        id: 12,
+        groupId: 'information',
+        questionText: 'a reference to coins',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'D',
+        evidence: 'after two coins of very different sizes',
+        explanation: 'Paragraph D: the high-wheeler was nicknamed the "penny-farthing", "after two coins of very different sizes". Paragraph G mentions money, but not coins.'
+      },
+      {
+        id: 13,
+        groupId: 'information',
+        questionText: 'an example of a later invention that the bicycle helped to make possible',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'G',
+        evidence: 'helped them to build the first successful powered aeroplane in 1903',
+        explanation: 'Paragraph G: the Wright brothers\' bicycle shop gave them skills and money that "helped them to build the first successful powered aeroplane".'
+      },
+      {
+        id: 14,
+        groupId: 'information',
+        questionText: 'uncertainty about the reason for an invention',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'B',
+        evidence: 'Nobody knows for certain why Drais built it.',
+        explanation: 'Paragraph B: "Nobody knows for certain why Drais built it". "Nobody knows for certain" = "uncertainty", and "why" = "the reason".'
+      }
+    ],
+    createdAt: new Date('2026-10-26')
+  },
+  {
+    id: 'ielts_4',
+    title: 'In Defence of the Pen',
+    topic: 'Education & Opinion',
+    difficulty: 'Upper Intermediate',
+    format: 'ielts',
+    labelParagraphs: true,
+    wordCount: 654,
+    estimatedTime: 20,
+    passage: `Not long ago, a pen was the most important tool a student owned. Today, in many classrooms, it is a laptop or a tablet. Notes are typed, homework is submitted online, and some education systems have reduced the time spent teaching children to write by hand. In 2016, for example, Finland stopped requiring its schools to teach joined-up handwriting, so that more time could be given to typing skills. To many people, this seems like common sense: most adults now write far more on screens than on paper. I understand this view, but I believe we are in danger of giving up handwriting too quickly, before we fully understand what it does for learning.
+
+The strongest argument for the pen comes from research on how students take notes. In a well-known study published in 2014, the psychologists Pam Mueller and Daniel Oppenheimer asked university students to watch short talks and take notes either on a laptop or by hand. The laptop users wrote more words, but they also tended to copy the speaker's sentences almost word for word. When the students were tested afterwards, both groups remembered facts equally well, yet those who had written by hand did better on questions that required them to understand ideas. The researchers' explanation was simple: because handwriting is slower, students cannot record everything, so they have to choose what is important and put it in their own words. That process of selecting and summarising helps them to learn.
+
+It would be a mistake, however, to treat this single study as the final word. Later attempts to repeat it, including studies published in 2019 and 2021, found that the advantage of handwriting was much smaller than first reported, and in some cases it disappeared altogether. In my opinion, the newspaper headlines announcing that laptops make students worse at learning were exaggerated. What the research really suggests is that the way students take notes matters more than the tool they use. A student who types thoughtful summaries will probably learn more than one who copies a lecture by hand without thinking.
+
+For young children, however, the case for handwriting is much harder to dismiss. Karin James, a scientist at Indiana University in the United States, and her colleagues taught children who could not yet read to recognise letters in one of three ways: by writing them freehand, by tracing them, or by typing them. When the children were later shown letters inside a brain scanner, the areas linked to reading were much more active in those who had learned by writing freehand. Forming a letter by hand, it seems, forces a child to pay close attention to its shape in a way that pressing a key does not. More recently, researchers in Norway who recorded the brain activity of university students found wider connections between brain areas when the students wrote by hand than when they typed.
+
+None of this means that keyboards should be removed from classrooms. Typing is an essential skill, and for long pieces of writing it has clear advantages: it is faster, it makes editing much easier, and it is kinder to students whose handwriting is slow or hard to read. For some students with physical difficulties, it is the only practical way to write at all. My argument is not that we should choose the pen instead of the keyboard, but that we should stop treating them as competitors. Each is better suited to different tasks.
+
+In practice, this means that young children should still spend time learning to form letters by hand before they move on to keyboards. Older students should be shown why note-taking methods matter, and then be allowed to choose the tool that suits a particular task. Schools that drop handwriting completely may save some time in the short term, but they may also lose something more valuable. The pen is an old technology, but old does not mean useless.`,
+    questionGroups: [
+      {
+        id: 'mc',
+        instructions: 'Choose the correct letter, A, B, C or D.',
+        tip: 'Önce soruyu okuyup metinde ilgili yeri bulun, sonra seçenekleri tek tek o kısımla karşılaştırın. Metindeki kelimeleri aynen tekrar eden seçenek çoğu zaman tuzaktır; doğru seçenek genelde aynı fikri başka kelimelerle verir.'
+      },
+      {
+        id: 'ynng',
+        instructions:
+          'Do the following statements agree with the claims of the writer in the passage? Choose YES if the statement agrees with the claims of the writer, NO if the statement contradicts the claims of the writer, or NOT GIVEN if it is impossible to say what the writer thinks about this.',
+        tip: 'Bu sorular olguları değil, yazarın görüşünü sorar. YES: yazar bunu savunuyor. NO: yazar bunun tersini savunuyor. NOT GIVEN: yazar bu konuda bir görüş bildirmiyor. "I believe", "in my opinion", "however", "it seems" gibi ifadeler yazarın görüşünü gösterir. Bu sorular metindeki sırayı takip eder.'
+      },
+      {
+        id: 'summary',
+        instructions: 'Complete the summary using the list of words, A–I, below.',
+        tip: 'Önce boşluğa ne tür bir kelime gerektiğini (isim, fiil, sıfat) belirleyin ve listede yalnızca o türdeki kelimelere bakın. Listede fazladan kelimeler var; metinde geçen bir kelime bile yanlış olabilir, anlamını kontrol edin.',
+        optionsTitle: 'List of Words',
+        wordBox: true,
+        options: [
+          { letter: 'A', text: 'partners' },
+          { letter: 'B', text: 'removed' },
+          { letter: 'C', text: 'spelling' },
+          { letter: 'D', text: 'old' },
+          { letter: 'E', text: 'choose' },
+          { letter: 'F', text: 'expensive' },
+          { letter: 'G', text: 'editing' },
+          { letter: 'H', text: 'avoid' },
+          { letter: 'I', text: 'competitors' }
+        ],
+        summaryTitle: "The writer's recommendations",
+        summary:
+          'The writer does not want keyboards to be [[10]] from classrooms, because typing is faster and makes [[11]] much easier. Pens and keyboards should not be seen as [[12]]. Young children should learn to form letters by hand, while older students should understand why note-taking methods matter and then be free to [[13]] the right tool for each task. Although the pen is an [[14]] technology, the writer believes it is still useful.'
+      }
+    ],
+    questions: [
+      {
+        id: 1,
+        groupId: 'mc',
+        questionText: 'The writer mentions Finland in paragraph A as an example of',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'a country where students write unusually well.' },
+          { letter: 'B', text: 'a change in what schools are required to teach.' },
+          { letter: 'C', text: 'a country that has banned laptops from classrooms.' },
+          { letter: 'D', text: 'the place where research on handwriting began.' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'Finland stopped requiring its schools to teach joined-up handwriting',
+        explanation: 'Paragraph A: Finland "stopped requiring its schools to teach joined-up handwriting". That is a change in what schools must teach. The passage says nothing about banning laptops or about research starting there.'
+      },
+      {
+        id: 2,
+        groupId: 'mc',
+        questionText: 'According to Mueller and Oppenheimer, why did writing by hand help students?',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'It allowed them to write down more of each talk.' },
+          { letter: 'B', text: 'It made them select and summarise the main ideas.' },
+          { letter: 'C', text: 'It helped them to remember facts more accurately.' },
+          { letter: 'D', text: 'It stopped them from being distracted by the internet.' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'so they have to choose what is important and put it in their own words',
+        explanation: 'Paragraph B: because handwriting is slower, students "have to choose what is important and put it in their own words". A is the opposite (laptop users wrote more), C is wrong (both groups remembered facts equally well), and the internet is never mentioned.'
+      },
+      {
+        id: 3,
+        groupId: 'mc',
+        questionText: 'What does the writer say about later research on note-taking?',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'It proved that laptops make students worse at learning.' },
+          { letter: 'B', text: 'It showed that the 2014 study had been badly designed.' },
+          { letter: 'C', text: 'It found a smaller advantage for handwriting, or none at all.' },
+          { letter: 'D', text: 'It was not reported in the newspapers.' }
+        ],
+        correctAnswer: 'C',
+        evidence: 'found that the advantage of handwriting was much smaller than first reported, and in some cases it disappeared altogether',
+        explanation: 'Paragraph C: later studies "found that the advantage of handwriting was much smaller than first reported, and in some cases it disappeared altogether". A repeats the headlines the writer calls "exaggerated".'
+      },
+      {
+        id: 4,
+        groupId: 'mc',
+        questionText: "In Karin James's study, children who learned letters by writing them freehand",
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'learned to read earlier than the other children.' },
+          { letter: 'B', text: 'showed more activity in brain areas linked to reading.' },
+          { letter: 'C', text: 'enjoyed the activity more than typing.' },
+          { letter: 'D', text: 'made fewer mistakes when tracing letters.' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'the areas linked to reading were much more active in those who had learned by writing freehand',
+        explanation: 'Paragraph D: "the areas linked to reading were much more active in those who had learned by writing freehand". The passage does not say they learned to read earlier, so A goes further than the text.'
+      },
+      {
+        id: 5,
+        groupId: 'ynng',
+        questionText: 'Handwriting may be abandoned before its value for learning is properly understood.',
+        questionType: 'yes_no_not_given',
+        answerFormat: 'ynng',
+        options: [],
+        correctAnswer: 'YES',
+        evidence: 'we are in danger of giving up handwriting too quickly, before we fully understand what it does for learning',
+        explanation: 'YES. Paragraph A: "I believe we are in danger of giving up handwriting too quickly, before we fully understand what it does for learning". "Giving up" = "abandoned".'
+      },
+      {
+        id: 6,
+        groupId: 'ynng',
+        questionText: 'The results of the 2014 study should be accepted without question.',
+        questionType: 'yes_no_not_given',
+        answerFormat: 'ynng',
+        options: [],
+        correctAnswer: 'NO',
+        evidence: 'It would be a mistake, however, to treat this single study as the final word.',
+        explanation: 'NO. Paragraph C: "It would be a mistake ... to treat this single study as the final word". The writer thinks the study should be questioned, so the statement contradicts the writer.'
+      },
+      {
+        id: 7,
+        groupId: 'ynng',
+        questionText: 'Students who type their notes usually spend less time revising for exams.',
+        questionType: 'yes_no_not_given',
+        answerFormat: 'ynng',
+        options: [],
+        correctAnswer: 'NOT GIVEN',
+        evidence: 'the way students take notes matters more than the tool they use',
+        explanation: 'NOT GIVEN. The writer talks about how notes are taken, but never says anything about how long students spend revising.'
+      },
+      {
+        id: 8,
+        groupId: 'ynng',
+        questionText: 'Writing letters by hand helps young children to notice their shape.',
+        questionType: 'yes_no_not_given',
+        answerFormat: 'ynng',
+        options: [],
+        correctAnswer: 'YES',
+        evidence: 'forces a child to pay close attention to its shape',
+        explanation: 'YES. Paragraph D: forming a letter by hand "forces a child to pay close attention to its shape". "Pay close attention to" = "notice".'
+      },
+      {
+        id: 9,
+        groupId: 'ynng',
+        questionText: 'Keyboards offer no real advantages over handwriting.',
+        questionType: 'yes_no_not_given',
+        answerFormat: 'ynng',
+        options: [],
+        correctAnswer: 'NO',
+        evidence: 'for long pieces of writing it has clear advantages',
+        explanation: 'NO. Paragraph E: for long pieces of writing, typing "has clear advantages" – it is faster, easier to edit and kinder to slow writers.'
+      },
+      {
+        id: 10,
+        groupId: 'summary',
+        questionText: 'The writer does not want keyboards to be ________ from classrooms.',
+        questionType: 'summary_completion',
+        options: [],
+        correctAnswer: 'B',
+        evidence: 'None of this means that keyboards should be removed from classrooms.',
+        explanation: 'Paragraph E: "None of this means that keyboards should be removed from classrooms." After "to be" we need a past participle, and "removed" is the only one in the list.'
+      },
+      {
+        id: 11,
+        groupId: 'summary',
+        questionText: 'Typing is faster and makes ________ much easier.',
+        questionType: 'summary_completion',
+        options: [],
+        correctAnswer: 'G',
+        evidence: 'it makes editing much easier',
+        explanation: 'Paragraph E: typing "makes editing much easier". "Spelling" also fits the grammar, but the passage never mentions spelling.'
+      },
+      {
+        id: 12,
+        groupId: 'summary',
+        questionText: 'Pens and keyboards should not be seen as ________.',
+        questionType: 'summary_completion',
+        options: [],
+        correctAnswer: 'I',
+        evidence: 'we should stop treating them as competitors',
+        explanation: 'Paragraph E: "we should stop treating them as competitors". "Partners" is the opposite idea: the writer wants us to stop seeing them as rivals.'
+      },
+      {
+        id: 13,
+        groupId: 'summary',
+        questionText: 'Older students should be free to ________ the right tool for each task.',
+        questionType: 'summary_completion',
+        options: [],
+        correctAnswer: 'E',
+        evidence: 'be allowed to choose the tool that suits a particular task',
+        explanation: 'Paragraph F: older students should "be allowed to choose the tool that suits a particular task". "Allowed to" = "free to".'
+      },
+      {
+        id: 14,
+        groupId: 'summary',
+        questionText: 'Although the pen is an ________ technology, the writer believes it is still useful.',
+        questionType: 'summary_completion',
+        options: [],
+        correctAnswer: 'D',
+        evidence: 'The pen is an old technology, but old does not mean useless.',
+        explanation: 'Paragraph F: "The pen is an old technology, but old does not mean useless." "Expensive" also fits after "an", but the writer never talks about cost.'
+      }
+    ],
+    createdAt: new Date('2026-10-26')
   }
 ];

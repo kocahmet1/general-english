@@ -15,6 +15,13 @@ export const TFNG_OPTIONS: Option[] = [
   { letter: 'NOT GIVEN', text: 'Metinde bu konuda bilgi yok' },
 ];
 
+/** YES / NO / NOT GIVEN: the same idea as TRUE / FALSE / NOT GIVEN, but about the writer's opinions. */
+export const YNNG_OPTIONS: Option[] = [
+  { letter: 'YES', text: 'Yazar bu görüşte' },
+  { letter: 'NO', text: 'Yazar bunun tersini düşünüyor' },
+  { letter: 'NOT GIVEN', text: 'Yazarın görüşü belli değil' },
+];
+
 export type ReadingAnswerIssue = 'word_limit' | 'plural' | 'spelling';
 
 export interface ReadingAnswerResult {
@@ -36,6 +43,7 @@ export function getQuestionGroup(passage: ReadingPassage, question: ReadingQuest
 export function getQuestionOptions(passage: ReadingPassage, question: ReadingQuestion): Option[] {
   if (question.options.length > 0) return question.options;
   if (getAnswerFormat(question) === 'tfng') return TFNG_OPTIONS;
+  if (getAnswerFormat(question) === 'ynng') return YNNG_OPTIONS;
   return getQuestionGroup(passage, question)?.options ?? [];
 }
 
