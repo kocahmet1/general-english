@@ -230,7 +230,8 @@ export type ReadingQuestionType =
   | 'summary_completion'
   | 'note_completion'
   | 'yes_no_not_given'    // The writer's views or claims
-  | 'multiple_choice';
+  | 'multiple_choice'
+  | 'short_answer';       // Answer a question with words from the passage
 
 export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> = {
   main_idea: 'Ana Fikir',
@@ -249,7 +250,8 @@ export const READING_QUESTION_TYPE_LABELS: Record<ReadingQuestionType, string> =
   summary_completion: 'Özet Tamamlama',
   note_completion: 'Not Tamamlama',
   yes_no_not_given: 'Yes / No / Not Given',
-  multiple_choice: 'Çoktan Seçmeli (IELTS)'
+  multiple_choice: 'Çoktan Seçmeli (IELTS)',
+  short_answer: 'Kısa Cevap'
 };
 
 /**

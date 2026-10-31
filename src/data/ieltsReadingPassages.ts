@@ -865,5 +865,214 @@ In practice, this means that young children should still spend time learning to 
       }
     ],
     createdAt: new Date('2026-10-26')
+  },
+  {
+    id: 'ielts_5',
+    title: "The Lunchbox Carriers of Mumbai",
+    topic: 'Business & Society',
+    difficulty: 'Intermediate',
+    format: 'ielts',
+    labelParagraphs: true,
+    wordCount: 586,
+    estimatedTime: 20,
+    passage: `For more than a hundred years, office workers in Mumbai, India's largest city, have been able to eat a home-cooked lunch at their desks without carrying it to work themselves. The meals are delivered by men known as dabbawalas, many of them wearing traditional white cotton caps. The name comes from 'dabba', a local word for a box, and 'wala', a person who does a particular job. At its busiest, the service delivered around 200,000 lunches a day with about 5,000 workers. What makes it remarkable is that it has always worked almost entirely without computers or written delivery lists.
+
+The service began in 1890, when a man called Mahadeo Havaji Bachche started delivering lunches with about a hundred helpers. At that time, many people were moving to Mumbai to work in its offices and factories, and they often lived far from their workplaces. Journeys were long and trains were crowded, so carrying food was difficult. In addition, many workers preferred food cooked at home, because it was cheaper, it followed their religious or family rules about food, and it simply tasted like home.
+
+The daily routine is carefully organised. In the morning, a dabbawala collects lunchboxes from homes in his area and takes them by bicycle or handcart to the nearest railway station. There, the boxes are sorted according to where they are going and loaded onto the city's crowded suburban trains. At the station nearest each destination, they are sorted again and handed to another dabbawala, who delivers them to offices by lunchtime. In the afternoon, the whole process runs in reverse, and the empty boxes are back at home before the evening. On its journey, a single lunchbox may pass through the hands of three or four different people.
+
+How do the boxes reach the right person? The answer is a simple code painted on the lid of each box. A short code of colours, numbers and letters shows the station where the box was collected, the station it is going to, and the building and floor where it must be delivered. Many dabbawalas have had little formal education, and some cannot read well, but the code is designed so that it can be understood at a glance. Each worker also knows his own small area extremely well, which reduces the risk of mistakes.
+
+The dabbawalas' reliability has made them famous. A figure that is often repeated in newspapers and business books claims that they make only one mistake in every 16 million deliveries, although it is not clear how this number was calculated. Whatever the exact figure, the system clearly works very well, and business schools have studied it as an example of excellent organisation. The dabbawalas have also received famous visitors. In 2003, Britain's Prince Charles, now King Charles III, met them during a visit to Mumbai, and two years later some of them were invited to his wedding.
+
+In recent years, the service has faced serious challenges. Food delivery apps now allow office workers to order almost any kind of meal from restaurants, and more people work from home for at least part of the week. In 2020, when offices and trains closed during the pandemic, deliveries stopped for months, and many dabbawalas had to find other work. Those who remain have tried to adapt, for example by delivering other goods as well as lunches. Whether the service can survive for another century is uncertain, but its story shows how much can be achieved with simple tools and excellent teamwork.`,
+    questionGroups: [
+      {
+        id: 'headings',
+        instructions:
+          'The passage has six paragraphs, A–F. Choose the correct heading for paragraphs B–F from the list of headings below. There are more headings than paragraphs, so you will not use them all.',
+        tip: 'Önce paragrafın ilk ve son cümlesini okuyup "Bu paragraf neyi anlatıyor?" sorusuna kısa bir cevap verin, sonra o cevaba en yakın başlığı seçin. Paragrafın sadece bir cümlesine uyan başlık genelde tuzaktır.',
+        optionsTitle: 'List of Headings',
+        example: { prompt: 'Paragraph A', answer: 'iii' },
+        options: [
+          { letter: 'i', text: 'A code that is easy to read' },
+          { letter: 'ii', text: 'The daily route of a lunchbox' },
+          { letter: 'iii', text: 'A huge service without modern technology' },
+          { letter: 'iv', text: 'The reasons behind a new business' },
+          { letter: 'v', text: 'An uncertain future' },
+          { letter: 'vi', text: 'A reputation for accuracy' },
+          { letter: 'vii', text: 'How new workers are trained' },
+          { letter: 'viii', text: 'Competition between delivery companies' }
+        ]
+      },
+      {
+        id: 'tfng',
+        instructions: TFNG_INSTRUCTIONS,
+        tip: TFNG_TIP
+      },
+      {
+        id: 'short',
+        instructions:
+          'Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.',
+        tip: 'Soru kelimesine (what, which) bakarak ne tür bir cevap arandığını belirleyin. Cevabı metinden aynen alın ve en fazla üç kelime yazın. Bu sorular metindeki sırayı takip eder.',
+        maxWords: 3
+      }
+    ],
+    questions: [
+      {
+        id: 1,
+        groupId: 'headings',
+        questionText: 'Paragraph B',
+        questionType: 'matching_headings',
+        options: [],
+        correctAnswer: 'iv',
+        evidence: 'The service began in 1890',
+        explanation: 'Paragraph B explains when and why the service started: long journeys, crowded trains and a wish for home-cooked food. These are "the reasons behind a new business".'
+      },
+      {
+        id: 2,
+        groupId: 'headings',
+        questionText: 'Paragraph C',
+        questionType: 'matching_headings',
+        options: [],
+        correctAnswer: 'ii',
+        evidence: 'The daily routine is carefully organised.',
+        explanation: 'Paragraph C follows a lunchbox step by step: from the home, to the station, onto the train, to the office, and back again. That is "the daily route of a lunchbox".'
+      },
+      {
+        id: 3,
+        groupId: 'headings',
+        questionText: 'Paragraph D',
+        questionType: 'matching_headings',
+        options: [],
+        correctAnswer: 'i',
+        evidence: 'the code is designed so that it can be understood at a glance',
+        explanation: 'Paragraph D is about the code painted on each lid, which is designed "so that it can be understood at a glance", even by workers who cannot read well.'
+      },
+      {
+        id: 4,
+        groupId: 'headings',
+        questionText: 'Paragraph E',
+        questionType: 'matching_headings',
+        options: [],
+        correctAnswer: 'vi',
+        evidence: "The dabbawalas' reliability has made them famous.",
+        explanation: 'The first sentence of paragraph E gives the main idea: "The dabbawalas\' reliability has made them famous." The visitors are an extra detail, not the main topic.'
+      },
+      {
+        id: 5,
+        groupId: 'headings',
+        questionText: 'Paragraph F',
+        questionType: 'matching_headings',
+        options: [],
+        correctAnswer: 'v',
+        evidence: 'Whether the service can survive for another century is uncertain',
+        explanation: 'Paragraph F describes the problems the service faces and ends by saying its survival "is uncertain". Heading viii is a trap: delivery apps are only one of the challenges, and the dabbawalas are not a delivery company competing with others.'
+      },
+      {
+        id: 6,
+        groupId: 'tfng',
+        questionText: 'Most of the lunches that dabbawalas deliver are cooked in restaurants.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: 'have been able to eat a home-cooked lunch at their desks',
+        explanation: 'FALSE. Paragraph A says office workers eat "a home-cooked lunch", and paragraph B says people preferred "food cooked at home". Restaurants are only mentioned later, in connection with delivery apps.'
+      },
+      {
+        id: 7,
+        groupId: 'tfng',
+        questionText: 'When the service began, it had about a hundred workers.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'TRUE',
+        evidence: 'started delivering lunches with about a hundred helpers',
+        explanation: 'TRUE. Paragraph B: Bachche "started delivering lunches with about a hundred helpers". "Helpers" = "workers".'
+      },
+      {
+        id: 8,
+        groupId: 'tfng',
+        questionText: 'A lunchbox is normally carried by the same person for its whole journey.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: 'a single lunchbox may pass through the hands of three or four different people',
+        explanation: 'FALSE. Paragraph C: "a single lunchbox may pass through the hands of three or four different people". The boxes are also handed to another dabbawala at the destination station.'
+      },
+      {
+        id: 9,
+        groupId: 'tfng',
+        questionText: 'Dabbawalas earn more money than most other workers in Mumbai.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'NOT GIVEN',
+        evidence: 'Many dabbawalas have had little formal education',
+        explanation: 'NOT GIVEN. The passage describes the dabbawalas\' education and how well they know their areas, but it never mentions how much they earn.'
+      },
+      {
+        id: 10,
+        groupId: 'tfng',
+        questionText: 'Prince Charles ate a lunch that had been delivered by the dabbawalas.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'NOT GIVEN',
+        evidence: 'met them during a visit to Mumbai',
+        explanation: 'NOT GIVEN. Paragraph E says Prince Charles "met them during a visit to Mumbai" and invited some of them to his wedding. It does not say whether he ate one of their lunches.'
+      },
+      {
+        id: 11,
+        groupId: 'short',
+        questionText: 'What do many dabbawalas wear on their heads?',
+        questionType: 'short_answer',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'white cotton caps',
+        acceptedAnswers: ['white caps', 'cotton caps', 'caps'],
+        evidence: 'many of them wearing traditional white cotton caps',
+        explanation: 'Paragraph A: "many of them wearing traditional white cotton caps". "Traditional white cotton caps" is four words, so it would be over the limit.'
+      },
+      {
+        id: 12,
+        groupId: 'short',
+        questionText: 'Which kind of public transport carries the lunchboxes across the city?',
+        questionType: 'short_answer',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'suburban trains',
+        acceptedAnswers: ['trains'],
+        evidence: "loaded onto the city's crowded suburban trains",
+        explanation: 'Paragraph C: the boxes are "loaded onto the city\'s crowded suburban trains". Bicycles and handcarts are also mentioned, but they are not public transport.'
+      },
+      {
+        id: 13,
+        groupId: 'short',
+        questionText: 'What is painted on the lid of each lunchbox?',
+        questionType: 'short_answer',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'simple code',
+        acceptedAnswers: ['code', 'short code'],
+        evidence: 'a simple code painted on the lid of each box',
+        explanation: 'Paragraph D: "a simple code painted on the lid of each box". The code is made of colours, numbers and letters, but "colours, numbers and letters" is four words.'
+      },
+      {
+        id: 14,
+        groupId: 'short',
+        questionText: 'What kind of modern service now competes with the dabbawalas?',
+        questionType: 'short_answer',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'food delivery apps',
+        acceptedAnswers: ['delivery apps'],
+        evidence: 'Food delivery apps now allow office workers to order almost any kind of meal from restaurants',
+        explanation: 'Paragraph F: "Food delivery apps now allow office workers to order almost any kind of meal from restaurants". "Restaurants" alone is not the service that competes; the apps are.'
+      }
+    ],
+    createdAt: new Date('2026-10-31')
   }
 ];

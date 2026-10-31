@@ -48,7 +48,12 @@ for (const passage of ieltsReadingPassages) {
         const group = getQuestionGroup(passage, q);
         for (const answer of [q.correctAnswer, ...(q.acceptedAnswers ?? [])]) {
           assert.ok(!isOverWordLimit(answer, group), `${label} answer "${answer}" fits the word limit`);
-          assert.ok(passage.passage.toLowerCase().includes(answer.toLowerCase()), `${label} answer "${answer}" comes from the passage`);
+          // Every word of an answer must be taken from the passage (short answers may leave words out).
+          // Digits are exempt: "60" is an accepted way to write "sixty".
+          const passageWords = new Set(passage.passage.toLowerCase().match(/[a-z0-9]+/g));
+          for (const word of answer.toLowerCase().match(/[a-z]+/g) ?? []) {
+            assert.ok(passageWords.has(word), `${label} answer "${answer}" uses only words from the passage ("${word}")`);
+          }
           assert.equal(evaluateReadingAnswer(passage, q, answer).isCorrect, true);
           assert.equal(evaluateReadingAnswer(passage, q, `  ${answer.toUpperCase()}. `).isCorrect, true);
         }
