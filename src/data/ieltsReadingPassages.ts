@@ -1074,5 +1074,422 @@ In recent years, the service has faced serious challenges. Food delivery apps no
       }
     ],
     createdAt: new Date('2026-10-31')
+  },
+  {
+    id: 'ielts_6',
+    title: 'Wolves Return to Yellowstone',
+    topic: 'Nature & Environment',
+    difficulty: 'Intermediate',
+    format: 'ielts',
+    labelParagraphs: true,
+    wordCount: 444,
+    estimatedTime: 20,
+    passage: `In January 1995, a small group of grey wolves was released into Yellowstone National Park in the United States. It was a historic moment, because wolves had been missing from the park for about seventy years. By the 1920s, hunters and park rangers had killed them all, because wolves were seen as dangerous animals that attacked farm animals and the deer and elk that visitors came to see.
+
+With no wolves to hunt them, the number of elk – a large kind of deer – grew. The elk ate young trees such as willow and aspen, especially along rivers, and in some areas these trees almost stopped growing. Scientists and park managers began to argue that the park was out of balance, and after many years of debate, the government agreed to bring wolves back.
+
+The wolves were caught in Canada and taken to Yellowstone, where they were kept in large fenced areas for several weeks so that they could get used to their new home. In total, 31 wolves were released in 1995 and 1996. They did better than many people expected. They formed groups called packs, had young, and spread across the park, and today around a hundred wolves live there.
+
+Soon, researchers noticed changes. Elk numbers fell, and the elk also seemed to behave differently, spending less time in open river valleys where they could easily be caught. In some places, willows and aspens began to grow taller again. With more willows to eat and build with, beavers returned to some streams, and their dams created ponds that became homes for fish, frogs and birds. Some scientists described this chain of effects as a 'trophic cascade': a change at the top of the food chain that spreads all the way down.
+
+However, the story may not be as simple as it is often told. Other researchers point out that wolves were not the only reason that elk numbers fell. Bears and cougars also hunt young elk, human hunters killed elk outside the park, and several dry years reduced the food available. Some studies have also found that trees are recovering in only a few places, not across the whole park. For these scientists, the wolves are an important part of the story, but not the whole story.
+
+Whatever the exact effects, the Yellowstone wolves have changed how many people think about nature. They show that removing one species can affect many others, and that bringing it back does not always return things exactly to how they were. The project has also encouraged similar plans in other places, although not everyone welcomes them: farmers who live near wolf areas still worry about their animals.`,
+    questionGroups: [
+      {
+        id: 'mc',
+        instructions: 'Choose the correct letter, A, B, C or D.',
+        tip: 'Önce soruyu okuyup metinde ilgili yeri bulun, sonra seçenekleri tek tek o kısımla karşılaştırın. Metindeki kelimeleri aynen tekrar eden seçenek çoğu zaman tuzaktır; doğru seçenek genelde aynı fikri başka kelimelerle verir.'
+      },
+      {
+        id: 'tfng',
+        instructions: TFNG_INSTRUCTIONS,
+        tip: TFNG_TIP
+      },
+      {
+        id: 'summary',
+        instructions: 'Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.',
+        tip: 'Özet metnin son kısmını anlatıyor; önce o bölümü bulun. Boşluktan önceki ve sonraki kelimelere bakarak nasıl bir kelime (isim, sıfat) gerektiğini tahmin edin. Sadece bir kelime yazın.',
+        maxWords: 1,
+        summaryTitle: 'A more complicated story',
+        summary:
+          'Not everyone agrees about what the wolves have done. Some researchers say elk numbers also fell because bears and [[10]] hunt young elk, because people hunted elk outside the park, and because several [[11]] years meant there was less food. Studies have also found that trees are recovering in only a few [[12]]. For these researchers, wolves are an important part of the story, but not the whole [[13]]. The project has encouraged similar plans elsewhere, but [[14]] living near wolf areas are still worried about their animals.'
+      }
+    ],
+    questions: [
+      {
+        id: 1,
+        groupId: 'mc',
+        questionText: 'Why had wolves disappeared from Yellowstone?',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'A disease had killed most of them.' },
+          { letter: 'B', text: 'Hunters and park rangers had killed them.' },
+          { letter: 'C', text: 'There was not enough food for them.' },
+          { letter: 'D', text: 'They had moved north to Canada.' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'hunters and park rangers had killed them all',
+        explanation: 'Paragraph A: "By the 1920s, hunters and park rangers had killed them all". Canada is mentioned later, but only as the place the new wolves came from.'
+      },
+      {
+        id: 2,
+        groupId: 'mc',
+        questionText: 'What happened to trees along the rivers when there were no wolves?',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'Park managers cut many of them down.' },
+          { letter: 'B', text: 'They grew faster than before.' },
+          { letter: 'C', text: 'Elk ate the young trees, so they hardly grew.' },
+          { letter: 'D', text: 'Beavers used them to build dams.' }
+        ],
+        correctAnswer: 'C',
+        evidence: 'The elk ate young trees such as willow and aspen',
+        explanation: 'Paragraph B: "The elk ate young trees such as willow and aspen ... and in some areas these trees almost stopped growing". "Almost stopped growing" = "hardly grew". Beavers only return later, in paragraph D.'
+      },
+      {
+        id: 3,
+        groupId: 'mc',
+        questionText: 'Why were the wolves kept in fenced areas at first?',
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'to protect visitors to the park' },
+          { letter: 'B', text: 'to let them get used to their new home' },
+          { letter: 'C', text: 'so that scientists could count them' },
+          { letter: 'D', text: 'so that they could recover from an illness' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'so that they could get used to their new home',
+        explanation: 'Paragraph C: they were kept in fenced areas "so that they could get used to their new home". The phrase "so that" introduces the reason.'
+      },
+      {
+        id: 4,
+        groupId: 'mc',
+        questionText: "What does the writer mean by a 'trophic cascade'?",
+        questionType: 'multiple_choice',
+        options: [
+          { letter: 'A', text: 'the loss of trees along rivers' },
+          { letter: 'B', text: 'a change at the top of the food chain that affects everything below it' },
+          { letter: 'C', text: 'a sudden increase in the number of beavers' },
+          { letter: 'D', text: 'a pond created by a beaver dam' }
+        ],
+        correctAnswer: 'B',
+        evidence: 'a change at the top of the food chain that spreads all the way down',
+        explanation: 'Paragraph D explains the term right after the colon: "a change at the top of the food chain that spreads all the way down". In IELTS, a definition often follows a colon, a dash or the word "or".'
+      },
+      {
+        id: 5,
+        groupId: 'tfng',
+        questionText: 'The decision to bring wolves back was made only after a long discussion.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'TRUE',
+        evidence: 'after many years of debate, the government agreed to bring wolves back',
+        explanation: 'TRUE. Paragraph B: "after many years of debate, the government agreed to bring wolves back". "Many years of debate" = "a long discussion".'
+      },
+      {
+        id: 6,
+        groupId: 'tfng',
+        questionText: 'The wolves were set free in the park on the day they arrived.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: 'they were kept in large fenced areas for several weeks',
+        explanation: 'FALSE. Paragraph C says the wolves "were kept in large fenced areas for several weeks" before they were released.'
+      },
+      {
+        id: 7,
+        groupId: 'tfng',
+        questionText: 'Most of the wolves released in 1995 were young adults.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'NOT GIVEN',
+        evidence: 'In total, 31 wolves were released in 1995 and 1996.',
+        explanation: 'NOT GIVEN. Paragraph C tells us how many wolves were released, but not how old they were.'
+      },
+      {
+        id: 8,
+        groupId: 'tfng',
+        questionText: 'Beaver dams created places for other animals to live.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'TRUE',
+        evidence: 'their dams created ponds that became homes for fish, frogs and birds',
+        explanation: 'TRUE. Paragraph D: the beavers\' "dams created ponds that became homes for fish, frogs and birds". "Homes" = "places to live".'
+      },
+      {
+        id: 9,
+        groupId: 'tfng',
+        questionText: 'All scientists agree that wolves were the only reason elk numbers fell.',
+        questionType: 'true_false_not_given',
+        answerFormat: 'tfng',
+        options: [],
+        correctAnswer: 'FALSE',
+        evidence: 'wolves were not the only reason that elk numbers fell',
+        explanation: 'FALSE. Paragraph E: "Other researchers point out that wolves were not the only reason that elk numbers fell." So scientists do not all agree. Watch out for strong words like "all" and "only" in statements.'
+      },
+      {
+        id: 10,
+        groupId: 'summary',
+        questionText: 'Bears and ________ also hunt young elk.',
+        questionType: 'summary_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'cougars',
+        evidence: 'Bears and cougars also hunt young elk',
+        explanation: 'Paragraph E: "Bears and cougars also hunt young elk". The gap needs a plural noun for an animal, like "bears".'
+      },
+      {
+        id: 11,
+        groupId: 'summary',
+        questionText: 'Several ________ years meant there was less food.',
+        questionType: 'summary_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'dry',
+        evidence: 'several dry years reduced the food available',
+        explanation: 'Paragraph E: "several dry years reduced the food available". "Reduced the food available" = "there was less food". The gap needs an adjective before "years".'
+      },
+      {
+        id: 12,
+        groupId: 'summary',
+        questionText: 'Trees are recovering in only a few ________.',
+        questionType: 'summary_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'places',
+        evidence: 'trees are recovering in only a few places',
+        explanation: 'Paragraph E: "trees are recovering in only a few places, not across the whole park". After "a few" we need a plural noun.'
+      },
+      {
+        id: 13,
+        groupId: 'summary',
+        questionText: 'Wolves are an important part of the story, but not the whole ________.',
+        questionType: 'summary_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'story',
+        evidence: 'the wolves are an important part of the story, but not the whole story',
+        explanation: 'Paragraph E ends: "the wolves are an important part of the story, but not the whole story". This one is copied almost word for word.'
+      },
+      {
+        id: 14,
+        groupId: 'summary',
+        questionText: '________ living near wolf areas are still worried about their animals.',
+        questionType: 'summary_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'farmers',
+        evidence: 'farmers who live near wolf areas still worry about their animals',
+        explanation: 'Paragraph F: "farmers who live near wolf areas still worry about their animals". "Worry" in the passage = "are worried" in the summary.'
+      }
+    ],
+    createdAt: new Date('2026-11-08')
+  },
+  {
+    id: 'ielts_7',
+    title: 'Why Do We Laugh?',
+    topic: 'Science & Psychology',
+    difficulty: 'Intermediate',
+    format: 'ielts',
+    labelParagraphs: true,
+    wordCount: 511,
+    estimatedTime: 20,
+    passage: `Most people laugh many times a day, yet few of us ever stop to ask why. We usually assume that laughter is a reaction to something funny, such as a joke or a silly situation. Scientists who study laughter, however, have found that this idea explains only a small part of why we laugh. Laughter, it seems, has more to do with other people than with humour.
+
+One of the first researchers to study laughter in everyday life was the American psychologist Robert Provine. Instead of bringing people into a laboratory, he and his students listened to conversations in public places, such as shopping centres and university campuses, and wrote down what people said just before they laughed. They found that most laughter did not follow jokes at all. It usually came after ordinary comments, such as 'I'll see you later' or 'It was nice meeting you too'. Surprisingly, the person who was speaking usually laughed more than the people who were listening. Provine also found that people were about thirty times more likely to laugh when they were with others than when they were alone.
+
+Laughter is also much older than human language. The American scientist Jaak Panksepp discovered that rats make high-pitched sounds, too high for humans to hear, when they play together or when they are tickled by people. The rats seemed to enjoy being tickled and would follow the hand that had tickled them. Apes such as chimpanzees also make a breathy panting sound during play fights, which many scientists believe is an early form of human laughter.
+
+The British scientist Sophie Scott, who has studied laughter for many years, believes that its main purpose is social. According to Scott, laughing together helps people to show that they like and agree with each other, and it can reduce tension after a disagreement. Her research has also shown that people can usually tell the difference between real laughter and laughter that is produced on purpose, even though the two can sound quite similar.
+
+Laughter is also contagious: hearing other people laugh makes us more likely to laugh ourselves. This is why many television comedies have used recorded laughter, often called a 'laugh track'. Studies suggest that people laugh more at jokes when they can hear others laughing, even when they know that the laughter has been recorded. Scott's research suggests that when we hear laughter, the parts of the brain that control the face get ready to join in.
+
+Many people also believe that laughter is good for our health. Some studies have found that laughing can reduce stress and increase the amount of pain that people can bear, at least for a short time. A study at Oxford University led by Robin Dunbar, for example, found that people could put up with more pain after watching a comedy than after watching a less amusing programme. However, claims that laughter can cure illness are not supported by strong evidence, so it is best to see laughter as something that makes life more pleasant, rather than as a medicine.`,
+    questionGroups: [
+      {
+        id: 'information',
+        instructions:
+          'The passage has six paragraphs, A–F. Which paragraph contains the following information? NB You may use any letter more than once.',
+        tip: 'Bu sorular metindeki sırayı takip etmez. İfadedeki anahtar fikrin eş anlamlısını düşünün ("cannot hear" → "too high for humans to hear", "warning" → "not supported by strong evidence"), sonra paragrafları hızlıca tarayın.',
+        options: paragraphLetters(6),
+        compactOptions: true
+      },
+      {
+        id: 'researchers',
+        instructions:
+          'Look at the following statements and the list of researchers below. Match each statement with the correct researcher, A, B, C or D. NB You may use any letter more than once.',
+        tip: 'Önce her ismin metinde geçtiği yeri bulun. Sonra o kişinin bulgusunu ifadeyle karşılaştırın: ifade bulguyu metinden farklı kelimelerle anlatır. Bir isim birden fazla soruya cevap olabilir.',
+        optionsTitle: 'List of Researchers',
+        options: [
+          { letter: 'A', text: 'Robert Provine' },
+          { letter: 'B', text: 'Jaak Panksepp' },
+          { letter: 'C', text: 'Sophie Scott' },
+          { letter: 'D', text: 'Robin Dunbar' }
+        ]
+      },
+      {
+        id: 'sentences',
+        instructions:
+          'Complete the sentences below. Choose NO MORE THAN TWO WORDS AND/OR A NUMBER from the passage for each answer.',
+        tip: 'Kelimeleri metinden aynen alın ve yazımına dikkat edin. Kelime sınırını aşan cevap yanlış sayılır. Yazdığınız kelimenin cümleye dilbilgisi olarak uyduğunu kontrol edin.',
+        maxWords: 2,
+        allowNumber: true
+      }
+    ],
+    questions: [
+      {
+        id: 1,
+        groupId: 'information',
+        questionText: 'a description of a sound that humans cannot hear',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'C',
+        evidence: 'rats make high-pitched sounds, too high for humans to hear',
+        explanation: 'Paragraph C: rats "make high-pitched sounds, too high for humans to hear". "Too high for humans to hear" = "humans cannot hear".'
+      },
+      {
+        id: 2,
+        groupId: 'information',
+        questionText: 'examples of the kind of remark that people often laugh after',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'B',
+        evidence: "such as 'I'll see you later' or 'It was nice meeting you too'",
+        explanation: 'Paragraph B gives two examples of ordinary comments that people laughed after: "I\'ll see you later" and "It was nice meeting you too". "Such as" introduces examples.'
+      },
+      {
+        id: 3,
+        groupId: 'information',
+        questionText: 'a warning not to believe a claim about laughter',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'F',
+        evidence: 'claims that laughter can cure illness are not supported by strong evidence',
+        explanation: 'Paragraph F: "claims that laughter can cure illness are not supported by strong evidence". The writer is warning the reader not to believe this claim.'
+      },
+      {
+        id: 4,
+        groupId: 'information',
+        questionText: 'the reason why some television programmes include recorded laughter',
+        questionType: 'matching_information',
+        options: [],
+        correctAnswer: 'E',
+        evidence: "This is why many television comedies have used recorded laughter",
+        explanation: 'Paragraph E: laughter is contagious, and "This is why many television comedies have used recorded laughter". "This is why" points back to the reason.'
+      },
+      {
+        id: 5,
+        groupId: 'researchers',
+        questionText: 'Animals other than humans may enjoy a playful activity.',
+        questionType: 'matching_features',
+        options: [],
+        correctAnswer: 'B',
+        evidence: 'The rats seemed to enjoy being tickled',
+        explanation: 'Jaak Panksepp (paragraph C): "The rats seemed to enjoy being tickled and would follow the hand that had tickled them." Rats are animals other than humans, and tickling is playful.'
+      },
+      {
+        id: 6,
+        groupId: 'researchers',
+        questionText: 'Laughter can help people to deal with physical discomfort.',
+        questionType: 'matching_features',
+        options: [],
+        correctAnswer: 'D',
+        evidence: 'people could put up with more pain after watching a comedy',
+        explanation: 'Robin Dunbar (paragraph F): people "could put up with more pain after watching a comedy". "Put up with more pain" = "deal with physical discomfort".'
+      },
+      {
+        id: 7,
+        groupId: 'researchers',
+        questionText: 'People are usually able to recognise laughter that is not genuine.',
+        questionType: 'matching_features',
+        options: [],
+        correctAnswer: 'C',
+        evidence: 'people can usually tell the difference between real laughter and laughter that is produced on purpose',
+        explanation: 'Sophie Scott (paragraph D): "people can usually tell the difference between real laughter and laughter that is produced on purpose". Laughter produced on purpose is not genuine.'
+      },
+      {
+        id: 8,
+        groupId: 'researchers',
+        questionText: 'The person telling a story usually laughs more than the people hearing it.',
+        questionType: 'matching_features',
+        options: [],
+        correctAnswer: 'A',
+        evidence: 'the person who was speaking usually laughed more than the people who were listening',
+        explanation: 'Robert Provine (paragraph B): "the person who was speaking usually laughed more than the people who were listening".'
+      },
+      {
+        id: 9,
+        groupId: 'researchers',
+        questionText: 'Laughter helps people to show that they get on well with each other.',
+        questionType: 'matching_features',
+        options: [],
+        correctAnswer: 'C',
+        evidence: 'laughing together helps people to show that they like and agree with each other',
+        explanation: 'Sophie Scott (paragraph D): "laughing together helps people to show that they like and agree with each other". "Like and agree with each other" = "get on well". This is the second statement that matches Scott.'
+      },
+      {
+        id: 10,
+        groupId: 'sentences',
+        questionText: 'Provine and his students listened to conversations in places such as shopping centres and university ________.',
+        questionType: 'sentence_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'campuses',
+        evidence: 'such as shopping centres and university campuses',
+        explanation: 'Paragraph B: "public places, such as shopping centres and university campuses". The gap needs a plural noun after "university".'
+      },
+      {
+        id: 11,
+        groupId: 'sentences',
+        questionText: 'People are about ________ times more likely to laugh with others than when they are alone.',
+        questionType: 'sentence_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'thirty',
+        acceptedAnswers: ['30'],
+        evidence: 'about thirty times more likely to laugh when they were with others',
+        explanation: 'Paragraph B: people were "about thirty times more likely to laugh when they were with others than when they were alone". Both "thirty" and "30" are accepted.'
+      },
+      {
+        id: 12,
+        groupId: 'sentences',
+        questionText: 'During play fights, chimpanzees make a breathy ________ sound.',
+        questionType: 'sentence_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'panting',
+        evidence: 'make a breathy panting sound during play fights',
+        explanation: 'Paragraph C: apes "make a breathy panting sound during play fights". The gap is between "breathy" and "sound", so it is a describing word: "panting".'
+      },
+      {
+        id: 13,
+        groupId: 'sentences',
+        questionText: 'Laughing together can reduce ________ after people disagree.',
+        questionType: 'sentence_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'tension',
+        evidence: 'it can reduce tension after a disagreement',
+        explanation: 'Paragraph D: laughing together "can reduce tension after a disagreement". "A disagreement" in the passage = "people disagree" in the sentence.'
+      },
+      {
+        id: 14,
+        groupId: 'sentences',
+        questionText: "Robin Dunbar's study on laughter and pain was carried out at ________.",
+        questionType: 'sentence_completion',
+        answerFormat: 'text',
+        options: [],
+        correctAnswer: 'Oxford University',
+        acceptedAnswers: ['Oxford'],
+        evidence: 'A study at Oxford University led by Robin Dunbar',
+        explanation: 'Paragraph F: "A study at Oxford University led by Robin Dunbar". "Oxford" alone is also accepted.'
+      }
+    ],
+    createdAt: new Date('2026-11-08')
   }
 ];
