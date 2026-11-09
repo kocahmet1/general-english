@@ -2071,5 +2071,703 @@ export const ieltsListeningAudio: Record<string, Record<number, IeltsPartAudio>>
         }
       ]
     }
+  },
+  "ielts-listening-practice-4": {
+    "1": {
+      "src": "audio/ielts/ielts-listening-practice-4-part1.mp3",
+      "duration": 300.167,
+      "cues": [
+        {
+          "id": "ann-1",
+          "kind": "announcer",
+          "start": 0,
+          "end": 12.24
+        },
+        {
+          "id": "pause-1",
+          "kind": "pause",
+          "start": 12.24,
+          "end": 42.24
+        },
+        {
+          "id": "ann-2",
+          "kind": "announcer",
+          "start": 42.24,
+          "end": 46.683
+        },
+        {
+          "id": "p1-l1",
+          "kind": "line",
+          "start": 46.683,
+          "end": 52.501
+        },
+        {
+          "id": "p1-l2",
+          "kind": "line",
+          "start": 52.501,
+          "end": 60.122
+        },
+        {
+          "id": "p1-l3",
+          "kind": "line",
+          "start": 60.122,
+          "end": 66.048
+        },
+        {
+          "id": "p1-l4",
+          "kind": "line",
+          "start": 66.048,
+          "end": 68.626
+        },
+        {
+          "id": "p1-l5",
+          "kind": "line",
+          "start": 68.626,
+          "end": 71.171
+        },
+        {
+          "id": "p1-l6",
+          "kind": "line",
+          "start": 71.171,
+          "end": 73.174
+        },
+        {
+          "id": "p1-l7",
+          "kind": "line",
+          "start": 73.174,
+          "end": 75.63
+        },
+        {
+          "id": "p1-l8",
+          "kind": "line",
+          "start": 75.63,
+          "end": 79.119
+        },
+        {
+          "id": "p1-l9",
+          "kind": "line",
+          "start": 79.119,
+          "end": 82.299
+        },
+        {
+          "id": "p1-l10",
+          "kind": "line",
+          "start": 82.299,
+          "end": 89.284
+        },
+        {
+          "id": "p1-l11",
+          "kind": "line",
+          "start": 89.284,
+          "end": 92.903
+        },
+        {
+          "id": "p1-l12",
+          "kind": "line",
+          "start": 92.903,
+          "end": 100.698
+        },
+        {
+          "id": "p1-l13",
+          "kind": "line",
+          "start": 100.698,
+          "end": 104.706
+        },
+        {
+          "id": "p1-l14",
+          "kind": "line",
+          "start": 104.706,
+          "end": 113.348
+        },
+        {
+          "id": "p1-l15",
+          "kind": "line",
+          "start": 113.348,
+          "end": 117.59
+        },
+        {
+          "id": "p1-l16",
+          "kind": "line",
+          "start": 117.59,
+          "end": 126.857
+        },
+        {
+          "id": "p1-l17",
+          "kind": "line",
+          "start": 126.857,
+          "end": 131.049
+        },
+        {
+          "id": "p1-l18",
+          "kind": "line",
+          "start": 131.049,
+          "end": 139.287
+        },
+        {
+          "id": "p1-l19",
+          "kind": "line",
+          "start": 139.287,
+          "end": 142.607
+        },
+        {
+          "id": "p1-l20",
+          "kind": "line",
+          "start": 142.607,
+          "end": 153.375
+        },
+        {
+          "id": "p1-l21",
+          "kind": "line",
+          "start": 153.375,
+          "end": 157.135
+        },
+        {
+          "id": "ann-3",
+          "kind": "announcer",
+          "start": 157.135,
+          "end": 162.845
+        },
+        {
+          "id": "pause-2",
+          "kind": "pause",
+          "start": 162.845,
+          "end": 192.845
+        },
+        {
+          "id": "ann-4",
+          "kind": "announcer",
+          "start": 192.845,
+          "end": 197.272
+        },
+        {
+          "id": "p1-l22",
+          "kind": "line",
+          "start": 197.272,
+          "end": 208.426
+        },
+        {
+          "id": "p1-l23",
+          "kind": "line",
+          "start": 208.426,
+          "end": 210.848
+        },
+        {
+          "id": "p1-l24",
+          "kind": "line",
+          "start": 210.848,
+          "end": 218.099
+        },
+        {
+          "id": "p1-l25",
+          "kind": "line",
+          "start": 218.099,
+          "end": 220.564
+        },
+        {
+          "id": "p1-l26",
+          "kind": "line",
+          "start": 220.564,
+          "end": 234.365
+        },
+        {
+          "id": "p1-l27",
+          "kind": "line",
+          "start": 234.365,
+          "end": 236.036
+        },
+        {
+          "id": "p1-l28",
+          "kind": "line",
+          "start": 236.036,
+          "end": 242.668
+        },
+        {
+          "id": "p1-l29",
+          "kind": "line",
+          "start": 242.668,
+          "end": 247.386
+        },
+        {
+          "id": "p1-l30",
+          "kind": "line",
+          "start": 247.386,
+          "end": 256.812
+        },
+        {
+          "id": "p1-l31",
+          "kind": "line",
+          "start": 256.812,
+          "end": 261.261
+        },
+        {
+          "id": "p1-l32",
+          "kind": "line",
+          "start": 261.261,
+          "end": 265.377
+        },
+        {
+          "id": "ann-5",
+          "kind": "announcer",
+          "start": 265.377,
+          "end": 270.167
+        },
+        {
+          "id": "pause-3",
+          "kind": "pause",
+          "start": 270.167,
+          "end": 300.167
+        }
+      ]
+    },
+    "2": {
+      "src": "audio/ielts/ielts-listening-practice-4-part2.mp3",
+      "duration": 356.253,
+      "cues": [
+        {
+          "id": "ann-1",
+          "kind": "announcer",
+          "start": 0,
+          "end": 11.625
+        },
+        {
+          "id": "pause-1",
+          "kind": "pause",
+          "start": 11.625,
+          "end": 41.625
+        },
+        {
+          "id": "ann-2",
+          "kind": "announcer",
+          "start": 41.625,
+          "end": 47.151
+        },
+        {
+          "id": "p2-l1",
+          "kind": "line",
+          "start": 47.151,
+          "end": 65.985
+        },
+        {
+          "id": "p2-l2",
+          "kind": "line",
+          "start": 65.985,
+          "end": 107.006
+        },
+        {
+          "id": "p2-l3",
+          "kind": "line",
+          "start": 107.006,
+          "end": 138.007
+        },
+        {
+          "id": "p2-l4",
+          "kind": "line",
+          "start": 138.007,
+          "end": 176.433
+        },
+        {
+          "id": "p2-l5",
+          "kind": "line",
+          "start": 176.433,
+          "end": 185.543
+        },
+        {
+          "id": "ann-3",
+          "kind": "announcer",
+          "start": 185.543,
+          "end": 190.968
+        },
+        {
+          "id": "pause-2",
+          "kind": "pause",
+          "start": 190.968,
+          "end": 220.968
+        },
+        {
+          "id": "ann-4",
+          "kind": "announcer",
+          "start": 220.968,
+          "end": 225.763
+        },
+        {
+          "id": "p2-l6",
+          "kind": "line",
+          "start": 225.763,
+          "end": 238.174
+        },
+        {
+          "id": "p2-l7",
+          "kind": "line",
+          "start": 238.174,
+          "end": 250.968
+        },
+        {
+          "id": "p2-l8",
+          "kind": "line",
+          "start": 250.968,
+          "end": 271.927
+        },
+        {
+          "id": "p2-l9",
+          "kind": "line",
+          "start": 271.927,
+          "end": 284.193
+        },
+        {
+          "id": "p2-l10",
+          "kind": "line",
+          "start": 284.193,
+          "end": 296.759
+        },
+        {
+          "id": "p2-l11",
+          "kind": "line",
+          "start": 296.759,
+          "end": 315.207
+        },
+        {
+          "id": "p2-l12",
+          "kind": "line",
+          "start": 315.207,
+          "end": 321.518
+        },
+        {
+          "id": "ann-5",
+          "kind": "announcer",
+          "start": 321.518,
+          "end": 326.253
+        },
+        {
+          "id": "pause-3",
+          "kind": "pause",
+          "start": 326.253,
+          "end": 356.253
+        }
+      ]
+    },
+    "3": {
+      "src": "audio/ielts/ielts-listening-practice-4-part3.mp3",
+      "duration": 381.242,
+      "cues": [
+        {
+          "id": "ann-1",
+          "kind": "announcer",
+          "start": 0,
+          "end": 15.33
+        },
+        {
+          "id": "pause-1",
+          "kind": "pause",
+          "start": 15.33,
+          "end": 45.33
+        },
+        {
+          "id": "ann-2",
+          "kind": "announcer",
+          "start": 45.33,
+          "end": 50.867
+        },
+        {
+          "id": "p3-l1",
+          "kind": "line",
+          "start": 50.867,
+          "end": 57.859
+        },
+        {
+          "id": "p3-l2",
+          "kind": "line",
+          "start": 57.859,
+          "end": 67.287
+        },
+        {
+          "id": "p3-l3",
+          "kind": "line",
+          "start": 67.287,
+          "end": 70.617
+        },
+        {
+          "id": "p3-l4",
+          "kind": "line",
+          "start": 70.617,
+          "end": 85.04
+        },
+        {
+          "id": "p3-l5",
+          "kind": "line",
+          "start": 85.04,
+          "end": 87.4
+        },
+        {
+          "id": "p3-l6",
+          "kind": "line",
+          "start": 87.4,
+          "end": 97.325
+        },
+        {
+          "id": "p3-l7",
+          "kind": "line",
+          "start": 97.325,
+          "end": 101.791
+        },
+        {
+          "id": "p3-l8",
+          "kind": "line",
+          "start": 101.791,
+          "end": 112.587
+        },
+        {
+          "id": "p3-l9",
+          "kind": "line",
+          "start": 112.587,
+          "end": 123.597
+        },
+        {
+          "id": "p3-l10",
+          "kind": "line",
+          "start": 123.597,
+          "end": 137.741
+        },
+        {
+          "id": "p3-l11",
+          "kind": "line",
+          "start": 137.741,
+          "end": 140.174
+        },
+        {
+          "id": "p3-l12",
+          "kind": "line",
+          "start": 140.174,
+          "end": 154.343
+        },
+        {
+          "id": "p3-l13",
+          "kind": "line",
+          "start": 154.343,
+          "end": 161.025
+        },
+        {
+          "id": "p3-l14",
+          "kind": "line",
+          "start": 161.025,
+          "end": 167.22
+        },
+        {
+          "id": "p3-l15",
+          "kind": "line",
+          "start": 167.22,
+          "end": 177.06
+        },
+        {
+          "id": "p3-l16",
+          "kind": "line",
+          "start": 177.06,
+          "end": 181.105
+        },
+        {
+          "id": "p3-l17",
+          "kind": "line",
+          "start": 181.105,
+          "end": 185.001
+        },
+        {
+          "id": "p3-l18",
+          "kind": "line",
+          "start": 185.001,
+          "end": 205.994
+        },
+        {
+          "id": "p3-l19",
+          "kind": "line",
+          "start": 205.994,
+          "end": 218.627
+        },
+        {
+          "id": "p3-l20",
+          "kind": "line",
+          "start": 218.627,
+          "end": 224.355
+        },
+        {
+          "id": "p3-l21",
+          "kind": "line",
+          "start": 224.355,
+          "end": 238.505
+        },
+        {
+          "id": "ann-3",
+          "kind": "announcer",
+          "start": 238.505,
+          "end": 244.7
+        },
+        {
+          "id": "pause-2",
+          "kind": "pause",
+          "start": 244.7,
+          "end": 274.7
+        },
+        {
+          "id": "ann-4",
+          "kind": "announcer",
+          "start": 274.7,
+          "end": 279.816
+        },
+        {
+          "id": "p3-l22",
+          "kind": "line",
+          "start": 279.816,
+          "end": 287.791
+        },
+        {
+          "id": "p3-l23",
+          "kind": "line",
+          "start": 287.791,
+          "end": 293.841
+        },
+        {
+          "id": "p3-l24",
+          "kind": "line",
+          "start": 293.841,
+          "end": 295.761
+        },
+        {
+          "id": "p3-l25",
+          "kind": "line",
+          "start": 295.761,
+          "end": 299.058
+        },
+        {
+          "id": "p3-l26",
+          "kind": "line",
+          "start": 299.058,
+          "end": 315.202
+        },
+        {
+          "id": "p3-l27",
+          "kind": "line",
+          "start": 315.202,
+          "end": 317.141
+        },
+        {
+          "id": "p3-l28",
+          "kind": "line",
+          "start": 317.141,
+          "end": 327.03
+        },
+        {
+          "id": "p3-l29",
+          "kind": "line",
+          "start": 327.03,
+          "end": 328.691
+        },
+        {
+          "id": "p3-l30",
+          "kind": "line",
+          "start": 328.691,
+          "end": 338.312
+        },
+        {
+          "id": "p3-l31",
+          "kind": "line",
+          "start": 338.312,
+          "end": 341.291
+        },
+        {
+          "id": "p3-l32",
+          "kind": "line",
+          "start": 341.291,
+          "end": 346.432
+        },
+        {
+          "id": "ann-5",
+          "kind": "announcer",
+          "start": 346.432,
+          "end": 351.242
+        },
+        {
+          "id": "pause-3",
+          "kind": "pause",
+          "start": 351.242,
+          "end": 381.242
+        }
+      ]
+    },
+    "4": {
+      "src": "audio/ielts/ielts-listening-practice-4-part4.mp3",
+      "duration": 262.751,
+      "cues": [
+        {
+          "id": "ann-1",
+          "kind": "announcer",
+          "start": 0,
+          "end": 8.195
+        },
+        {
+          "id": "pause-1",
+          "kind": "pause",
+          "start": 8.195,
+          "end": 53.195
+        },
+        {
+          "id": "ann-2",
+          "kind": "announcer",
+          "start": 53.195,
+          "end": 58.632
+        },
+        {
+          "id": "p4-l1",
+          "kind": "line",
+          "start": 58.632,
+          "end": 73.536
+        },
+        {
+          "id": "p4-l2",
+          "kind": "line",
+          "start": 73.536,
+          "end": 106.285
+        },
+        {
+          "id": "p4-l3",
+          "kind": "line",
+          "start": 106.285,
+          "end": 120.682
+        },
+        {
+          "id": "p4-l4",
+          "kind": "line",
+          "start": 120.682,
+          "end": 149.866
+        },
+        {
+          "id": "p4-l5",
+          "kind": "line",
+          "start": 149.866,
+          "end": 182.227
+        },
+        {
+          "id": "p4-l6",
+          "kind": "line",
+          "start": 182.227,
+          "end": 219.049
+        },
+        {
+          "id": "p4-l7",
+          "kind": "line",
+          "start": 219.049,
+          "end": 249.606
+        },
+        {
+          "id": "p4-l8",
+          "kind": "line",
+          "start": 249.606,
+          "end": 258.541
+        },
+        {
+          "id": "ann-3",
+          "kind": "announcer",
+          "start": 258.541,
+          "end": 262.751
+        }
+      ]
+    }
   }
 };

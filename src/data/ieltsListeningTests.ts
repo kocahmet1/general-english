@@ -7,7 +7,7 @@ import type {
   IeltsWordLimit,
 } from '../types/ieltsListening';
 
-// Two original IELTS-format listening tests (4 parts, 40 questions each),
+// Four original IELTS-format listening tests (4 parts, 40 questions each),
 // written for a student moving from band 4.5–5 towards 6.5.
 //
 // They follow the real exam's format (question types, rubrics, announcer,
@@ -20,7 +20,9 @@ import type {
 //   - more time between answers and clear signposting in Parts 2 and 4.
 // Test 1 is the easiest; Test 2 uses more paraphrase and more distractors;
 // Test 3 is a step closer to the real exam again (a distractor in almost every
-// question, every multiple-choice option mentioned, slightly faster speech).
+// question, every multiple-choice option mentioned, slightly faster speech);
+// Test 4 is the closest to a real paper (map, "Choose TWO", three speakers in
+// Part 3, NO MORE THAN TWO WORDS, the fastest speech).
 //
 // Every evidence quote is copied word for word from its script line and every
 // typed answer appears in the script; tests/ielts-listening-content.test.mjs
@@ -47,8 +49,8 @@ const ONE_WORD_ONLY: IeltsWordLimit = { maxWords: 1, allowNumber: false, label: 
 // voices are slowed down (never below speed 0.82, where artefacts start); voices
 // still too fast at 0.82 get an extra pitch-preserving slow-down (`tempo`).
 // Measured speech rate after rendering: about 140 words/min in Test 1, 150 in
-// Test 2 and 155–160 in Test 3, against roughly 160–180 in real IELTS
-// conversations.
+// Test 2, 155–160 in Test 3 and about 165 in Test 4, against roughly 160–180
+// in real IELTS conversations.
 const VOICE = {
   tom: { voice: 'bm_george', speed: 0.84 },
   sophie: { voice: 'af_bella', speed: 0.83, tempo: 0.95 },
@@ -68,6 +70,13 @@ const VOICE = {
   hannah: { voice: 'af_bella', speed: 0.88 },
   ben: { voice: 'am_fenrir', speed: 0.88 },
   morgan: { voice: 'bm_george', speed: 0.96 },
+  paula: { voice: 'bf_emma', speed: 0.84 },
+  daniel: { voice: 'am_michael', speed: 0.95 },
+  simon: { voice: 'bm_fable', speed: 0.88, tempo: 0.93 },
+  grant: { voice: 'bm_george', speed: 0.98 },
+  maya: { voice: 'af_heart', speed: 0.88 },
+  owen: { voice: 'am_puck', speed: 0.86, tempo: 0.94 },
+  holt: { voice: 'af_bella', speed: 0.94 },
 } as const;
 
 /* ═══════════════════════════════════ TEST 1 ═══════════════════════════════════ */
@@ -1679,4 +1688,556 @@ const test3: IeltsListeningTest = {
   ],
 };
 
-export const ieltsListeningTests: IeltsListeningTest[] = [test1, test2, test3];
+/* ═══════════════════════════════════ TEST 4 ═══════════════════════════════════ */
+// The closest of the four to a real paper: map labelling and "Choose TWO" in
+// Part 2, three speakers and opinion attribution in Part 3, NO MORE THAN TWO
+// WORDS in Part 4 (two answers really are two words), and the fastest speech.
+
+const NO_MORE_THAN_TWO_WORDS: IeltsWordLimit = { maxWords: 2, allowNumber: false, label: 'NO MORE THAN TWO WORDS' };
+
+const test4: IeltsListeningTest = {
+  id: 'ielts-listening-practice-4',
+  title: 'IELTS Listening Practice Test 4',
+  level: 'İleri',
+  difficulty: 'advanced',
+  description: 'Trende unutulan bir çanta, bir doğa koruma alanında gönüllülük (harita), öğrencilerin telefon deneyi ve bal arıları. Gerçek sınava en yakın test: harita, "Choose TWO", üç konuşmacı, iki kelimelik cevaplar ve daha hızlı konuşma.',
+  parts: [
+    /* ───────────── Part 1 ───────────── */
+    {
+      number: 1,
+      context: 'You will hear a man telephoning a railway lost property office about a bag he left on a train.',
+      speakers: [
+        { id: 'paula', name: 'Paula', role: 'Lost property officer', gender: 'female', accent: 'british', ...VOICE.paula },
+        { id: 'daniel', name: 'Daniel', role: 'Caller', gender: 'male', accent: 'american', ...VOICE.daniel },
+      ],
+      script: [
+        L('p1-l1', 'paula', 'Good morning, Coastline Railways lost property, Paula speaking. How can I help?'),
+        L('p1-l2', 'daniel', "Hello. I left a bag on one of your trains yesterday evening, and I'm hoping someone's handed it in."),
+        L('p1-l3', 'paula', "Let's see what we can do. I'll just take a few details first. Which journey were you making?"),
+        L('p1-l4', 'daniel', 'I was going from Leeds to York.'),
+        L('p1-l5', 'paula', 'And can I have your name, please?'),
+        L('p1-l6', 'daniel', 'Daniel Kowalski.'),
+        L('p1-l7', 'paula', 'Could you spell the surname for me?'),
+        L('p1-l8', 'daniel', "Sure. It's K-O-W-A-L-S-K-I."),
+        L('p1-l9', 'paula', 'Is that with a W or a V in the middle?'),
+        L('p1-l10', 'daniel', "A W. It's a Polish name, so people say it with a V sound, but it's written with a W."),
+        L('p1-l11', 'paula', 'Thank you. Now, what time did the train leave Leeds?'),
+        L('p1-l12', 'daniel', 'Well, I was booked on the 6.45, but I finished work early, so I got the one before, the 6.15.'),
+        L('p1-l13', 'paula', 'The 6.15. And do you remember which carriage you were in?'),
+        L('p1-l14', 'daniel', 'I got on at the front, in carriage 2, but it was really crowded, so I walked through the train and found a seat in carriage 7.'),
+        L('p1-l15', 'paula', 'Carriage 7. And where did you put the bag? On the luggage rack?'),
+        L('p1-l16', 'daniel', "I tried to, but it was too heavy to lift up there, so I put it under the table in front of me. I suppose that's why I forgot about it."),
+        L('p1-l17', 'paula', 'That happens a lot, believe me. Can you describe the bag?'),
+        L('p1-l18', 'daniel', "It's a rucksack, quite a big one. The straps and the pockets are black, but the main part is green, a dark green."),
+        L('p1-l19', 'paula', 'So mainly green. And what was inside it?'),
+        L('p1-l20', 'daniel', "My laptop, which is the main thing I'm worried about, and my camera. I thought my phone was in there as well, but I found it in my coat pocket this morning."),
+        L('p1-l21', 'paula', "Well, that's one less thing to worry about."),
+        BREAK(7, 10),
+        L('p1-l22', 'paula', "Right, Mr Kowalski, I've put all that on the system. If the bag is handed in, we'll send you a text message, and you can collect it from our office at York station."),
+        L('p1-l23', 'daniel', "OK. When's the office open?"),
+        L('p1-l24', 'paula', "Every day from eight until six, except Sundays. We used to close on Mondays as well, but we don't any more."),
+        L('p1-l25', 'daniel', 'And do I need to bring anything?'),
+        L('p1-l26', 'paula', "Yes. Please bring your train ticket if you still have it, because it shows you were on that train. A bank statement isn't enough, I'm afraid. And you'll need some photo ID as well, like a passport or a driving licence."),
+        L('p1-l27', 'daniel', 'Is there a charge?'),
+        L('p1-l28', 'paula', "There is. It's £8 for small things like umbrellas and gloves, but for a bag, it's £12."),
+        L('p1-l29', 'daniel', "That's fine. And how long will you keep it, if I can't come straight away?"),
+        L('p1-l30', 'paula', 'We used to keep everything for three months, but we simply ran out of space, so now it\'s 28 days. After that, it goes to a charity.'),
+        L('p1-l31', 'daniel', 'Twenty-eight days. Right. Thanks very much for your help.'),
+        L('p1-l32', 'paula', "You're welcome. Fingers crossed it turns up."),
+      ],
+      questionGroups: [
+        {
+          id: 't4-g1',
+          type: 'gap_fill',
+          layout: 'form',
+          instructions: 'Complete the form below.\nWrite ONE WORD AND/OR A NUMBER for each answer.',
+          title: 'Coastline Railways – Lost property report',
+          wordLimit: ONE_WORD_AND_OR_NUMBER,
+          tip: 'Arayan kişi önce planladığı ya da denediği şeyi söylüyor, sonra gerçekte olanı ("I was booked on…, but…", "I tried to, but…"). Cevap ikincisidir. Harf harf söylenen isimde W ve V gibi karışan harflere dikkat edin; okunuşla yazılış farklı olabilir.',
+          blocks: [
+            { kind: 'field', label: 'Journey:', value: 'Leeds to York', example: true },
+            { kind: 'field', label: 'Name:', value: 'Daniel {{1}}' },
+            { kind: 'field', label: 'Train left Leeds at:', value: '{{2}}' },
+            { kind: 'field', label: 'Seat:', value: 'carriage {{3}}' },
+            { kind: 'field', label: 'Bag was left:', value: 'under the {{4}}' },
+            { kind: 'field', label: 'Colour of bag:', value: 'mainly {{5}}' },
+            { kind: 'field', label: 'Contents:', value: 'a laptop and a {{6}}' },
+          ],
+          questions: [
+            {
+              number: 1,
+              answer: text('Kowalski'),
+              evidence: [ev('p1-l8', "It's K-O-W-A-L-S-K-I.")],
+              explanation: "Soyadı harf harf veriliyor: K-O-W-A-L-S-K-I. Daniel ortadaki harfin V değil W olduğunu söylüyor; isim V sesiyle okunsa da W ile yazılıyor. 'Kovalski' yanlış sayılır.",
+            },
+            {
+              number: 2,
+              answer: text('6.15', '6.15 pm', '18.15'),
+              evidence: [ev('p1-l12', 'so I got the one before, the 6.15')],
+              explanation: "Daniel'in bileti 6.45 trenine ama işten erken çıktığı için bir önceki trene, 6.15'e binmiş. 6.45 çeldirici.",
+            },
+            {
+              number: 3,
+              answer: text('7', 'seven'),
+              evidence: [ev('p1-l14', 'found a seat in carriage 7')],
+              explanation: "Trene öndeki 2 numaralı vagondan binmiş, ama çok kalabalık olduğu için yürüyüp 7 numaralı vagonda yer bulmuş. Soru oturduğu yeri soruyor: 7. '2' çeldirici.",
+            },
+            {
+              number: 4,
+              answer: text('table'),
+              evidence: [ev('p1-l16', 'so I put it under the table in front of me')],
+              explanation: "Paula bagaj rafını soruyor; Daniel çantayı oraya kaldırmaya çalışmış ama çok ağır olduğu için önündeki masanın altına koymuş. 'Rack' çeldirici; formda zaten 'under the' yazıyor.",
+            },
+            {
+              number: 5,
+              answer: text('green'),
+              evidence: [ev('p1-l18', 'but the main part is green, a dark green')],
+              explanation: "Askılar ve cepler siyah, ama çantanın ana kısmı koyu yeşil. Formda 'mainly' (çoğunlukla) yazdığı için cevap green; black çeldirici. 'Dark green' iki kelime olduğu için tek kelime sınırını aşar ve yanlış sayılır.",
+            },
+            {
+              number: 6,
+              answer: text('camera'),
+              evidence: [ev('p1-l20', 'and my camera')],
+              explanation: "Çantada dizüstü bilgisayar ve fotoğraf makinesi var. Daniel telefonunun da çantada olduğunu sanmış ama sabah ceketinin cebinde bulmuş; phone çeldirici.",
+            },
+          ],
+        },
+        {
+          id: 't4-g2',
+          type: 'gap_fill',
+          layout: 'notes',
+          instructions: 'Complete the notes below.\nWrite ONE WORD AND/OR A NUMBER for each answer.',
+          title: 'Collecting the bag',
+          wordLimit: ONE_WORD_AND_OR_NUMBER,
+          tip: '"We used to…, but now…" kalıbı çok sık bir tuzaktır: eski bilgi çeldirici, yeni bilgi cevaptır. Fiyatlarda hangi eşya için hangi ücretin söylendiğini eşleştirin.',
+          blocks: [
+            { kind: 'bullet', text: 'office at York station, open 8 am – 6 pm, but closed on {{7}}' },
+            { kind: 'bullet', text: 'bring your train {{8}} and photo ID' },
+            { kind: 'bullet', text: 'charge for a bag: £{{9}}' },
+            { kind: 'bullet', text: 'items are kept for {{10}} days, then given to charity' },
+          ],
+          questions: [
+            {
+              number: 7,
+              answer: text('Sundays', 'Sunday'),
+              evidence: [ev('p1-l24', 'Every day from eight until six, except Sundays.')],
+              explanation: "Ofis pazar günleri kapalı. Eskiden pazartesileri de kapalıymış, ama artık değil ('We used to close on Mondays as well, but we don't any more'); Monday çeldirici.",
+            },
+            {
+              number: 8,
+              answer: text('ticket'),
+              evidence: [ev('p1-l26', 'Please bring your train ticket if you still have it')],
+              explanation: "Tren bileti o trende olduğunu kanıtlıyor. Banka hesap dökümü yeterli değil (çeldirici). Fotoğraflı kimlik notta zaten yazıyor.",
+            },
+            {
+              number: 9,
+              answer: text('12'),
+              evidence: [ev('p1-l28', "but for a bag, it's £12")],
+              explanation: "Şemsiye, eldiven gibi küçük eşyalar için ücret £8, çanta için £12. Notta 'charge for a bag' yazdığı için 12.",
+            },
+            {
+              number: 10,
+              answer: text('28', 'twenty-eight'),
+              evidence: [ev('p1-l30', "so now it's 28 days")],
+              explanation: "Eskiden her şeyi üç ay saklıyorlarmış, ama yer kalmadığı için artık 28 gün. 'Three months' çeldirici; notta zaten 'days' yazıyor.",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 2 ───────────── */
+    {
+      number: 2,
+      context: 'You will hear the volunteer coordinator at a nature reserve talking to a group of new volunteers.',
+      speakers: [
+        { id: 'simon', name: 'Simon Reed', role: 'Volunteer coordinator', gender: 'male', accent: 'british', ...VOICE.simon },
+      ],
+      script: [
+        L('p2-l1', 'simon', "Good morning, everyone, and welcome to Millbrook Nature Reserve. I'm Simon Reed, and I coordinate the volunteers here. Thank you all for giving up your time. I'll start with a bit of background, then explain what you'll be doing, and finally I'll show you round on the map."),
+        L('p2-l2', 'simon', "Visitors often assume the reserve was set up to protect the bitterns, the rare birds that nest in our reed beds, and they're certainly our most famous residents now. But the bitterns only arrived about ten years ago. In fact, this whole area was a gravel quarry until 1985, and when the quarry closed, the council planned to build four hundred houses here. Local people campaigned against the plan for three years, and in the end the council agreed to turn the land into a nature reserve instead. These days we welcome a lot of school groups, but education wasn't part of the original idea."),
+        L('p2-l3', 'simon', "Now, a few rules. You'll each get a green jacket with the reserve's logo on it, and we'd like you to wear it, but if you forget it one day, it isn't the end of the world. A lot of the time you'll work in pairs, but there are some jobs you can do on your own. The one thing I really must insist on is that you sign in and sign out at the visitor centre every single time you come. If there's a fire or an accident, we need to know exactly who is on the reserve."),
+        L('p2-l4', 'simon', "So, what will you be doing? Not leading school groups, at least not yet. That needs a training course, and most people do it after six months or so. Counting birds is also something we leave to our specialist volunteers, who can recognise every species by its call. For your first month, the work is mostly practical. You'll be repairing the paths, which get terribly muddy in winter, and cutting back the brambles and other plants that grow over the edge of the lake. And just so you know, the café is run by a separate company, so nobody will ask you to serve coffee!"),
+        L('p2-l5', 'simon', "Right, let's look at the map. Everyone should have one. We're in the visitor centre, at the bottom of the map, next to the entrance."),
+        BREAK(15, 20),
+        L('p2-l6', 'simon', "As you come out of the visitor centre, turn right, and the first building you reach, just before the river, is the volunteers' tool shed. That's where you'll collect your gloves and tools every morning."),
+        L('p2-l7', 'simon', "If you turn left out of the visitor centre instead, towards the car park, you'll find the picnic area. It's in the space between the car park and the lake, and it gets very busy at weekends."),
+        L('p2-l8', 'simon', "Now follow the path up the west side of the lake, that's the left-hand side on your map. About halfway along, right on the edge of the water, is the pond-dipping platform, where children catch water insects in nets. Don't confuse it with the woodland further west, where we're hoping to build a log cabin next year."),
+        L('p2-l9', 'simon', "Keep going to the far end of the lake, and right in the middle of the north shore, you'll see the bird hide. It's a wooden hut with narrow windows, so you can watch the birds without disturbing them."),
+        L('p2-l10', 'simon', "From the bird hide, the path continues east. Up at the top of the map, between the lake and the river, is the viewing tower. It's twelve metres high, and from the top you can see the whole reserve."),
+        L('p2-l11', 'simon', "Then the path comes down to the footbridge. Cross over the river, and the field straight ahead of you is our wildflower meadow. In June and July, it's full of butterflies. The field to the south of it, down in the corner, belongs to a local farmer, so please don't go in there."),
+        L('p2-l12', 'simon', "OK, that's everything for now. Let's go and find you your jackets."),
+      ],
+      questionGroups: [
+        {
+          id: 't4-g3',
+          type: 'mcq_single',
+          instructions: 'Choose the correct letter, A, B or C.',
+          tip: 'Gerçek sınavdaki gibi her seçenek kayıtta geçiyor. "Visitors often assume…" ya da "it isn\'t the end of the world" gibi ifadeler bir seçeneği zayıflatır; "In fact…" ve "The one thing I really must insist on…" asıl cevabı getirir.',
+          questions: [
+            {
+              number: 11,
+              prompt: 'Why was the nature reserve created?',
+              options: abc('to protect a rare bird', 'to give schools a place to visit', 'to stop houses being built on the land'),
+              answer: choice('C'),
+              evidence: [ev('p2-l2', 'the council planned to build four hundred houses here')],
+              explanation: "Ziyaretçiler alanın nadir bir kuşu korumak için kurulduğunu sanıyor ama bu kuşlar ancak on yıl önce gelmiş (A yanlış). Bugünlerde çok okul grubu geliyor ama asıl amaç bu değilmiş (B yanlış). Belediye buraya ev yapmak istemiş, halk buna karşı çıkmış ve alan doğa koruma alanı olmuş (C).",
+            },
+            {
+              number: 12,
+              prompt: 'What does Simon say is the most important rule for volunteers?',
+              options: abc('wearing the green jacket', 'signing in and out at the visitor centre', 'always working with another volunteer'),
+              answer: choice('B'),
+              evidence: [ev('p2-l3', 'The one thing I really must insist on is that you sign in and sign out at the visitor centre')],
+              explanation: "Yeşil ceketi unutmak 'dünyanın sonu değil' (A yanlış). Bazı işler tek başına yapılabiliyor (C yanlış). Simon'ın ısrar ettiği tek kural her gelişte ziyaretçi merkezinde giriş-çıkış kaydı yapmak (B); yangın ya da kaza olursa kimin alanda olduğunu bilmeleri gerekiyor.",
+            },
+          ],
+        },
+        {
+          id: 't4-g4',
+          type: 'mcq_multi',
+          instructions: 'Choose TWO letters, A–E.',
+          prompt: 'Which TWO tasks will new volunteers do in their first month?',
+          tip: 'Beş seçeneğin beşi de geçer; üçü açıkça reddedilir ("Not… at least not yet", "something we leave to…", "nobody will ask you to…"). "For your first month…" ifadesinden sonra gelenleri dinleyin.',
+          options: [
+            { key: 'A', text: 'guiding school groups' },
+            { key: 'B', text: 'repairing paths' },
+            { key: 'C', text: 'counting birds' },
+            { key: 'D', text: 'cutting back plants' },
+            { key: 'E', text: 'serving in the café' },
+          ],
+          answerKeys: ['B', 'D'],
+          evidence: [
+            ev('p2-l4', "You'll be repairing the paths"),
+            ev('p2-l4', 'cutting back the brambles and other plants'),
+          ],
+          explanation: "İlk ay işler pratik: patikaları onarmak (B) ve göl kenarına taşan böğürtlen ve diğer bitkileri budamak (D). Okul gruplarına rehberlik eğitim gerektiriyor ve genelde altı ay sonra yapılıyor (A yanlış); kuş sayımını uzman gönüllüler yapıyor (C yanlış); kafeyi ayrı bir şirket işletiyor (E yanlış).",
+          questions: [{ number: 13 }, { number: 14 }],
+        },
+        {
+          id: 't4-g5',
+          type: 'matching',
+          variant: 'map',
+          instructions: 'Label the map below.\nWrite the correct letter, A–I, next to Questions 15–20.',
+          title: 'Millbrook Nature Reserve',
+          tip: 'Haritada önce sabit noktaları bulun: ziyaretçi merkezi, göl, nehir, köprü. Simon ziyaretçi merkezinden başlayıp gölün etrafında saat yönünde ilerliyor. "Turn right/left", "the west side", "the north shore", "straight ahead" gibi yön ifadelerini haritada parmağınızla takip edin. Dokuz harften üçü kullanılmayacak.',
+          figure: { src: 'ielts-listening/t4-reserve-map.svg', alt: 'Millbrook Nature Reserve haritası: altta giriş ve ziyaretçi merkezi, solda otopark, ortada göl ve çevresinde patika, sol üstte koru, sağda nehir ve üzerinde köprü; A–I harfli yerler.', width: 640, height: 470 },
+          options: lettersUpTo('I'),
+          questions: [
+            {
+              number: 15,
+              prompt: "Volunteers' tool shed",
+              answer: choice('A'),
+              evidence: [ev('p2-l6', "turn right, and the first building you reach, just before the river, is the volunteers' tool shed")],
+              explanation: "Ziyaretçi merkezinden çıkıp sağa dönünce, nehirden hemen önce ulaşılan ilk bina alet kulübesi: A. I nehrin öbür tarafında, bu yüzden yanlış.",
+            },
+            {
+              number: 16,
+              prompt: 'Picnic area',
+              answer: choice('H'),
+              evidence: [ev('p2-l7', "It's in the space between the car park and the lake")],
+              explanation: "Ziyaretçi merkezinden sola, otoparka doğru gidince piknik alanı var; otoparkla göl arasında: H.",
+            },
+            {
+              number: 17,
+              prompt: 'Pond-dipping platform',
+              answer: choice('B'),
+              evidence: [ev('p2-l8', 'About halfway along, right on the edge of the water, is the pond-dipping platform')],
+              explanation: "Gölün batı (sol) tarafındaki patikanın yarısında, tam su kenarında: B. Daha batıdaki koru (C) çeldirici; Simon ikisini karıştırmamayı özellikle söylüyor.",
+            },
+            {
+              number: 18,
+              prompt: 'Bird hide',
+              answer: choice('D'),
+              evidence: [ev('p2-l9', "right in the middle of the north shore, you'll see the bird hide")],
+              explanation: "Gölün uzak ucunda, kuzey kıyısının tam ortasında kuş gözlem kulübesi: D.",
+            },
+            {
+              number: 19,
+              prompt: 'Viewing tower',
+              answer: choice('E'),
+              evidence: [ev('p2-l10', 'Up at the top of the map, between the lake and the river, is the viewing tower.')],
+              explanation: "Gözlem kulesi haritanın üst kısmında, gölle nehir arasında: E. F de gölle nehir arasında ama haritanın üst kısmında değil, gölün doğu tarafında aşağıda.",
+            },
+            {
+              number: 20,
+              prompt: 'Wildflower meadow',
+              answer: choice('G'),
+              evidence: [ev('p2-l11', 'Cross over the river, and the field straight ahead of you is our wildflower meadow.')],
+              explanation: "Köprüden nehrin karşısına geçince tam karşıdaki tarla kır çiçeği çayırı: G. Onun güneyindeki köşe tarlası (I) bir çiftçiye ait; çeldirici.",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 3 ───────────── */
+    {
+      number: 3,
+      context: 'You will hear two psychology students, Maya and Owen, talking to their tutor, Dr Grant, about an experiment on mobile phones and studying.',
+      speakers: [
+        { id: 'grant', name: 'Dr Grant', role: 'Tutor', gender: 'male', accent: 'british', ...VOICE.grant },
+        { id: 'maya', name: 'Maya', role: 'Student', gender: 'female', accent: 'american', ...VOICE.maya },
+        { id: 'owen', name: 'Owen', role: 'Student', gender: 'male', accent: 'american', ...VOICE.owen },
+      ],
+      script: [
+        L('p3-l1', 'grant', "Come in, Maya, Owen. Have a seat. So, you've finished collecting your data. How did the experiment go?"),
+        L('p3-l2', 'owen', "Pretty well, overall. We were worried we wouldn't get enough people to take part, but in the end forty-two students signed up, which was more than we needed."),
+        L('p3-l3', 'grant', 'Good. Just remind me how you set it up.'),
+        L('p3-l4', 'maya', 'Everyone had twenty minutes to learn a list of facts about an imaginary country. Half of them had their phone on the desk, switched to silent, and the other half left their phone in another room. Then they all did a short test.'),
+        L('p3-l5', 'grant', 'And were there any problems?'),
+        L('p3-l6', 'maya', 'A couple. The main one was the test itself. Almost everyone got nearly full marks, so it was really hard to see any difference between the two groups.'),
+        L('p3-l7', 'grant', "Ah, so the test was too easy. That's a very common problem."),
+        L('p3-l8', 'owen', "The other thing was that we found out afterwards that some people in the phone group had been reading their messages under the desk, even though we'd asked them not to."),
+        L('p3-l9', 'maya', "We'd booked a seminar room in the library, and I was afraid it might be noisy, but actually it was perfect. And everyone stayed right to the end, which was a relief."),
+        L('p3-l10', 'grant', "Forty-two is fine for a project like this. It isn't a big sample, but it's enough to show a trend. What worries me more is who they were. If I remember rightly, nearly all of them were psychology students, weren't they?"),
+        L('p3-l11', 'owen', 'Yes, they were mostly from our year.'),
+        L('p3-l12', 'grant', "That's the issue. They're all a similar age, they study the same subject, and some of them may even have guessed what you were testing. Don't take anyone out of the results now, but you should mention it as a limitation."),
+        L('p3-l13', 'owen', "So what should we do about the test? I'd quite like to make it harder and run the whole experiment again."),
+        L('p3-l14', 'grant', "You could do that. Or you could find a test from a published study, one that's already been checked."),
+        L('p3-l15', 'maya', "Honestly, I don't think we have time for either before the deadline. I'd rather use the results we've got and explain the problem clearly in our discussion."),
+        L('p3-l16', 'owen', "I suppose that's more realistic. OK, let's do that."),
+        L('p3-l17', 'grant', 'Was there anything in the results that surprised you?'),
+        L('p3-l18', 'maya', "Yes. We expected the people without their phones to feel anxious, but hardly anyone said they did. And the phone group weren't any slower. Both groups finished at about the same time. What really surprised me was how confident the phone group were. They rated their own concentration much higher than the other group did."),
+        L('p3-l19', 'grant', "That's interesting, and it fits with some recent research. Before you write the discussion, I'd like you both to read Professor Hart's article on phones and attention. It's on the reading list."),
+        L('p3-l20', 'owen', 'We were also thinking of interviewing a few of the participants about how they felt.'),
+        L('p3-l21', 'grant', "It's a nice idea, but you'd need new ethics approval for that, and there isn't time. Just the article. And there's no need to book another meeting before you write it. Just email me the discussion when it's done."),
+        BREAK(27, 30),
+        L('p3-l22', 'grant', "Now, before you go, I've had a quick look at the other sections you sent me last week. Let's go through them one by one."),
+        L('p3-l23', 'grant', "Your introduction is good. It's clear and very well written, so I wouldn't change anything."),
+        L('p3-l24', 'maya', "Even though it's quite long?"),
+        L('p3-l25', 'grant', "Length isn't a problem there. It reads well."),
+        L('p3-l26', 'grant', "The method section, on the other hand, is missing some important information. You don't say how many people were in each group, or exactly what they were told. Another researcher should be able to repeat your experiment just by reading it."),
+        L('p3-l27', 'owen', "OK, we'll add that."),
+        L('p3-l28', 'grant', "In the results section, you've put all the scores in one big table. That's very hard to follow. A simple bar chart would make the pattern much clearer."),
+        L('p3-l29', 'maya', 'We can do that.'),
+        L('p3-l30', 'grant', "And finally, the personal reflection at the end. It's interesting to read, but the course doesn't ask for one, so you can take it out completely."),
+        L('p3-l31', 'owen', 'Could we move it into the appendix instead?'),
+        L('p3-l32', 'grant', "No, I'd just delete it. It'll make the report tighter."),
+      ],
+      questionGroups: [
+        {
+          id: 't4-g6',
+          type: 'mcq_multi',
+          instructions: 'Choose TWO letters, A–E.',
+          prompt: 'Which TWO problems did the students have with their experiment?',
+          tip: 'Üç konuşmacı var; sorun gerçekten yaşandı mı, yoksa sadece korkulan ama olmayan bir şey mi ("We were worried…, but…", "I was afraid…, but…")? Olmayanları eleyin.',
+          options: [
+            { key: 'A', text: 'Some participants left before the end.' },
+            { key: 'B', text: 'The room was too noisy.' },
+            { key: 'C', text: 'Some participants used their phones secretly.' },
+            { key: 'D', text: 'The test was too easy.' },
+            { key: 'E', text: 'Not enough people took part.' },
+          ],
+          answerKeys: ['C', 'D'],
+          evidence: [
+            ev('p3-l6', 'Almost everyone got nearly full marks'),
+            ev('p3-l8', 'some people in the phone group had been reading their messages under the desk'),
+          ],
+          explanation: "Gerçek sorunlar: neredeyse herkes tam puan aldığı için test çok kolaydı (D) ve telefon grubundaki bazı kişiler masanın altından gizlice mesaj okumuştu (C). Yeterli katılımcı bulamamaktan korkmuşlar ama 42 kişi gelmiş (E yanlış); odanın gürültülü olmasından korkmuşlar ama oda mükemmelmiş (B yanlış); herkes sonuna kadar kalmış (A yanlış).",
+          questions: [{ number: 21 }, { number: 22 }],
+        },
+        {
+          id: 't4-g7',
+          type: 'mcq_single',
+          instructions: 'Choose the correct letter, A, B or C.',
+          tip: 'Soruda kimin görüşü sorulduğuna bakın: Dr Grant mı, Maya mı, ikisi birlikte mi karar veriyor? Bir öğrencinin önerisi ("I\'d quite like to…") her zaman sonuç değildir; konuşmanın nasıl bittiğini dinleyin.',
+          questions: [
+            {
+              number: 23,
+              prompt: 'What does Dr Grant say about the participants?',
+              options: abc('They were too similar to each other.', 'There were not enough of them.', 'Some of them should be removed from the results.'),
+              answer: choice('A'),
+              evidence: [ev('p3-l12', "They're all a similar age, they study the same subject")],
+              explanation: "Dr Grant 42 kişinin bu proje için yeterli olduğunu söylüyor (B yanlış). Onu endişelendiren katılımcıların neredeyse hepsinin benzer yaşta ve aynı bölümde olması (A). Kimseyi sonuçlardan çıkarmamalarını, bunu bir sınırlılık olarak yazmalarını söylüyor (C yanlış).",
+            },
+            {
+              number: 24,
+              prompt: 'What do the students decide to do about the test?',
+              options: abc('make it harder and repeat the experiment', 'explain the problem in their report', 'replace it with a published test'),
+              answer: choice('B'),
+              evidence: [ev('p3-l15', "I'd rather use the results we've got and explain the problem clearly in our discussion.")],
+              explanation: "Owen testi zorlaştırıp deneyi tekrarlamak istiyor (A), Dr Grant yayımlanmış bir test öneriyor (C). Ama Maya ikisine de vakit olmadığını söylüyor; eldeki sonuçları kullanıp sorunu tartışma bölümünde açıklayacaklar ve Owen kabul ediyor (B).",
+            },
+            {
+              number: 25,
+              prompt: 'What surprised Maya about the results?',
+              options: abc('Students without their phones felt anxious.', 'Students with their phones were slower to finish.', 'Students with their phones thought they had concentrated well.'),
+              answer: choice('C'),
+              evidence: [ev('p3-l18', 'What really surprised me was how confident the phone group were.')],
+              explanation: "Telefonsuz grubun kaygılanacağını beklemişler ama neredeyse kimse kaygılanmamış (A yanlış). Telefonlu grup daha yavaş da değilmiş (B yanlış). Maya'yı asıl şaşırtan, telefonlu grubun kendi konsantrasyonuna çok yüksek puan vermesi (C).",
+            },
+            {
+              number: 26,
+              prompt: 'What will the students do before they write the discussion?',
+              options: abc('read an article', 'interview some participants', 'meet Dr Grant again'),
+              answer: choice('A'),
+              evidence: [ev('p3-l21', 'Just the article.')],
+              explanation: "Dr Grant, Professor Hart'ın makalesini okumalarını istiyor (A). Owen katılımcılarla görüşmeyi öneriyor, ama yeni etik onay gerekeceği ve vakit olmadığı için Dr Grant kabul etmiyor (B yanlış). Yeni bir görüşmeye gerek yok; tartışma bölümünü bitirince e-postayla gönderecekler (C yanlış).",
+            },
+          ],
+        },
+        {
+          id: 't4-g8',
+          type: 'matching',
+          variant: 'list',
+          instructions: 'What does Dr Grant say about each section of the report?\nChoose FOUR answers from the box and write the correct letter, A–F, next to Questions 27–30.',
+          optionsTitle: 'Comments',
+          tip: 'Öğrencilerin sorduğu her şey Dr Grant\'in görüşü değildir: Maya "Even though it\'s quite long?" diye soruyor, Owen "Could we move it…?" diye öneriyor. Kutudaki seçeneği Dr Grant\'in son kararına göre seçin.',
+          options: [
+            { key: 'A', text: 'It needs more detail.' },
+            { key: 'B', text: 'It is too long.' },
+            { key: 'C', text: 'It would be clearer as a graph.' },
+            { key: 'D', text: 'It should be removed.' },
+            { key: 'E', text: 'It does not need any changes.' },
+            { key: 'F', text: 'It should be moved to the appendix.' },
+          ],
+          questions: [
+            {
+              number: 27,
+              prompt: 'Introduction',
+              answer: choice('E'),
+              evidence: [ev('p3-l23', "so I wouldn't change anything")],
+              explanation: "Giriş açık ve iyi yazılmış; Dr Grant hiçbir şeyi değiştirmeyeceğini söylüyor (E). Maya uzunluğu soruyor ama Dr Grant bunun sorun olmadığını söylüyor; B çeldirici.",
+            },
+            {
+              number: 28,
+              prompt: 'Method',
+              answer: choice('A'),
+              evidence: [ev('p3-l26', 'is missing some important information')],
+              explanation: "Yöntem bölümünde önemli bilgiler eksik: her grupta kaç kişi olduğu, katılımcılara tam olarak ne söylendiği. Daha fazla ayrıntı gerekiyor (A).",
+            },
+            {
+              number: 29,
+              prompt: 'Results',
+              answer: choice('C'),
+              evidence: [ev('p3-l28', 'A simple bar chart would make the pattern much clearer.')],
+              explanation: "Bütün puanlar büyük bir tabloda ve takip etmesi zor. Basit bir sütun grafiği daha anlaşılır olur: 'bar chart' = graph (C).",
+            },
+            {
+              number: 30,
+              prompt: 'Personal reflection',
+              answer: choice('D'),
+              evidence: [ev('p3-l30', 'so you can take it out completely')],
+              explanation: "Ders kişisel değerlendirme istemiyor, bu yüzden tamamen çıkarılabilir (D). Owen eke (appendix) taşımayı öneriyor ama Dr Grant 'No, I'd just delete it' diyor; F çeldirici.",
+            },
+          ],
+        },
+      ],
+    },
+
+    /* ───────────── Part 4 ───────────── */
+    {
+      number: 4,
+      context: 'You will hear part of a lecture about honeybees.',
+      speakers: [
+        { id: 'holt', name: 'Dr Clare Holt', role: 'Lecturer', gender: 'female', accent: 'american', ...VOICE.holt },
+      ],
+      script: [
+        L('p4-l1', 'holt', "Good afternoon, everyone. Today I'm going to talk about honeybees: how a colony is organised, how bees share information, how they make honey, and why so many colonies have been dying in some parts of the world."),
+        L('p4-l2', 'holt', "Let's start with the colony. A healthy colony can contain as many as sixty thousand bees, but only one of them, the queen, lays eggs. In summer, she can lay up to two thousand a day. Almost all the other bees are female workers, and what's remarkable is that a worker's job depends on her age, rather than her size or strength. Young workers stay inside the hive, cleaning cells and feeding the larvae. Only in the last two or three weeks of their lives do they fly out to collect food."),
+        L('p4-l3', 'holt', "The males, called drones, do no work at all. Their only purpose is to mate with a queen from another colony, and in autumn the workers simply push them out of the hive, so that they don't eat the colony's honey during the winter."),
+        L('p4-l4', 'holt', "Now, communication. When a worker finds a good source of food, she returns to the hive and performs what's known as the waggle dance. The angle of the dance tells the other bees which direction to fly in, compared with the position of the sun, and the length of the waggle tells them how far away the food is. The other bees follow the dancer closely in the dark hive, feeling her movements, and they also pick up the smell of the flowers she's visited."),
+        L('p4-l5', 'holt', "So how is honey actually made? Bees collect nectar from flowers, which is mostly water and sugar. Back at the hive, they pass it from bee to bee, and then spread it in the cells, where they fan it with their wings until most of the water has evaporated. Finally, they seal each cell with a thin layer of wax. Stored like this, honey can last for an extremely long time. Pots of honey found in ancient Egyptian tombs were reportedly still good to eat after three thousand years."),
+        L('p4-l6', 'holt', "Let's turn to the decline. In some countries, beekeepers have lost a third of their colonies in a single winter. There's no single cause. One factor is the loss of habitat: as farms have got bigger, many of the hedges and wild flowers that bees depend on have disappeared. Another is pesticides. Some of the chemicals used on crops don't kill bees directly, but they affect their memory, so the bees can't find their way back to the hive. And a third problem is a tiny parasite called the varroa mite, which feeds on bees and spreads disease."),
+        L('p4-l7', 'holt', "So what can be done? Governments in Europe have banned some of the most harmful pesticides. Farmers are being paid to plant strips of wild flowers along the edges of their fields. And people in cities can help, too. Bees actually do surprisingly well in urban areas, and a balcony full of flowers, or a garden where the grass isn't cut too often, can make a real difference. Some cities have even started planting flowers on the roofs of bus shelters."),
+        L('p4-l8', 'holt', "Next week, we'll look at other pollinators, such as butterflies and hoverflies, and at how much of our food depends on them."),
+      ],
+      questionGroups: [
+        {
+          id: 't4-g9',
+          type: 'gap_fill',
+          layout: 'notes',
+          instructions: 'Complete the notes below.\nWrite NO MORE THAN TWO WORDS for each answer.',
+          title: 'Honeybees',
+          wordLimit: NO_MORE_THAN_TWO_WORDS,
+          tip: 'Kural "en fazla iki kelime": cevapların çoğu tek kelime, bazıları iki kelime. Kayıtta duyduğunuz kelimeleri olduğu gibi yazın, kendi kelimelerinizle değiştirmeyin. Notlar dersi farklı kelimelerle özetler: "damage bees\' ___" ↔ "affect their memory", "receive money to grow" ↔ "are being paid to plant". Cevabın hemen yanında söylenen ikinci bir bilgi ("rather than her size", "during the winter") genellikle çeldiricidir.',
+          blocks: [
+            { kind: 'heading', text: 'The colony' },
+            { kind: 'bullet', text: 'up to 60,000 bees, but only one, the {{31}}, produces eggs' },
+            { kind: 'bullet', text: "a worker's role is determined by her {{32}}" },
+            { kind: 'bullet', text: 'drones (males) are forced to leave the hive in {{33}}' },
+            { kind: 'heading', text: 'Communication: the waggle dance' },
+            { kind: 'bullet', text: 'angle of the dance = direction of the food in relation to the {{34}}' },
+            { kind: 'bullet', text: '{{35}} of the waggle = distance to the food' },
+            { kind: 'heading', text: 'Making honey' },
+            { kind: 'bullet', text: 'bees gather {{36}} from flowers' },
+            { kind: 'bullet', text: 'water evaporates as the bees fan it with their wings' },
+            { kind: 'bullet', text: 'each cell is then covered with {{37}}' },
+            { kind: 'heading', text: 'Why colonies are dying' },
+            { kind: 'bullet', text: 'loss of habitat as farms get bigger' },
+            { kind: 'bullet', text: "some pesticides damage bees' {{38}}, so they cannot find the hive" },
+            { kind: 'bullet', text: 'the varroa mite spreads disease' },
+            { kind: 'heading', text: 'Solutions' },
+            { kind: 'bullet', text: 'farmers receive money to grow {{39}} around field margins' },
+            { kind: 'bullet', text: 'in some cities, flowers now grow on top of {{40}}' },
+          ],
+          questions: [
+            {
+              number: 31,
+              answer: text('queen'),
+              evidence: [ev('p4-l2', 'but only one of them, the queen, lays eggs')],
+              explanation: "Bir kolonide 60.000'e kadar arı olabilir, ama yalnızca bir tanesi, kraliçe, yumurta bırakır: 'produces eggs' = 'lays eggs'.",
+            },
+            {
+              number: 32,
+              answer: text('age'),
+              evidence: [ev('p4-l2', "a worker's job depends on her age, rather than her size or strength")],
+              explanation: "İşçi arının görevi büyüklüğüne ya da gücüne değil yaşına bağlı: genç işçiler kovanda kalır, yaşlılar yiyecek toplar. Size ve strength çeldirici.",
+            },
+            {
+              number: 33,
+              answer: text('autumn'),
+              evidence: [ev('p4-l3', 'in autumn the workers simply push them out of the hive')],
+              explanation: "Erkek arılar sonbaharda kovandan atılıyor, böylece kışın koloninin balını yemiyorlar. 'Winter' çeldirici: atılma zamanı değil, balın korunduğu dönem.",
+            },
+            {
+              number: 34,
+              answer: text('sun'),
+              evidence: [ev('p4-l4', 'compared with the position of the sun')],
+              explanation: "Dansın açısı, yiyeceğin yönünü güneşin konumuna göre gösteriyor: 'compared with the position of the sun'. Notta 'in relation to the' = 'compared with the position of the'. 'Position' tek başına yanlış; 'sun's position' da kayıttaki biçim değil.",
+            },
+            {
+              number: 35,
+              answer: text('length'),
+              evidence: [ev('p4-l4', 'and the length of the waggle tells them how far away the food is')],
+              explanation: "Sallanma dansının (waggle) uzunluğu yiyeceğin ne kadar uzakta olduğunu gösteriyor. 'Angle' çeldirici: açı mesafeyi değil yönü gösteriyor.",
+            },
+            {
+              number: 36,
+              answer: text('nectar'),
+              evidence: [ev('p4-l5', 'Bees collect nectar from flowers')],
+              explanation: "Arılar çiçeklerden nektar topluyor; nektar çoğunlukla su ve şekerden oluşuyor. 'Water' ve 'sugar' nektarın içeriği, toplanan şey değil.",
+            },
+            {
+              number: 37,
+              answer: text('wax'),
+              evidence: [ev('p4-l5', 'they seal each cell with a thin layer of wax')],
+              explanation: "Her petek gözü ince bir balmumu tabakasıyla kapatılıyor: 'a thin layer of wax'. Kayıtta 'beeswax' değil 'wax' geçiyor; duyduğunuz kelimeyi yazın.",
+            },
+            {
+              number: 38,
+              answer: text('memory'),
+              evidence: [ev('p4-l6', 'but they affect their memory, so the bees can\'t find their way back to the hive')],
+              explanation: "Bazı tarım ilaçları arıları doğrudan öldürmüyor ama hafızalarını etkiliyor, bu yüzden arılar kovanın yolunu bulamıyor. 'Damage bees' ___' = 'affect their memory'.",
+            },
+            {
+              number: 39,
+              answer: text('wild flowers', 'wildflowers'),
+              evidence: [ev('p4-l7', 'Farmers are being paid to plant strips of wild flowers along the edges of their fields.')],
+              explanation: "Çiftçilere tarlalarının kenarına kır çiçeği şeritleri ekmeleri için para ödeniyor. Notta farklı kelimeler var: 'receive money to grow' = 'are being paid to plant', 'field margins' = 'the edges of their fields'. İki kelimelik bir cevap; 'flowers' tek başına eksik kalır.",
+            },
+            {
+              number: 40,
+              answer: text('bus shelters'),
+              evidence: [ev('p4-l7', 'Some cities have even started planting flowers on the roofs of bus shelters.')],
+              explanation: "Bazı şehirler otobüs duraklarının çatılarına çiçek ekiyor: 'on top of' = 'on the roofs of'. Balkonlar ve bahçeler de geçiyor ama çatılarına çiçek ekilen yer otobüs durakları. İki kelime ve çoğul yazılmalı.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const ieltsListeningTests: IeltsListeningTest[] = [test1, test2, test3, test4];

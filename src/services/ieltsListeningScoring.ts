@@ -49,15 +49,17 @@ export function partRange(part: IeltsListeningPart): [number, number] {
 
 const NUMBER = /^\d[\d,.]*$/;
 
+/** "9:30" → "9.30"; "9.30pm" / "9.30 p.m." → "9.30 pm". */
+const clockTimes = (value: string): string =>
+  value.replace(/(\d):(\d)/g, '$1.$2').replace(/(\d)\s*([ap])\.?m\.?(?=\s|$)/g, '$1 $2m');
+
 /** Case, spacing, punctuation, currency symbols and "9:30" vs "9.30" do not matter. */
 export function canonicalAnswer(value: string): string {
-  return normalizeAnswer(value.replace(/[£$€]/g, ''))
-    .replace(/(\d):(\d)/g, '$1.$2')
-    .replace(/^(the|a|an) /, '');
+  return clockTimes(normalizeAnswer(value.replace(/[£$€]/g, ''))).replace(/^(the|a|an) /, '');
 }
 
 export function countWords(value: string): { words: number; numbers: number } {
-  const tokens = normalizeAnswer(value.replace(/[£$€]/g, '')).split(' ').filter(Boolean);
+  const tokens = clockTimes(normalizeAnswer(value.replace(/[£$€]/g, ''))).split(' ').filter(Boolean);
   const numbers = tokens.filter(token => NUMBER.test(token)).length;
   return { words: tokens.length - numbers, numbers };
 }
