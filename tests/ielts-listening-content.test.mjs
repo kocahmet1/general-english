@@ -24,9 +24,9 @@ const { ieltsListeningAudio } = await loadModule('../src/data/ieltsListeningAudi
 const { markTest, markGroup, markTextAnswer, isOverWordLimit, bandForRaw, rawForBand, questionPrompt, expectedLabel } = scoring;
 const TIME = /^\d{1,2}\.\d{2}/;
 
-test('three tests with unique ids', () => {
-  assert.equal(ieltsListeningTests.length, 3);
-  assert.equal(new Set(ieltsListeningTests.map(t => t.id)).size, 3);
+test('four tests with unique ids', () => {
+  assert.equal(ieltsListeningTests.length, 4);
+  assert.equal(new Set(ieltsListeningTests.map(t => t.id)).size, 4);
 });
 
 test('band conversion follows the IELTS listening table', () => {
@@ -47,6 +47,8 @@ test('typed answers: case, currency, articles, word limits, spelling and plurals
   const limit = { maxWords: 1, allowNumber: true, label: 'ONE WORD AND/OR A NUMBER' };
   assert.equal(markTextAnswer(key, '9:30', limit).isCorrect, true);
   assert.equal(markTextAnswer(key, ' 9.30 AM ', limit).isCorrect, true);
+  assert.equal(markTextAnswer(key, '9:30 am', limit).isCorrect, true, 'a colon time with am/pm fits the limit');
+  assert.equal(markTextAnswer(key, '9.30a.m.', limit).isCorrect, true);
   assert.equal(markTextAnswer({ kind: 'text', accepted: ['54'] }, '£54', limit).isCorrect, true);
   assert.equal(markTextAnswer({ kind: 'text', accepted: ['station'] }, 'railway station', limit).issue, 'word_limit');
   assert.equal(markTextAnswer({ kind: 'text', accepted: ['station'] }, 'the station', limit).isCorrect, true);

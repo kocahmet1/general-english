@@ -37,6 +37,7 @@
 .il-level-easy { background: #1f8a4c; }
 .il-level-medium { background: #a46a0a; }
 .il-level-hard { background: #b4452c; }
+.il-level-advanced { background: #6b3fa0; }
 .il-card .completed-badge { margin-left: auto; }
 .il-card-score { margin: 0 0 14px; font-size: .9rem; color: var(--text-secondary); }
 .il-card-score strong { color: var(--text-primary); font-size: 1.05rem; }

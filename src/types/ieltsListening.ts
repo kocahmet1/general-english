@@ -129,7 +129,7 @@ export interface IeltsListeningTest {
   title: string;
   /** Shown on the card, e.g. 'Kolay'. */
   level: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'advanced';
   description: string;
   parts: IeltsListeningPart[];
 }
